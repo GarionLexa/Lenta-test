@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    
+    <!-- Настройки для обложки ссылки (Open Graph) -->
+    <title>ЛЕНТА: Мониторинг доставок</title>
+    <meta name="description" content="База гипермаркетов и схем заездов для водителей логистики.">
+    <meta property="og:title" content="ЛЕНТА ЛОГИСТИКА: Мониторинг доставок">
+    <meta property="og:description" content="Схемы подъездов к РЦ и гипермаркетам.">
+    <meta property="og:image" content="1790837126974.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="1790837126974.jpg">
+    
+    <!-- Иконки сайта и для добавления на экран "Домой" -->
+    <link rel="icon" href="1790837126974.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="1790837126974.jpg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        lentaBlue: '#004182',
+                        lentaDark: '#002B5E',
+                        lentaDarker: '#001A3D',
+                        lentaYellow: '#FDCB05',
+                        lentaYellowHover: '#E5B704'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #001A3D;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Эффект матового стекла */
+        .glass-menu {
+            background: rgba(0, 43, 94, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(253, 203, 5, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .glass-modal {
+            background: rgba(0, 26, 61, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(253, 203, 5, 0.6);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.85);
+        }
+
+        .table-container {
+            max-height: calc(100vh - 290px);
+            min-height: 350px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior-y: contain;
+            padding-bottom: 120px; /* Отступ чтобы на телефоне не резался низ */
+        }
+        
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #002B5E;
+            z-index: 10;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #001A3D; }
+        ::-webkit-scrollbar-thumb { background: #004182; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FDCB05; }
+        
+        .city-slider {
+            display: flex;
+            overflow-x: auto;
+            overscroll-behavior-x: touch; 
+            touch-action: pan-x; 
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+        .city-slider::-webkit-scrollbar { display: none; }
+
+        .tactile-btn {
+            transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .tactile-btn:active {
+            transform: scale(0.93);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-animate {
+            animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes micPulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.9); }
+            70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .mic-pulsing {
+            animation: micPulse 1.4s infinite;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-3 min-h-screen relative">
+
+    <!-- Модальное окно выбора навигатора -->
+    <div id="navModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-modal rounded-3xl p-6 md:p-8 max-w-sm w-full text-center relative modal-animate">
+            <button onclick="playClickSound(); closeNavModal();" class="absolute top-3 right-3 text-blue-300 hover:text-white bg-lentaDark p-2 rounded-full transition-colors border border-blue-800 cursor-pointer tactile-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-lg md:text-xl font-black text-white mb-1 uppercase tracking-wide">Выберите навигатор</h3>
+            <p class="text-xs text-blue-200 mb-6 font-medium">Открытие маршрута в приложении</p>
+            
+            <div class="flex flex-wrap justify-center gap-4 my-2">
+                <button onclick="playClickSound(); executeNavigation('yandex');" class="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 border-4 border-yellow-200 text-lentaDark font-black flex flex-col items-center justify-center shadow-lg shadow-yellow-500/40 tactile-btn cursor-pointer">
+                    <span class="text-2xl mb-0.5">🟡</span>
+                    <span class="text-xs uppercase tracking-wider font-extrabold text-white drop-shadow-md">Яндекс</span>
+                </button>
+                
+                <button onclick="playClickSound(); executeNavigation('2gis');" class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-green-700 border-4 border-emerald-200 text-white font-black flex flex-col items-center justify-center shadow-lg shadow-emerald-500/40 tactile-btn cursor-pointer">
+                    <span class="text-2xl mb-0.5">🟢</span>
+                    <span class="text-xs uppercase tracking-wider font-extrabold text-white drop-shadow-md">2ГИС</span>
+                </button>
+                
+                <button onclick="playClickSound(); executeNavigation('google');" class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-indigo-700 border-4 border-blue-200 text-white font-black flex flex-col items-center justify-center shadow-lg shadow-blue-500/40 tactile-btn cursor-pointer">
+                    <span class="text-2xl mb-0.5">🔵</span>
+                    <span class="text-xs uppercase tracking-wider font-extrabold text-white drop-shadow-md">Google</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto space-y-2">
+        <header class="glass-menu p-3 sm:p-4 rounded-2xl shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-lentaYellow/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-row items-start justify-between gap-2 mb-3 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center shadow-lg border-2 border-lentaDark relative overflow-hidden shrink-0">
+                        <!-- Оригинальный векторный подсолнух Ленты -->
+                        <svg class="w-9 h-9" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 2 C55 18, 55 35, 50 48 C45 35, 45 18, 50 2 Z" fill="#FEE140" stroke="#D97706" stroke-width="1.5"/>
+                            <path d="M50 98 C55 82, 55 65, 50 52 C45 65, 45 82, 50 98 Z" fill="#F59E0B" stroke="#D97706" stroke-width="1.5"/>
+                            <path d="M2 50 C18 45, 35 45, 48 50 C35 55, 18 55, 2 50 Z" fill="#FEE140" stroke="#D97706" stroke-width="1.5"/>
+                            <path d="M98 50 C82 45, 65 45, 52 50 C65 55, 82 55, 98 50 Z" fill="#F59E0B" stroke="#D97706" stroke-width="1.5"/>
+                            <circle cx="50" cy="50" r="18" fill="#78350F"/>
+                            <circle cx="50" cy="50" r="14" fill="#451A03"/>
+                            <circle cx="50" cy="50" r="8" fill="#1E1B4B"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-base md:text-xl font-black text-white tracking-wide uppercase flex items-center gap-2">
+                            ЛЕНТА <span class="bg-lentaYellow text-lentaDark px-2 py-0.5 rounded text-xs font-bold shadow-sm">ЛОГИСТИКА</span>
+                        </h1>
+                        <div class="text-[10px] md:text-xs text-blue-200 font-medium tracking-wide mt-0.5">
+                            Мониторинг доставок <span class="text-lentaYellow/90 font-bold ml-1 whitespace-nowrap">📍 Схемы: Дмитрий Шаров</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Компактная кнопка скачивания APK -->
+                <a href="./app.apk" download="Lenta_Logistics.apk" onclick="playClickSound()" title="Установить приложение Android" class="shrink-0 flex items-center justify-center gap-1.5 px-2.5 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 rounded-lg text-[10px] md:text-xs font-bold transition-all tactile-btn cursor-pointer shadow-sm mt-0.5">
+                    <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span class="hidden sm:inline">Скачать</span> APK
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 relative z-30 mb-2">
+                <div class="relative sm:col-span-8 flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-lentaYellow">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <input type="text" id="searchInput" placeholder="Номер ТК, адрес, город, О'кей..." 
+                               class="bg-lentaDark/90 border-2 border-lentaDarker text-white placeholder-blue-300 text-xs md:text-sm rounded-xl focus:ring-0 focus:border-lentaYellow block w-full pl-9 pr-9 py-2.5 outline-none transition-all shadow-inner">
+
+                        <button id="clearSearchBtn" onclick="playClickSound(); clearSearch();" class="hidden absolute right-2.5 top-2.5 text-blue-300 hover:text-lentaYellow transition-colors cursor-pointer z-40 bg-lentaDark p-1 rounded-full shadow-md border border-blue-800 tactile-btn">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <button id="voiceSearchBtn" onclick="playClickSound(); startVoiceSearch();" class="bg-lentaDark hover:bg-lentaBlue border-2 border-blue-700 text-blue-200 w-11 h-11 rounded-xl transition-all shadow-lg flex items-center justify-center shrink-0 cursor-pointer tactile-btn" title="Голосовой поиск">
+                        <svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    </button>
+
+                    <div id="autocompleteList" class="absolute z-[100] w-[calc(100%-3.5rem)] glass-menu rounded-xl hidden max-h-[40vh] overflow-y-auto mt-1 text-left text-white top-full left-0 shadow-2xl"></div>
+                </div>
+                
+                <div class="sm:col-span-4 relative z-20">
+                    <div class="relative w-full">
+                        <button id="customFilterBtn" onclick="playClickSound()" class="bg-lentaDark/90 border-2 border-lentaDarker text-white text-xs md:text-sm rounded-xl focus:ring-0 focus:border-lentaYellow w-full py-2.5 px-3 outline-none transition-all shadow-inner flex justify-between items-center text-left cursor-pointer tactile-btn">
+                            <span id="customFilterText">Все режимы работы</span>
+                            <svg class="h-4 w-4 text-lentaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        
+                        <div id="customFilterList" class="absolute z-50 w-full glass-menu rounded-xl hidden flex-col mt-1 text-left text-white overflow-hidden shadow-2xl border border-blue-800/50">
+                            <div class="filter-option px-3.5 py-2 hover:bg-lentaBlue cursor-pointer transition-colors border-b border-blue-800/30 text-xs" data-value="all">Все режимы работы</div>
+                            <div class="filter-option px-3.5 py-2 hover:bg-lentaBlue cursor-pointer transition-colors border-b border-blue-800/30 text-xs" data-value="24/7">Круглосуточные</div>
+                            <div class="filter-option px-3.5 py-2 hover:bg-lentaBlue cursor-pointer transition-colors text-xs" data-value="limited">С ограничением</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative z-10 pt-1.5 border-t border-blue-800/60">
+                <div class="text-[10px] uppercase font-bold tracking-wider text-blue-200 mb-1.5 flex items-center justify-between">
+                    <span>📍 Города маршрута</span>
+                    <span id="cityCounter" class="text-lentaYellow font-bold">Все города</span>
+                </div>
+                <div id="citySlider" class="city-slider gap-1.5 py-0.5 text-xs"></div>
+            </div>
+        </header>
+
+        <div class="table-container relative z-10">
+            <table class="w-full text-sm text-left text-blue-100">
+                <thead class="text-xs text-blue-300 uppercase bg-lentaDark shadow-md hidden md:table-header-group">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 font-bold w-44">Бренд / ТК</th>
+                        <th scope="col" class="px-4 py-3 font-bold w-32">Город</th>
+                        <th scope="col" class="px-4 py-3 font-bold">Адрес и Навигация</th>
+                        <th scope="col" class="px-4 py-3 font-bold w-40">Время приёма</th>
+                        <th scope="col" class="px-4 py-3 font-bold w-32">Режим работы</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="block md:table-row-group space-y-3 md:space-y-0 p-0.5 md:p-0"></tbody>
+            </table>
+        </div>
+        
+        <div class="text-[11px] text-blue-300 flex justify-between font-semibold px-2 relative z-20">
+            <span id="rowCount" class="bg-lentaDark px-2.5 py-1 rounded-lg border border-lentaBlue shadow-inner">Загрузка данных...</span>
+            <span class="bg-lentaDark px-2.5 py-1 rounded-lg border border-lentaBlue shadow-inner">Маршрут: 8092</span>
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        ['click', 'touchstart', 'touchend', 'touchmove', 'keydown', 'pointerdown', 'scroll', 'wheel', 'mousemove'].forEach(evt => {
+            document.addEventListener(evt, () => {
+                getAudioContext();
+            }, { passive: true });
+        });
+
+        function playClickSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                if (ctx.state === 'suspended') ctx.resume();
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(450, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.05);
+                
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
+        let lastScrollTickTime = 0;
+        let lastScrollTop = 0;
+        let accumulatedScrollDist = 0;
+        
+        function playTickSound(scrollSpeed = 1) {
+            try {
+                const now = Date.now();
+                if (scrollSpeed < 0.2) return;
+
+                accumulatedScrollDist += scrollSpeed * 12;
+                const threshold = Math.max(60, Math.min(220, 220 / (scrollSpeed * 0.5)));
+                
+                if (accumulatedScrollDist < threshold) return;
+                if (now - lastScrollTickTime < 40) return;
+
+                accumulatedScrollDist = 0;
+                lastScrollTickTime = now;
+                
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                if (ctx.state === 'suspended') ctx.resume();
+
+                const osc = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'square';
+                osc2.type = 'sawtooth';
+
+                osc.frequency.setValueAtTime(240, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.02);
+
+                osc2.frequency.setValueAtTime(480, ctx.currentTime);
+                osc2.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.02);
+                
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
+                
+                osc.connect(gain);
+                osc2.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc2.start();
+                osc.stop(ctx.currentTime + 0.02);
+                osc2.stop(ctx.currentTime + 0.02);
+            } catch (e) {}
+        }
+
+        const rawData = `203	8092	ООО "Лента", 620000, Свердловская обл., г. Екатеринбург, Дублер Сибирского тракта, д. 19, корп. 1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+227	8092	ООО "Лента", 620016, Свердловская обл., г. Екатеринбург, Академика Сахарова пр-кт, д. 107/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+228	8092	ООО "Лента", 620017, Свердловск
