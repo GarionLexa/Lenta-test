@@ -177,6 +177,52 @@
         @keyframes weatherFallSnow { 0% { background-position: 0 0, 20px 20px; } 100% { background-position: 30px 60px, 0px 40px; } }
         @keyframes weatherFallLeaves { 0% { background-position: 0 -70px, 30px -90px, 15px -50px; } 100% { background-position: 70px 70px, -30px 90px, 65px 50px; } }
 
+        /* ЗНАКИ И ПОЛИЦИЯ */
+        .parallax-signs {
+            position: absolute; bottom: 18px; left: 0; width: 2000vw; height: 40px; z-index: 9;
+            background-image: 
+                /* Уступи дорогу (Перевернутый белый треугольник с красной каймой) */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='40' viewBox='0 0 1200 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"),
+                /* Главная дорога (Желтый ромб) */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1700' height='40' viewBox='0 0 1700 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+            /* Огромный отступ между знаками, чтобы они встречались редко */
+            background-size: 1200px 40px, 1700px 40px;
+            background-repeat: repeat-x;
+            will-change: transform;
+        }
+
+        .police-car {
+            position: absolute; bottom: 4px; right: -150px; width: 60px; height: 20px;
+            background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%);
+            border-radius: 6px 10px 4px 4px;
+            z-index: 25; /* Между дорогой и фурами */
+            transform: scaleX(-1); /* Едет влево */
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .police-car.active {
+            display: block;
+            animation: driveOpposite 4.5s linear forwards; /* Сильно замедлили машину (было 2s, стало 4.5s) */
+        }
+        .police-siren-red {
+            position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
+            animation: sirenRed 0.4s infinite;
+        }
+        .police-siren-blue {
+            position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
+            animation: sirenBlue 0.4s infinite;
+        }
+        /* Строгое чередование свечения сирен */
+        @keyframes sirenRed { 
+            0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 
+            50%, 100% { box-shadow: none; background: #991b1b; } 
+        }
+        @keyframes sirenBlue { 
+            0%, 49% { box-shadow: none; background: #1e3a8a; } 
+            50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } 
+        }
+        @keyframes driveOpposite { 0% { right: -150px; } 100% { right: 120vw; } }
+
         .city-slider {
             display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; 
             scrollbar-width: none; overscroll-behavior-x: contain;
@@ -220,6 +266,15 @@
             background-repeat: no-repeat;
         }
         
+        @keyframes truckBump {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-2px); }
+        }
+        
+        .auto-driving .truck-wrapper {
+            animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s);
+        }
+
         .dark .city-name-plaque {
             background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
         }
@@ -275,7 +330,8 @@
             
             <div class="flex flex-row items-center justify-between gap-4 mb-4">
                 <div class="flex items-center gap-3 shrink-0">
-                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="Включить музыку и автопилот!">
+                    <!-- ИНТЕРАКТИВНЫЙ ПОДСОЛНУХ (Музыка и Автопилот) -->
+                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Музыка/Пауза. 2 Тапа: Сброс в начало!">
                         <img id="logoImage" src="icon.png" alt="Логотип" class="w-full h-full object-cover transition-transform group-hover:scale-105">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent pointer-events-none rounded-full mix-blend-overlay"></div>
                     </div>
@@ -339,7 +395,21 @@
                     <div id="layerLeaves" class="weather-layer leaves-anim"></div>
                     <div id="layerSnow" class="weather-layer snow-anim"></div>
 
+                    <!-- Добавленные знаки и полицейская машина -->
+                    <div id="layerSigns" class="parallax-signs"></div>
                     <div id="layerRoad" class="parallax-road"></div>
+                    
+                    <div id="policeCar" class="police-car">
+                        <div class="police-siren-red"></div>
+                        <div class="police-siren-blue"></div>
+                        <div class="absolute top-1 left-2 w-4 h-3 bg-sky-200/50 rounded-sm"></div>
+                        <div class="absolute top-1 right-2 w-6 h-3 bg-sky-200/50 rounded-sm"></div>
+                        <div class="absolute bottom-[-2px] left-2 w-3.5 h-3.5 bg-gray-800 rounded-full border border-gray-400"></div>
+                        <div class="absolute bottom-[-2px] right-2 w-3.5 h-3.5 bg-gray-800 rounded-full border border-gray-400"></div>
+                        <!-- Фары -->
+                        <div class="absolute bottom-1 right-0 w-2 h-2 bg-yellow-200 rounded-full shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]"></div>
+                        <div class="absolute bottom-1 left-0 w-1 h-2 bg-red-500 rounded-full"></div>
+                    </div>
 
                     <!-- Контейнер для фур -->
                     <div id="citySlider" class="city-slider relative z-30 cursor-pointer"></div>
@@ -507,18 +577,30 @@
         let lastLogoTapTime = 0;
         let autoScrollAnimationId = null;
 
+        // ==========================================
+        // ЛОГИКА ПОДСОЛНУХА (Одиночный и Двойной ТАП)
+        // ==========================================
         function handleLogoTap() {
             unlockAudio(); // Гарантированная разблокировка
             const now = Date.now();
             
             if (now - lastLogoTapTime < 400) {
-                // Двойной тап - начинаем музыку заново
+                // ----------------------------------------------------
+                // ДВОЙНОЙ ТАП - СТОП И СБРОС (Reset to start)
+                // ----------------------------------------------------
+                bgMusic.pause();
                 bgMusic.currentTime = 0;
-                if (!isMusicPlaying) {
-                    toggleMusicState();
-                }
+                isMusicPlaying = false;
+                document.getElementById('logoImage').classList.remove('record-spin');
+                stopAutoScroll(); 
+                
+                // Сброс сцены и фур в самое начало!
+                resetTrucksToStart();
+                
             } else {
-                // Одиночный тап - плей/пауза
+                // ----------------------------------------------------
+                // ОДИНОЧНЫЙ ТАП - ПЛЕЙ / ПАУЗА
+                // ----------------------------------------------------
                 toggleMusicState();
             }
             lastLogoTapTime = now;
@@ -527,11 +609,14 @@
         function toggleMusicState() {
             const logo = document.getElementById('logoImage');
             if (isMusicPlaying) {
+                // СТАВИМ НА ПАУЗУ
                 bgMusic.pause();
                 isMusicPlaying = false;
                 logo.classList.remove('record-spin'); // Останавливаем пластинку
-                stopAutoScroll(); // Останавливаем караван
+                stopAutoScroll(); // Останавливаем караван (фуры замирают на месте)
+                // *После этого можно листать фуры вручную*
             } else {
+                // ИГРАЕМ МУЗЫКУ И ЗАПУСКАЕМ КИНО
                 const playPromise = bgMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
@@ -547,6 +632,17 @@
                     });
                 }
             }
+        }
+
+        function resetTrucksToStart() {
+            // Заново собираем список фур в исходном порядке
+            buildCitySlider(); 
+            // Сбрасываем скролл и переменные
+            citySlider.scrollLeft = 0;
+            virtualScrollX = 0;
+            lastActualScrollLeft = 0;
+            // Отматываем природу на 0 (Утро, чистое небо)
+            updateParallax(0);
         }
 
         const citySlider = document.getElementById('citySlider');
@@ -578,6 +674,7 @@
         function startAutoScroll() {
             if (!autoScrollAnimationId) {
                 lastActualScrollLeft = citySlider.scrollLeft;
+                citySlider.classList.add('auto-driving');
                 autoScrollLoop();
             }
         }
@@ -587,16 +684,39 @@
                 cancelAnimationFrame(autoScrollAnimationId);
                 autoScrollAnimationId = null;
             }
+            citySlider.classList.remove('auto-driving');
+            // Глушим мотор при остановке автопилота
+            if (engineGain) {
+                engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
+            }
+            // Прячем полицию, если она была на экране
+            document.getElementById('policeCar').classList.remove('active');
         }
+
+        let policeTimer = 0;
 
         function autoScrollLoop() {
             if (!isMusicPlaying) return;
 
-            const speed = 1.2; // Идеальная скорость движения каравана
+            // ЗАМЕДЛИЛИ ФУРЫ (было 1.2, стало 0.6)
+            const speed = 0.6; 
             virtualScrollX += speed;
             citySlider.scrollLeft += speed;
             
             playEngineSound(0.4); // Легкое урчание дизеля на автопилоте
+
+            // Полицейская машина пролетает навстречу (примерно раз в 10-15 сек)
+            policeTimer++;
+            if (policeTimer > 600) { 
+                if (Math.random() > 0.98) {
+                    const pCar = document.getElementById('policeCar');
+                    if (!pCar.classList.contains('active')) {
+                        pCar.classList.add('active');
+                        setTimeout(() => { pCar.classList.remove('active'); }, 4500); // Время совпадает с анимацией 4.5s
+                        policeTimer = 0;
+                    }
+                }
+            }
 
             // Магия бесконечной ленты: если первая фура уехала за край экрана, переставляем её в конец!
             if (citySlider.firstElementChild) {
@@ -619,6 +739,7 @@
             document.getElementById('layerMountains').style.transform = `translate3d(-${(vX * 0.2) % 200}px, 0, 0)`;
             document.getElementById('layerTrees').style.transform = `translate3d(-${(vX * 0.5) % 100}px, 0, 0)`;
             document.getElementById('layerRoad').style.transform = `translate3d(-${(vX * 0.9) % 40}px, 0, 0)`;
+            document.getElementById('layerSigns').style.transform = `translate3d(-${(vX * 0.9) % 1000}px, 0, 0)`; // Знаки едут вместе с дорогой
 
             // Смена дня и ночи (Плавный цикл туда-обратно каждые 3000 пикселей)
             const cycleLength = 3000;
@@ -859,8 +980,11 @@
             const label = isAll ? '🌐 ВСЕ ГОРОДА' : city;
             const cabHtml = cabVariants[index % cabVariants.length];
 
+            const bumpDelay = (index * 0.37) % 2; 
+            const bumpDuration = 1.1 + (index % 3) * 0.15; 
+
             btn.innerHTML = `
-                <div class="truck-wrapper flex items-end">
+                <div class="truck-wrapper flex items-end" style="--bump-del: -${bumpDelay}s; --bump-dur: ${bumpDuration}s;">
                     <div class="trailer h-10 md:h-11 min-w-[150px] max-w-[180px] rounded-l-md border-y border-l border-b-2 border-gray-300 shadow-md flex relative z-10 overflow-hidden transition-all duration-300 group-hover:border-lentaBlue lenta-trailer-bg">
                         <div class="tail-light"></div>
                         <div class="w-full h-full relative flex items-center justify-center overflow-hidden lenta-fruit-bg">
