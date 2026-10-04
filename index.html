@@ -185,7 +185,6 @@
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='40' viewBox='0 0 1200 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"),
                 /* Главная дорога (Желтый ромб) */
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1700' height='40' viewBox='0 0 1700 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
-            /* Огромный отступ между знаками, чтобы они встречались редко */
             background-size: 1200px 40px, 1700px 40px;
             background-repeat: repeat-x;
             will-change: transform;
@@ -195,14 +194,14 @@
             position: absolute; bottom: 4px; right: -150px; width: 60px; height: 20px;
             background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%);
             border-radius: 6px 10px 4px 4px;
-            z-index: 25; /* Между дорогой и фурами */
-            transform: scaleX(-1); /* Едет влево */
+            z-index: 25; 
+            transform: scaleX(-1);
             display: none;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         .police-car.active {
             display: block;
-            animation: driveOpposite 4.5s linear forwards; /* Сильно замедлили машину (было 2s, стало 4.5s) */
+            animation: driveOpposite 4.5s linear forwards; 
         }
         .police-siren-red {
             position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
@@ -212,7 +211,6 @@
             position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
             animation: sirenBlue 0.4s infinite;
         }
-        /* Строгое чередование свечения сирен */
         @keyframes sirenRed { 
             0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 
             50%, 100% { box-shadow: none; background: #991b1b; } 
@@ -345,7 +343,7 @@
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-2 shrink-0">
+                <div class="flex items-center gap-1.5 shrink-0">
                     <!-- Кнопка Темы (День/Ночь) Ручное управление -->
                     <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-10 h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn" title="Сменить тему">
                         <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -698,10 +696,11 @@
         function autoScrollLoop() {
             if (!isMusicPlaying) return;
 
-            // ЗАМЕДЛИЛИ ФУРЫ (было 1.2, стало 0.6)
+            // Скорость колонны
             const speed = 0.6; 
-            virtualScrollX += speed;
-            citySlider.scrollLeft += speed;
+            
+            // Фон (горы, дорога, деревья) едет влево, создавая эффект движения вперед
+            virtualScrollX += speed; 
             
             playEngineSound(0.4); // Легкое урчание дизеля на автопилоте
 
@@ -712,22 +711,26 @@
                     const pCar = document.getElementById('policeCar');
                     if (!pCar.classList.contains('active')) {
                         pCar.classList.add('active');
-                        setTimeout(() => { pCar.classList.remove('active'); }, 4500); // Время совпадает с анимацией 4.5s
+                        setTimeout(() => { pCar.classList.remove('active'); }, 4500); 
                         policeTimer = 0;
                     }
                 }
             }
 
-            // Магия бесконечной ленты: если первая фура уехала за край экрана, переставляем её в конец!
-            if (citySlider.firstElementChild) {
-                const firstItem = citySlider.firstElementChild;
-                const itemWidth = firstItem.offsetWidth + 20; // 20 - это margin-right
-                
-                if (citySlider.scrollLeft >= itemWidth) {
-                    citySlider.appendChild(firstItem); // Перенос в конец
-                    citySlider.scrollLeft -= itemWidth; // Сброс скролла без дерганий
-                    lastActualScrollLeft = citySlider.scrollLeft; // Синхронизация
+            // Магия бесконечной ленты (Теперь фуры едут ВПРАВО!)
+            if (citySlider.lastElementChild) {
+                // Если мы уперлись в левый край, берем последнюю фуру и ставим в самое начало
+                if (citySlider.scrollLeft <= 1) {
+                    const lastItem = citySlider.lastElementChild;
+                    const itemWidth = lastItem.offsetWidth + 20; // 20 - это margin-right
+                    
+                    citySlider.prepend(lastItem); // Переносим в начало
+                    citySlider.scrollLeft += itemWidth; // Незаметно компенсируем скролл, чтобы не было рывка
                 }
+                
+                // Двигаем "камеру" влево, из-за чего фуры на экране физически едут ВПРАВО
+                citySlider.scrollLeft -= speed;
+                lastActualScrollLeft = citySlider.scrollLeft; // Синхронизация
             }
 
             updateParallax(virtualScrollX);
