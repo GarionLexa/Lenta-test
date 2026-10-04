@@ -3,23 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    
-    <!-- Настройки для обложки ссылки (Open Graph) -->
     <title>ЛЕНТА: Мониторинг доставок</title>
-    <meta name="description" content="База гипермаркетов и схем заездов для водителей логистики.">
-    <meta property="og:title" content="ЛЕНТА ЛОГИСТИКА: Мониторинг доставок">
-    <meta property="og:description" content="Схемы подъездов к РЦ и гипермаркетам.">
-    <meta property="og:image" content="1790837126974.jpg">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="1790837126974.jpg">
     
-    <!-- Иконки сайта и для добавления на экран "Домой" -->
-    <link rel="icon" href="1790837126974.jpg" type="image/jpeg">
-    <link rel="apple-touch-icon" href="1790837126974.jpg">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
@@ -28,9 +16,17 @@
                     colors: {
                         lentaBlue: '#004182',
                         lentaDark: '#002B5E',
-                        lentaDarker: '#001A3D',
                         lentaYellow: '#FDCB05',
-                        lentaYellowHover: '#E5B704'
+                        lentaYellowHover: '#E5B704',
+                        bgSoft: '#F4F7FA',
+                        cardWhite: '#FFFFFF',
+                        textMain: '#1F2937',
+                        textMuted: '#6B7280'
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.06)',
+                        'float': '0 20px 40px -10px rgba(0,65,130,0.15)',
+                        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)'
                     }
                 }
             }
@@ -38,125 +34,136 @@
     </script>
     <style>
         body {
-            background-color: #001A3D;
-            color: #f1f5f9;
+            background-color: #F4F7FA;
+            color: #1F2937;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
         
-        /* Эффект матового стекла */
-        .glass-menu {
-            background: rgba(0, 43, 94, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(253, 203, 5, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        /* 3D Параллакс фон */
+        .parallax-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .parallax-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            opacity: 0.6;
+        }
+        .shape-1 { width: 40vw; height: 40vw; background: rgba(253, 203, 5, 0.2); top: -10%; left: -10%; }
+        .shape-2 { width: 50vw; height: 50vw; background: rgba(0, 65, 130, 0.15); bottom: -15%; right: -15%; }
+        .shape-3 { width: 30vw; height: 30vw; background: rgba(0, 163, 255, 0.1); top: 40%; left: 30%; }
+
+        /* Современный хедер */
+        .modern-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            border-radius: 0 0 32px 32px;
         }
 
         .glass-modal {
-            background: rgba(0, 26, 61, 0.96);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(253, 203, 5, 0.6);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.85);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 25px 50px rgba(0, 30, 60, 0.15);
         }
 
-        .table-container {
-            max-height: calc(100vh - 290px);
-            min-height: 350px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            overscroll-behavior-y: contain;
-            padding-bottom: 120px; /* Отступ чтобы на телефоне не резался низ */
+        /* 3D Карточки с плавной анимацией */
+        .store-card {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: center bottom;
+            will-change: transform, opacity;
+        }
+        .store-card:active {
+            transform: scale(0.97) translateY(4px);
+            box-shadow: 0 5px 15px -5px rgba(0,0,0,0.05);
         }
         
-        thead th {
-            position: sticky;
-            top: 0;
-            background-color: #002B5E;
-            z-index: 10;
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-reveal {
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #001A3D; }
-        ::-webkit-scrollbar-thumb { background: #004182; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #FDCB05; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         .city-slider {
             display: flex;
             overflow-x: auto;
-            overscroll-behavior-x: touch; 
-            touch-action: pan-x; 
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+            overscroll-behavior-x: contain; 
             scroll-behavior: smooth;
         }
-        .city-slider::-webkit-scrollbar { display: none; }
 
         .tactile-btn {
-            transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
         }
         .tactile-btn:active {
-            transform: scale(0.93);
+            transform: scale(0.92);
         }
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.85); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .modal-animate {
-            animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes micPulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.9); }
+        @keyframes micPulseLight {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
             70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        .mic-pulsing {
-            animation: micPulse 1.4s infinite;
-        }
+        .mic-pulsing { animation: micPulseLight 1.4s infinite; }
     </style>
 </head>
-<body class="p-2 sm:p-3 min-h-screen relative">
+<body class="min-h-screen relative pb-24">
 
-    <!-- Модальное окно выбора навигатора -->
-    <div id="navModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-modal rounded-3xl p-6 md:p-8 max-w-sm w-full text-center relative modal-animate">
-            <button onclick="playClickSound(); closeNavModal();" class="absolute top-3 right-3 text-blue-300 hover:text-white bg-lentaDark p-2 rounded-full transition-colors border border-blue-800 cursor-pointer tactile-btn">
+    <div class="parallax-bg" id="parallaxBg">
+        <div class="parallax-shape shape-1" data-speed="0.03"></div>
+        <div class="parallax-shape shape-2" data-speed="-0.04"></div>
+        <div class="parallax-shape shape-3" data-speed="0.02"></div>
+    </div>
+
+    <div id="navModal" class="fixed inset-0 z-[100] bg-gray-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal">
+            <button onclick="playClickSound(); closeNavModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 bg-gray-100 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h3 class="text-lg md:text-xl font-black text-white mb-1 uppercase tracking-wide">Выберите навигатор</h3>
-            <p class="text-xs text-blue-200 mb-6 font-medium">Открытие маршрута в приложении</p>
+            <h3 class="text-xl font-black text-lentaDark mb-1 tracking-tight">Маршрут</h3>
+            <p class="text-sm text-gray-500 mb-6 font-medium">Выберите навигатор для запуска</p>
             
-            <div class="flex flex-wrap justify-center gap-4 my-2">
-                <button onclick="playClickSound(); executeNavigation('yandex');" class="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 border-4 border-yellow-200 text-lentaDark font-black flex flex-col items-center justify-center shadow-lg shadow-yellow-500/40 tactile-btn cursor-pointer">
-                    <span class="text-2xl mb-0.5">🟡</span>
-                    <span class="text-xs uppercase tracking-wider font-extrabold text-white drop-shadow-md">Яндекс</span>
+            <div class="flex flex-wrap justify-center gap-5 my-2">
+                <button onclick="playClickSound(); executeNavigation('yandex');" class="w-20 h-20 rounded-2xl bg-white border border-gray-100 shadow-[0_8px_20px_rgba(253,203,5,0.25)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
+                    <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-xl">Я</span></div>
+                    <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700">Яндекс</span>
                 </button>
                 
-                <button onclick="playClickSound(); executeNavigation('2gis');" class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-green-700 border-4 border-emerald-200 text-white font-black flex flex-col items-center justify-center shadow-lg shadow-emerald-500/40 tactile-btn cursor-pointer">
-                    <span class="text-2xl mb-0.5">🟢</span>
-                    <span class="text-xs uppercase tracking-wider font-extrabold text-white drop-shadow-md">2ГИС</span>
+                <button onclick="playClickSound(); executeNavigation('2gis');" class="w-20 h-20 rounded-2xl bg-white border border-gray-100 shadow-[0_8px_20px_rgba(16,185,129,0.2)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-white text-xs font-black">2Г</span></div>
+                    <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700">2ГИС</span>
                 </button>
                 
-                <button onclick="playClickSound(); executeNavigation('google');" class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-indigo-700 border-4 border-blue-200 text-white font-black flex flex-col items-center justify-center shadow-lg shadow-blue-500/40 tactile-btn cursor-pointer">
-                    <span class="text-2xl mb-0.5">🔵</span>
-                    <span class="text-xs uppercase tracking-wider font-extrabold text-white drop-shadow-md">Google</span>
+                <button onclick="playClickSound(); executeNavigation('google');" class="w-20 h-20 rounded-2xl bg-white border border-gray-100 shadow-[0_8px_20px_rgba(59,130,246,0.2)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-white text-xs font-black">G</span></div>
+                    <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700">Google</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto space-y-2">
-        <header class="glass-menu p-3 sm:p-4 rounded-2xl shadow-2xl relative overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-lentaYellow/10 rounded-full blur-3xl pointer-events-none"></div>
+    <header class="modern-header sticky top-0 z-50 pt-safe-top shadow-soft">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6">
             
-            <div class="flex flex-row items-start justify-between gap-2 mb-3 relative z-10">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-600 flex items-center justify-center shadow-lg border-2 border-lentaDark relative overflow-hidden shrink-0">
-                        <!-- Оригинальный векторный подсолнух Ленты -->
-                        <svg class="w-9 h-9" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="flex justify-between items-center mb-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-white shadow-[0_8px_20px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-50 transform rotate-[-3deg] hover:rotate-0 transition-transform duration-300">
+                        <svg class="w-10 h-10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M50 2 C55 18, 55 35, 50 48 C45 35, 45 18, 50 2 Z" fill="#FEE140" stroke="#D97706" stroke-width="1.5"/>
                             <path d="M50 98 C55 82, 55 65, 50 52 C45 65, 45 82, 50 98 Z" fill="#F59E0B" stroke="#D97706" stroke-width="1.5"/>
                             <path d="M2 50 C18 45, 35 45, 48 50 C35 55, 18 55, 2 50 Z" fill="#FEE140" stroke="#D97706" stroke-width="1.5"/>
@@ -167,88 +174,70 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-base md:text-xl font-black text-white tracking-wide uppercase flex items-center gap-2">
-                            ЛЕНТА <span class="bg-lentaYellow text-lentaDark px-2 py-0.5 rounded text-xs font-bold shadow-sm">ЛОГИСТИКА</span>
+                        <h1 class="text-xl md:text-2xl font-black text-lentaDark tracking-tight flex items-center gap-2">
+                            ЛЕНТА <span class="bg-lentaYellow text-lentaDark px-2.5 py-0.5 rounded-lg text-xs md:text-sm font-bold shadow-sm">ЛОГИСТИКА</span>
                         </h1>
-                        <div class="text-[10px] md:text-xs text-blue-200 font-medium tracking-wide mt-0.5">
-                            Мониторинг доставок <span class="text-lentaYellow/90 font-bold ml-1 whitespace-nowrap">📍 Схемы: Дмитрий Шаров</span>
+                        <div class="text-xs text-gray-500 font-medium mt-0.5 flex items-center gap-1.5">
+                            Мониторинг доставок <span class="text-gray-300">|</span> <span class="text-lentaBlue font-semibold">📍 Схемы: Д. Шаров</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Компактная кнопка скачивания APK -->
-                <a href="./app.apk" download="Lenta_Logistics.apk" onclick="playClickSound()" title="Установить приложение Android" class="shrink-0 flex items-center justify-center gap-1.5 px-2.5 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 rounded-lg text-[10px] md:text-xs font-bold transition-all tactile-btn cursor-pointer shadow-sm mt-0.5">
-                    <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span class="hidden sm:inline">Скачать</span> APK
+                <!-- Кнопка Скачать APK -->
+                <a href="app.apk" download onclick="playClickSound()" class="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-lentaBlue px-3 py-2 md:px-4 md:py-2.5 rounded-2xl shadow-[0_8px_20px_rgba(0,65,130,0.08)] border border-gray-100 transition-all tactile-btn group shrink-0" title="Скачать приложение (APK)">
+                    <svg class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span class="text-xs md:text-sm font-bold hidden sm:block">APK</span>
                 </a>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 relative z-30 mb-2">
-                <div class="relative sm:col-span-8 flex items-center gap-2">
-                    <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-lentaYellow">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </div>
-                        <input type="text" id="searchInput" placeholder="Номер ТК, адрес, город, О'кей..." 
-                               class="bg-lentaDark/90 border-2 border-lentaDarker text-white placeholder-blue-300 text-xs md:text-sm rounded-xl focus:ring-0 focus:border-lentaYellow block w-full pl-9 pr-9 py-2.5 outline-none transition-all shadow-inner">
-
-                        <button id="clearSearchBtn" onclick="playClickSound(); clearSearch();" class="hidden absolute right-2.5 top-2.5 text-blue-300 hover:text-lentaYellow transition-colors cursor-pointer z-40 bg-lentaDark p-1 rounded-full shadow-md border border-blue-800 tactile-btn">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                <div class="relative flex-1 group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-lentaBlue transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Поиск по ТК, городу, адресу..." 
+                           class="bg-gray-100/80 hover:bg-gray-100 focus:bg-white border-2 border-transparent focus:border-lentaBlue text-gray-800 placeholder-gray-400 text-sm md:text-base rounded-2xl block w-full pl-11 pr-24 py-3.5 outline-none transition-all shadow-inner-soft">
+                    
+                    <div class="absolute right-2 top-2 flex items-center gap-1">
+                        <button id="clearSearchBtn" onclick="playClickSound(); clearSearch();" class="hidden text-gray-400 hover:text-gray-700 bg-white p-1.5 rounded-full shadow-sm cursor-pointer tactile-btn">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        <button id="voiceSearchBtn" onclick="playClickSound(); startVoiceSearch();" class="bg-white text-lentaBlue hover:bg-blue-50 w-10 h-10 rounded-xl shadow-sm flex items-center justify-center cursor-pointer tactile-btn" title="Голосовой поиск">
+                            <svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                         </button>
                     </div>
 
-                    <button id="voiceSearchBtn" onclick="playClickSound(); startVoiceSearch();" class="bg-lentaDark hover:bg-lentaBlue border-2 border-blue-700 text-blue-200 w-11 h-11 rounded-xl transition-all shadow-lg flex items-center justify-center shrink-0 cursor-pointer tactile-btn" title="Голосовой поиск">
-                        <svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                    </button>
-
-                    <div id="autocompleteList" class="absolute z-[100] w-[calc(100%-3.5rem)] glass-menu rounded-xl hidden max-h-[40vh] overflow-y-auto mt-1 text-left text-white top-full left-0 shadow-2xl"></div>
+                    <div id="autocompleteList" class="absolute z-[100] w-full bg-white rounded-2xl hidden max-h-[40vh] overflow-y-auto mt-2 text-left text-gray-800 shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 hide-scrollbar"></div>
                 </div>
                 
-                <div class="sm:col-span-4 relative z-20">
-                    <div class="relative w-full">
-                        <button id="customFilterBtn" onclick="playClickSound()" class="bg-lentaDark/90 border-2 border-lentaDarker text-white text-xs md:text-sm rounded-xl focus:ring-0 focus:border-lentaYellow w-full py-2.5 px-3 outline-none transition-all shadow-inner flex justify-between items-center text-left cursor-pointer tactile-btn">
-                            <span id="customFilterText">Все режимы работы</span>
-                            <svg class="h-4 w-4 text-lentaYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        
-                        <div id="customFilterList" class="absolute z-50 w-full glass-menu rounded-xl hidden flex-col mt-1 text-left text-white overflow-hidden shadow-2xl border border-blue-800/50">
-                            <div class="filter-option px-3.5 py-2 hover:bg-lentaBlue cursor-pointer transition-colors border-b border-blue-800/30 text-xs" data-value="all">Все режимы работы</div>
-                            <div class="filter-option px-3.5 py-2 hover:bg-lentaBlue cursor-pointer transition-colors border-b border-blue-800/30 text-xs" data-value="24/7">Круглосуточные</div>
-                            <div class="filter-option px-3.5 py-2 hover:bg-lentaBlue cursor-pointer transition-colors text-xs" data-value="limited">С ограничением</div>
-                        </div>
+                <div class="sm:w-48 relative">
+                    <button id="customFilterBtn" onclick="playClickSound()" class="bg-gray-100/80 hover:bg-gray-100 border-2 border-transparent text-gray-700 text-sm font-semibold rounded-2xl w-full py-3.5 px-4 outline-none transition-all flex justify-between items-center cursor-pointer tactile-btn">
+                        <span id="customFilterText" class="truncate">Все точки</span>
+                        <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    
+                    <div id="customFilterList" class="absolute z-50 w-full bg-white rounded-2xl hidden flex-col mt-2 text-left text-gray-700 overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100">
+                        <div class="filter-option px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 text-sm font-medium" data-value="all">Все режимы работы</div>
+                        <div class="filter-option px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 text-sm font-medium" data-value="24/7">Круглосуточные</div>
+                        <div class="filter-option px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors text-sm font-medium" data-value="limited">С ограничением</div>
                     </div>
                 </div>
             </div>
 
-            <div class="relative z-10 pt-1.5 border-t border-blue-800/60">
-                <div class="text-[10px] uppercase font-bold tracking-wider text-blue-200 mb-1.5 flex items-center justify-between">
-                    <span>📍 Города маршрута</span>
-                    <span id="cityCounter" class="text-lentaYellow font-bold">Все города</span>
-                </div>
-                <div id="citySlider" class="city-slider gap-1.5 py-0.5 text-xs"></div>
+            <div class="relative">
+                <div id="citySlider" class="city-slider hide-scrollbar gap-2 py-1"></div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <div class="table-container relative z-10">
-            <table class="w-full text-sm text-left text-blue-100">
-                <thead class="text-xs text-blue-300 uppercase bg-lentaDark shadow-md hidden md:table-header-group">
-                    <tr>
-                        <th scope="col" class="px-4 py-3 font-bold w-44">Бренд / ТК</th>
-                        <th scope="col" class="px-4 py-3 font-bold w-32">Город</th>
-                        <th scope="col" class="px-4 py-3 font-bold">Адрес и Навигация</th>
-                        <th scope="col" class="px-4 py-3 font-bold w-40">Время приёма</th>
-                        <th scope="col" class="px-4 py-3 font-bold w-32">Режим работы</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody" class="block md:table-row-group space-y-3 md:space-y-0 p-0.5 md:p-0"></tbody>
-            </table>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 relative z-10">
+        <div class="flex justify-between items-center mb-4 px-1">
+            <span id="rowCount" class="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider">Загрузка данных...</span>
+            <span class="text-xs md:text-sm font-bold text-lentaBlue bg-blue-50 px-3 py-1 rounded-lg">Маршрут: 8092</span>
         </div>
         
-        <div class="text-[11px] text-blue-300 flex justify-between font-semibold px-2 relative z-20">
-            <span id="rowCount" class="bg-lentaDark px-2.5 py-1 rounded-lg border border-lentaBlue shadow-inner">Загрузка данных...</span>
-            <span class="bg-lentaDark px-2.5 py-1 rounded-lg border border-lentaBlue shadow-inner">Маршрут: 8092</span>
-        </div>
-    </div>
+        <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+    </main>
 
     <script>
         let audioCtx = null;
@@ -257,37 +246,27 @@
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) audioCtx = new AudioContext();
             }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             return audioCtx;
         }
 
-        ['click', 'touchstart', 'touchend', 'touchmove', 'keydown', 'pointerdown', 'scroll', 'wheel', 'mousemove'].forEach(evt => {
-            document.addEventListener(evt, () => {
-                getAudioContext();
-            }, { passive: true });
+        ['click', 'touchstart', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, () => getAudioContext(), { passive: true, once: true });
         });
 
         function playClickSound() {
             try {
                 const ctx = getAudioContext();
-                if (!ctx) return;
-                if (ctx.state === 'suspended') ctx.resume();
-
+                if (!ctx || ctx.state === 'suspended') return;
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(450, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.05);
-                
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-                
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.05);
+                osc.frequency.setValueAtTime(500, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.04);
             } catch (e) {}
         }
 
@@ -299,30 +278,29 @@
             try {
                 const now = Date.now();
                 if (scrollSpeed < 0.2) return;
-
+                
                 accumulatedScrollDist += scrollSpeed * 12;
                 const threshold = Math.max(60, Math.min(220, 220 / (scrollSpeed * 0.5)));
                 
                 if (accumulatedScrollDist < threshold) return;
                 if (now - lastScrollTickTime < 40) return;
-
+                
                 accumulatedScrollDist = 0;
                 lastScrollTickTime = now;
                 
                 const ctx = getAudioContext();
-                if (!ctx) return;
-                if (ctx.state === 'suspended') ctx.resume();
-
+                if (!ctx || ctx.state === 'suspended') return;
+                
                 const osc = ctx.createOscillator();
                 const osc2 = ctx.createOscillator();
                 const gain = ctx.createGain();
-
+                
                 osc.type = 'square';
                 osc2.type = 'sawtooth';
-
+                
                 osc.frequency.setValueAtTime(240, ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.02);
-
+                
                 osc2.frequency.setValueAtTime(480, ctx.currentTime);
                 osc2.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.02);
                 
@@ -332,7 +310,7 @@
                 osc.connect(gain);
                 osc2.connect(gain);
                 gain.connect(ctx.destination);
-
+                
                 osc.start();
                 osc2.start();
                 osc.stop(ctx.currentTime + 0.02);
@@ -340,6 +318,125 @@
             } catch (e) {}
         }
 
+        window.addEventListener('scroll', () => {
+            const currentScrollTop = window.scrollY;
+            const timeDiff = 16;
+            const scrollDist = Math.abs(currentScrollTop - lastScrollTop);
+            const speed = scrollDist / timeDiff;
+            
+            playTickSound(speed);
+            lastScrollTop = currentScrollTop;
+        }, { passive: true });
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768) return;
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            
+            document.querySelectorAll('.parallax-shape').forEach(shape => {
+                const speed = parseFloat(shape.getAttribute('data-speed'));
+                shape.style.transform = `translate(${x * speed * 100}px, ${y * speed * 100}px)`;
+            });
+        });
+
         const rawData = `203	8092	ООО "Лента", 620000, Свердловская обл., г. Екатеринбург, Дублер Сибирского тракта, д. 19, корп. 1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
 227	8092	ООО "Лента", 620016, Свердловская обл., г. Екатеринбург, Академика Сахарова пр-кт, д. 107/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
-228	8092	ООО "Лента", 620017, Свердловск
+228	8092	ООО "Лента", 620017, Свердловская обл., г. Екатеринбург, Космонавтов пр-кт, д.1в/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+229	8092	ООО "Лента", 620039, Свердловская обл., г. Екатеринбург, ул. 22 Партсъезда, д. 2	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+230	8092	ООО "Лента", 620057, Свердловская обл., г. Екатеринбург, ул.Таганская, д.60, А	Екатеринбург	07:00-12:00	12:00-17:00	-	Нет	08:00	24:00
+176	8092	ООО "Лента", 623430 Свердловская обл., г. Каменск-Уральский, ул. Суворова, д. 48	Каменск-Уральский	08:00-13:00	-	-	Да	Круглосуточно	Круглосуточно
+309	8092	ООО "Лента", 640003, Курганская обл., г. Курган, ул. Коли Мяготина, д.8	Курган	08:00-13:00	13:00-18:00	-	Нет	08:00	24:00
+74	8092	ООО "Лента", 455001, Челябинская обл., г. Магнитогорск, ул. Вокзальная, д.23	Магнитогорск	07:00-12:00	12:00-17:00	-	Нет	08:00	02:00
+192	8092	ООО "Лента", 455048, Челябинская обл., г. Магнитогорск, пр-кт Ленина, д. 119	Магнитогорск	07:00-12:00	12:00-17:00	-	Нет	08:00	02:00
+317	8092	ООО "Лента", 628609, Ханты- Мансийский Автономный округ - Югра АО, г. Нижневартовск, ул. Кузоваткина, 17	Нижневартовск	08:00-13:00	14:00-19:00	-	Да	08:00	23:00
+61	8092	ООО "Лента", 622049, Свердловская обл., г. Нижний Тагил, пр-кт Уральский, д. 75	Нижний Тагил	08:00-13:00	13:00-18:00	-	Нет	Круглосуточно	Круглосуточно
+206	8092	ООО "Лента", 622000, Свердловская обл., г. Нижний Тагил, Свердловское ш., д. 31	Нижний Тагил	08:00-12:00	13:00-17:00	-	Нет	08:00	23:00
+285	8092	ООО "Лента", 629803, Ямало-Ненецкий АО, г. Ноябрьск, мкр.Б-2А, ул. Цоя, д.22	Ноябрьск	08:00-13:00	14:00-19:00	-	Нет	07:00	23:00
+42	8092	ООО "Лента"  614097, г. Пермь, Парковый пр., д.66	Пермь	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+147	8092	ООО "Лента", 614065, г. Пермь, ш. Космонавтов, стр.162 б	Пермь	08:00-12:00	13:00-17:00	-	Да	Круглосуточно	Круглосуточно
+235	8092	ООО "Лента", 614077, г. Пермь, б-р Гагарина, д.65	Пермь	06:00-11:00	12:00-16:00	-	Да	Круглосуточно	Круглосуточно
+297	8092	ООО "Лента", 614025, г. Пермь, ул. Героев Хасана, 105	Пермь	06:00-11:00	12:00-16:00	-	Да	Круглосуточно	Круглосуточно
+92	8092	ООО "Лента", 628403, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, ул. 30 лет Победы, д. 74	Сургут	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+93	8092	ООО "Лента",628403, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, ул. Югорский тракт, д.2	Сургут	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+321	8092	ООО "Лента", 628412, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, Югорский тракт, д.38 (ТК Сити Молл)	Сургут	08:00-13:00	13:00-18:00	-	Да	Круглосуточно	Круглосуточно
+135	8092	ООО "Лента", 626150, Тюменская обл., г. Тобольск, 15-й мкр., д. 21	Тобольск	08:00-13:00	13:00-18:00	-	Да	Круглосуточно	Круглосуточно
+91	8092	ООО "Лента", 625016, Тюменская обл., г.Тюмень, ул.Мельникайте, д. 139	Тюмень	07:00-12:00	13:00-18:00	-	Да	Круглосуточно	Круглосуточно
+94	8092	ООО "Лента", 625014, Тюменская обл., г. Тюмень, ул. Республики, д. 291	Тюмень	08:00-13:00	14:00-19:00	-	Нет	08:00	24:00
+146	8092	ООО "Лента", 625007, Тюменская обл., г. Тюмень, Тобольский тракт, д.101	Тюмень	08:00-13:00	14:00-19:00	-	Да	Круглосуточно	Круглосуточно
+209	8092	ООО "Лента", 625022, Тюменская обл., г. Тюмень, ул. Алебашевская, д. 19	Тюмень	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+245	8092	ООО "Лента", 625046, Тюменская обл., г. Тюмень, ул. Народная, д.76	Тюмень	03:00-08:00	08:00-13:00	13:00-20:00	Да	Круглосуточно	Круглосуточно
+100	8092	ООО "Лента", 628011, Ханты-Мансийский Автономный округ - ЮГРА АО, г. Ханты-Мансийск, ул. Объездная, д. 9	Ханты-Мансийск	03:00-08:00	08:00-13:00	13:00-20:00	Да	Круглосуточно	Круглосуточно
+69	8092	ООО "Лента", 454045, Челябинская обл., г. Челябинск, ул. Блюхера, д. 126	Челябинск	03:00-08:00	08:00-13:00	-	Да	Круглосуточно	Круглосуточно
+154	8092	ООО "Лента", 454021, Челябинская обл., г. Челябинск, ул. Братьев Кашириных, д. 75	Челябинск	03:00-08:00	08:00-14:00	-	Да	Круглосуточно	Круглосуточно
+184	8092	ООО "Лента", 454004, Челябинская обл., г. Челябинск, ул. Академика Сахарова, д. 15	Челябинск	07:00-14:00	-	-	Нет	08:00	00:00
+212	8092	ООО "Лента", 454008, Челябинская обл., г. Челябинск, ул. Черкасская, д. 23	Челябинск	07:00-14:00	-	-	Нет	08:00	24:00
+213	8092	ООО "Лента", 454010, Челябинская обл., г. Челябинск, Копейское ш., д. 64	Челябинск	07:00-14:00	14:00-19:00	-	Нет	09:00	23:00
+301	8092	ООО "Лента", 454007, Челябинская обл., г. Челябинск, ул. Артиллерийская, д. 136	Челябинск	08:00-14:00	-	-	Нет	09:00	24:00
+335	8092	ООО "Лента", 454003, Челябинская область, г. Челябинск, ул. Братьев Кашириных, д. 133	Челябинск	07:00-14:00	-	-	Нет	08:00	23:00
+337	8092	ООО "Лента", 454100, Челябинская область, г. Челябинск, Комсомольский пр., д. 113	Челябинск	08:00-14:00	14:00-17:00	-	Нет	08:00	23:00
+334	8092	ООО "Лента", 454080, Челябинская область, г. Челябинск, ул. Труда, д. 166	Челябинск	07:00-14:00	-	-	Нет	08:00	23:00
+336	8092	ООО "Лента", 454135, Челябинская область, г. Челябинск, ул. Энергетиков, д. 21Б	Челябинск	08:00-14:00	-	-	Нет	08:00	23:00
+338	8092	ООО "Лента", 456300, Челябинская область, г. Миасс, пр. Автозаводцев, д. 65/1	Миасс	09:00-16:00	-	-	Нет	09:00	23:00
+368	8092	620017, Свердловская обл., г.Екатеринбург г.о., Екатеринбург г., ул. Бабушкина, стр.2	Екатеринбург	09:00-12:00	-	-	Нет	08:00	24:00
+396	8092	Свердловская обл., город Екатеринбург г.о, Екатеринбург г., Репина ул., стр.94, помещ.1	Екатеринбург	08:00-11:00	-	-	Нет	08:00	24:00
+369	8092	Свердловская обл., город Екатеринбург г.о., Екатеринбург г., Академика Шварца ул., стр.15	Екатеринбург	08:00-11:00	-	-	Да	Круглосуточно	Круглосуточно
+390	8092	625053, Тюменская обл., Тюмень, Широтная ул., д.199	Tюмень	13:00-16:00	-	-	Нет	08:00	24:00
+389	8092	625048, Тюменская обл., г. Тюмень, Профсоюзная ул., д.1, к.1	Тюмень	08:00-17:00	-	-	Нет	08:00	23:00
+929929	8092	ООО ОКЕЙ, ул. Федюнинского, 67, Тюмень, Тюменская обл., 625062	Тюмень	-	-	-	Нет	-	-
+411	8092	628406, Ханты-Мансийский Автономный округ-Югра АО, Сургут, Нефтеюганское ш.,1	Сургут	08:00-11:00	-	-	Нет	08:00	24:00
+343	8092	ООО "Лента" 628307 Ханты-Мансийский Автономный округ - Югра, г.Нефтеюганск ул. Усть-Балыкская 6	Нефтеюганск	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+929455	-	РЦ "Монетка", Пермский край, Краснокамский муниципальный округ, Шоссейная улица, 1Б, деревня Никитино	Пермь	-	-	-	Нет	-	-
+929453	-	РЦ "Монетка", Тюменская обл., г. Тюмень, Велижанский тракт, 9-й километр, 130	Тюмень	-	-	-	Нет	-	-
+928177	-	РЦ "Монетка", Новосвердловская ул., 5, Берёзовский	Березовский	-	-	-	Нет	-	-
+927898	-	РЦ "Монетка", территория Ново-Свердловская ТЭЦ, 2Г, Екатеринбург	Березовский	-	-	-	Нет	-	-
+929451	-	РЦ "Монетка", Нефтеюганск, территория Восточная Зона, ст2	Нефтеюганск	-	-	-	Нет	-	-
+929452	-	РЦ "Монетка", Интернациональная ул., 1/1, посёлок железнодорожная станция Формачёво	Южноуральск	-	-	-	Нет	-	-
+928817	-	РЦ "Монетка", Гвардейская ул., 57, корп. 1, жилой район Шакша Южная, Уфа	Уфа	-	-	-	Нет	-	-
+929034	-	РЦ "Монетка", ул. 3307-й километр, 3307, село Толмачёво	Новосибирск	-	-	-	Нет	-	-
+929000	-	РЦ "Монетка", д. Валищево, Территория промышленного парка Валищево, 3	Москва	-	-	-	Нет	-	-
+929100	-	РЦ "Монетка", Санкт-Петербург, Невский район, исторический район Стеклянный Городок	Санкт-Петербург	-	-	-	Нет	-	-
+8081	-	РЦ Молл, Радонежская улица, 15, Челябинск, 454036	Челябинск	-	-	-	Нет	-	-
+8082	-	РЦ Молл, Моховая улица, 7, Челябинск, 454005	Челябинск	-	-	-	Нет	-	-
+8083	-	РЦ Молл, шоссе Металлургов, 88, Челябинск, 454052	Челябинск	-	-	-	Нет	-	-`;
+
+        const customRoutes = {
+            '230': 'https://yandex.ru/maps/54/yekaterinburg/?from=mapframe&ll=60.629319%2C56.908463&mode=usermaps&source=mapframe&um=constructor%3A5104fa7b18d77875444dfad81e1c3b3a83dea27ff53f279ba413a4122c01582d&utm_source=mapframe&z=16.33',
+            '228': 'https://yandex.ru/maps/54/yekaterinburg/?from=mapframe&ll=60.610110%2C56.860900&mode=usermaps&source=mapframe&um=constructor%3A6026fb18a7fe967b8e2a98c4ceb40a19fc23566b601295405d35c1a158b9f276&utm_source=mapframe&z=17',
+            '227': 'https://yandex.ru/maps/54/yekaterinburg/?from=mapframe&ll=60.500749%2C56.791951&mode=usermaps&source=mapframe&um=constructor%3A04fba415c82b2ed0370f19d8bc7f1542400515b1d3befc0e7c8ad07bbfba1adf&utm_source=mapframe&z=17',
+            '203': 'https://yandex.ru/maps/?um=constructor%3Afbbd0b022ba16d28a9759e073e3de48d938f03a1cd710ca64ff5c6fad195da4f&source=constructorLink',
+            '229': 'https://yandex.ru/maps/54/yekaterinburg/?ll=60.582759%2C56.885806&mode=usermaps&source=constructorLink&um=constructor%3A3a69d8183a94451d7f581d90c23fd3f5d1d9d52b984bd848d8f243cbd1c5a180&z=18',
+            '396': 'https://yandex.ru/maps/54/yekaterinburg/?ll=60.535975%2C56.815168&mode=usermaps&source=constructorLink&um=constructor%3A76b75ff4aaa1421a3fe42cf126b8b1cd82bf5430d6c378dd71e48a7ebe024a08&z=17',
+            '369': 'https://yandex.ru/maps/54/yekaterinburg/?ll=60.622557%2C56.797838&mode=usermaps&source=constructorLink&um=constructor%3A4657623263425861d33635a73b8cd62fb0eeb81e3c3b45b8c05104ec6d4f1197&z=17',
+            '368': 'https://yandex.ru/maps/54/yekaterinburg/?indoorLevel=2&ll=60.631254%2C56.882798&mode=usermaps&source=constructorLink&um=constructor%3Aba5f0124bbf8fc174f2a371ea321d716de5cda19fb0ebcfb81ec96de73379bd4&z=17',
+            '176': 'https://yandex.ru/maps/11164/kamensk-uralskiy/?from=mapframe&ll=61.920244%2C56.380716&mode=usermaps&source=mapframe&um=constructor%3Abd1a7d5da68ec526e6188f7af58cc0929cc8a81daeafb4ac7d33750c451d9bc0&utm_source=mapframe&z=16',
+            '309': 'https://yandex.ru/maps/53/kurgan/?from=mapframe&ll=65.280661%2C55.426803&mode=usermaps&source=mapframe&um=constructor%3A420fafc29d9ff7845f23b3d0f5fe5d6051285ad1bda792995069c43c9404e8c3&utm_source=mapframe&z=16',
+            '317': 'https://yandex.ru/maps/1091/nizhnevartovsk/?from=mapframe&ll=76.544952%2C60.942692&mode=usermaps&source=mapframe&um=constructor%3A75800c946a3cbaed7cf8e53198910cd1c30b7095d89c3ab44f1368c7dd9652cb&utm_source=mapframe&z=16',
+            '61': 'https://yandex.ru/maps/11168/nizhniy-tagil/?from=mapframe&ll=59.961666%2C57.872355&mode=usermaps&source=mapframe&um=constructor%3Aa7378e1aef386f28ca28c65f508d8ae0f2cbb09b20b34e696e54659d3fae9f3e&utm_source=mapframe&z=16',
+            '206': 'https://yandex.ru/maps/11168/nizhniy-tagil/?from=mapframe&ll=60.016664%2C57.876045&mode=usermaps&source=mapframe&um=constructor%3A7231762167fcef11955abd3b1a59d373a8da1955be22583a84939e66165e7ac9&utm_source=mapframe&z=16',
+            '285': 'https://yandex.ru/maps/11231/noyabrsk/?from=mapframe&ll=75.456404%2C63.215521&mode=usermaps&source=mapframe&um=constructor%3A112b91bbe90364221b4cdb56516915d627a7eccb67d6c11079886677b4ac1e3a&utm_source=mapframe&z=17',
+            '42': 'https://yandex.ru/maps/50/perm/?from=mapframe&ll=56.171552%2C57.996761&mode=usermaps&source=mapframe&um=constructor%3A5f010ce5afd6535b0b18886528d936fd1b7bf8610c0c53f27ddb913c793bddbd&utm_source=mapframe&z=16',
+            '147': 'https://yandex.ru/maps/50/perm/?from=mapframe&ll=56.150251%2C57.972214&mode=usermaps&source=mapframe&um=constructor%3A5eaec7c3c73aabe8e58cefe8f133cfedc4a8190a4cd272690d42de6ce51fad03&utm_source=mapframe&z=15',
+            '235': 'https://yandex.ru/maps/50/perm/?from=mapframe&ll=56.288671%2C58.004634&mode=usermaps&source=mapframe&um=constructor%3A22984dd9fd6a1ab5351609cc78de557a7b12a3b5b2ba707f4ec6bf602f0468a5&utm_source=mapframe&z=17',
+            '297': 'https://yandex.ru/maps/50/perm/?from=mapframe&ll=56.263987%2C57.965428&mode=usermaps&source=mapframe&um=constructor%3A4e9ee4c0120c8736377edd7dd7e322d9fc13d71b1d29bc1465b247e20fda75fc&utm_source=mapframe&z=16',
+            '929455': 'https://yandex.ru/maps/?ll=55.833832%2C58.059088&mode=usermaps&source=constructorLink&um=constructor%3A110d38e8c21f29189371c4964665d40a84d9e81cfc1940cf7dc62772acad23ea&z=18',
+            '321': 'https://yandex.ru/maps/973/surgut/?from=mapframe&ll=73.372707%2C61.241015&mode=usermaps&source=mapframe&um=constructor%3A2cfca0b1d021c6435cbaeef81e04008fb7e4358926f65fe889aaf1a41826412b&utm_source=mapframe&z=15',
+            '92': 'https://yandex.ru/maps/973/surgut/?from=mapframe&ll=73.456881%2C61.255798&mode=usermaps&source=mapframe&um=constructor%3A9379333ad3cdd6f45da9d6857009830d9356b2c1c92a2b89e3951bfc7e2a3648&utm_source=mapframe&z=15',
+            '93': 'https://yandex.ru/maps/973/surgut/?from=mapframe&ll=73.349182%2C61.273897&mode=usermaps&source=mapframe&um=constructor%3Aa21541dd1e7e69ee0a840617c7c4b5922d40a407d1a897d37ad544623b3b63a9&utm_source=mapframe&z=16',
+            '411': 'https://yandex.ru/maps/973/surgut/?ll=73.368235%2C61.276036&mode=usermaps&source=constructorLink&um=constructor%3A60886fa81ee18a4a366f726a4ed5ea98b8030d9db8401993606927e644bac0ec&z=17',
+            '135': 'https://yandex.ru/maps/11175/tobolsk/?from=mapframe&ll=68.300662%2C58.222049&mode=usermaps&source=mapframe&um=constructor%3A25af0bb6c6e6288b166f38abd5de7ef050d2a890742300f98d30d80990d57b6a&utm_source=mapframe&z=17',
+            '209': 'https://yandex.ru/maps/55/tyumen/?from=mapframe&ll=65.567336%2C57.170480&mode=usermaps&source=mapframe&um=constructor%3Ade84586b0c2f001281d090ca8c5775a62b18fc94a41ab1577376ae260f731b6b&utm_source=mapframe&z=16',
+            '245': 'https://yandex.ru/maps/55/tyumen/?from=mapframe&ll=65.600741%2C57.094176&mode=usermaps&source=mapframe&um=constructor%3A04abbef82906ae05068e6836f6b08760b7073ccc16aed493712e1bbb54bfcc2f&utm_source=mapframe&z=17',
+            '91': 'https://yandex.ru/maps/55/tyumen/?from=mapframe&ll=65.544285%2C57.115267&mode=usermaps&source=mapframe&um=constructor%3A171904fd66cf680314763358254991b49c0b4f1d2b2f8877a23c7c321cb65e28&utm_source=mapframe&z=16',
+            '94': 'https://yandex.ru/maps/55/tyumen/?from=mapframe&ll=65.660714%2C57.103949&mode=usermaps&source=mapframe&um=constructor%3A58fbb1fcb1e80c35c75e82bfbe2552d111bb224a9e9de187728a98a1191d20b0&utm_source=mapframe&z=16',
+            '146': 'https://yandex.ru/maps/55/tyumen/?from=mapframe&ll=65.672489%2C57.172735&mode=usermaps&source=mapframe&um=constructor%3Ab4936975fb5b0f5594204fd2e904747317394327623d2bcf64495a9783ebc94e&utm_source=mapframe&z=17',
+            '390': 'https://yandex.ru/maps/55/tyumen/?ll=65.626385%2C57.096766&mode=usermaps&source=constructorLink&um=constructor%3A67de6668c15807d5327f6e8991f3b3490f6e8d5c41242706511b3b0f09df13e9&z=17',
+            '412': 'https://yandex.ru/maps/55/tyumen/?ll=65.569012%2C57.104090&mode=usermaps&source=constructorLink&um=constructor%3A389c846fd349914f08a0a9449f19af0fb823b54ab3cb10a2d8d60f8b3611135d&z=17',
+            '389': 'https://yandex.ru/maps/55/tyumen/?ll=65.565185%2C57.156700&mode=usermaps&source=constructorLink&um=constructor%3A26fddcbf1d22e4358f5aab3b9a6859c9fc72bff9f2a9fda524caaa8258734de8&z=18',
+            '929453': 'https://yandex.ru/maps/55/tyumen/?l=sat%2Cskl&ll=65.664636%2C57.241837&mode=usermaps&source=constructorLink&um=constructor%3A97e33d2a8be33ff982bc14cb579922fb83b7b63eb3a58743cc3e27e7e2d04ac0&z=17',
+            '301': 'https://yandex.ru/maps/56/chelyabinsk/?from=mapframe&ll=61.430032%2C55.163913&mode=usermaps&source=mapframe&um=constructor%3A9d044f9f9436b17fe70f5e8b72f7b17f6e68e3bfb6ee3b08b132e1c3455e3830&utm_source=mapframe&z=16',
+            '69': 'https://yandex.ru/maps/56/chelyabinsk/?from=mapframe&ll=61.349663%2C55.109058&mode=usermaps&source=mapframe&um=constructor%3Abc45b5761f5a48073b942abd8c8130f88579e07796d0999f63a64397dc646b09&utm_source=mapframe&z=16',
+            '154': 'https://yandex.ru/maps/56/chelyabinsk/?from=mapframe&ll=61.376066%2C55.175693&mode=usermaps&source=mapframe&um=constructor%3Ac71bbc2e6598ee5e2cf91ca61cb3a30b52e4e03c6e67715828c0b02990872723&utm_source=mapframe&z=17',
+            '184': 'https://yandex.ru/maps/56/chelyabinsk/?from=mapframe&ll=61.294019%2C55.159810&mode=usermaps&source=mapframe&um=constructor%3Ab829fc4ffba2f143e55ad6f474a74b19cf405a2b677adab1ae1bfdabc0349433&utm_source=mapframe&z=16',
+            '212': 'https://yandex.ru/maps/56/chelyabinsk/?from=mapframe&ll=61.376355%2C55.229925&mode=usermaps&source=mapframe&um=constructor%3A2e3fb35aeac193e8f2ec41fd88276cb67adec56a5c07d4b717b97617d3b8ae7d&utm_source=mapframe&z=15',
+            '213': 'https://yandex.ru/maps/56/chelyabinsk/?from=mapframe&l=sat%2Cskl&ll=61.452650%2C55.145623&mode=usermaps&source=mapframe&um=constructor%3Ae5ecd7ac5aceed759fd409ece9510ff02eddd36b826ee9e4437d0d69bf02c403&utm_source=mapframe&z=16',
+    ...
