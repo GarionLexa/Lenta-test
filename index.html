@@ -7,7 +7,7 @@
     <title>ЛЕНТА: Мониторинг доставок</title>
     <meta name="description" content="База гипермаркетов и схем заездов для водителей логистики.">
     
-    <!-- PWA, Иконки и полноэкранный режим -->
+    <!-- PWA, Иконки и полноэкранный режим (Без адресной строки) -->
     <link rel="icon" href="icon.png" type="image/png">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="manifest" href="manifest.json">
@@ -331,7 +331,7 @@
         }
 
         // ==========================================
-        // БРОНЕБОЙНЫЙ АУДИОДВИЖОК (БЕЗ ЗАВИСАНИЙ)
+        // ГЛОБАЛЬНЫЙ БРОНЕБОЙНЫЙ АУДИОДВИЖОК
         // ==========================================
         let audioCtx = null;
 
@@ -365,14 +365,14 @@
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(450, ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime); // Комфортная громкость
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
                 osc.connect(gain); gain.connect(ctx.destination);
                 osc.start(); osc.stop(ctx.currentTime + 0.05);
             } catch (e) {}
         }
 
-        // 2. Трещотка (Вертикальный скролл страницы)
+        // 2. Трещотка (Вертикальный скролл) - ТИШЕ
         let lastVerticalScrollY = 0;
         let accumulatedVerticalDist = 0;
         let lastVerticalTickTime = 0;
@@ -385,11 +385,11 @@
             if (dist < 1) return;
 
             accumulatedVerticalDist += dist;
-            const threshold = 60; // Каждые 60 пикселей - щелчок
+            const threshold = 60; 
 
             if (accumulatedVerticalDist > threshold) {
                 const now = Date.now();
-                if (now - lastVerticalTickTime > 25) { // Не чаще чем раз в 25 мс
+                if (now - lastVerticalTickTime > 25) { 
                     playVerticalTickSound(dist);
                     accumulatedVerticalDist = 0;
                     lastVerticalTickTime = now;
@@ -408,7 +408,8 @@
                 osc.frequency.setValueAtTime(150, ctx.currentTime); 
                 osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.015);
                 
-                const vol = Math.min(0.05, speed * 0.005);
+                // ЗВУК СНИЖЕН (было 0.05, стало 0.015 максимум)
+                const vol = Math.min(0.015, speed * 0.002);
                 gain.gain.setValueAtTime(vol, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.015);
                 
@@ -420,7 +421,7 @@
             } catch (e) {}
         }
 
-        // 3. Звук дизеля фуры (Горизонтальный свайп по городам)
+        // 3. Звук дизеля фуры (Горизонтальный свайп) - ГРОМЧЕ И НИЖЕ
         let engineOsc = null;
         let engineGain = null;
         let engineFilter = null;
@@ -436,7 +437,6 @@
             const dt = now - lastSliderScrollTime;
             const dx = Math.abs(scrollX - lastSliderScrollLeft);
             
-            // 1. Звук мотора
             if (dt > 16) {
                 const speed = dx / dt; 
                 if (speed > 0.05) {
@@ -446,7 +446,7 @@
             lastSliderScrollLeft = scrollX;
             lastSliderScrollTime = now;
 
-            // 2. Параллакс и 4D Эффекты
+            // 4D Эффекты
             const maxScroll = citySlider.scrollWidth - citySlider.clientWidth;
             const progress = maxScroll > 0 ? Math.min(1, Math.max(0, scrollX / maxScroll)) : 0;
 
@@ -454,7 +454,6 @@
             document.getElementById('layerTrees').style.transform = `translate3d(-${scrollX * 0.5}px, 0, 0)`;
             document.getElementById('layerRoad').style.transform = `translate3d(-${scrollX * 0.9}px, 0, 0)`;
 
-            // Смена неба
             document.getElementById('skyDay').style.opacity = Math.max(0, 1 - (progress * 2));
             document.getElementById('skySunset').style.opacity = progress < 0.5 ? (progress * 2) : Math.max(0, 1 - ((progress - 0.5) * 2));
             document.getElementById('skyNight').style.opacity = progress > 0.4 ? ((progress - 0.4) / 0.6) : 0;
@@ -462,7 +461,6 @@
 
             const darkness = 1 - (progress * 0.7); 
             
-            // Фары и габариты ночью
             if (progress > 0.6) {
                 document.documentElement.style.setProperty('--truck-light-opacity', '1');
                 document.documentElement.style.setProperty('--truck-body-brightness', '0.6');
@@ -471,28 +469,26 @@
                 document.documentElement.style.setProperty('--truck-body-brightness', '1');
             }
 
-            // Времена года (Листья, Снег)
             const layerTrees = document.getElementById('layerTrees');
             const layerLeaves = document.getElementById('layerLeaves');
             const layerSnow = document.getElementById('layerSnow');
 
-            if (progress < 0.25) { // Весна
+            if (progress < 0.25) { 
                 layerLeaves.style.opacity = 0; layerSnow.style.opacity = 0;
                 layerTrees.style.filter = `brightness(${darkness}) hue-rotate(-20deg) saturate(1.5)`;
-            } else if (progress < 0.5) { // Лето
+            } else if (progress < 0.5) { 
                 layerLeaves.style.opacity = 0; layerSnow.style.opacity = 0;
                 layerTrees.style.filter = `brightness(${darkness})`;
-            } else if (progress < 0.75) { // Осень
+            } else if (progress < 0.75) { 
                 let p = (progress - 0.5) / 0.25; 
                 layerLeaves.style.opacity = p; layerSnow.style.opacity = 0;
                 layerTrees.style.filter = `brightness(${darkness}) sepia(${p*0.6}) hue-rotate(-${p * 40}deg)`;
-            } else { // Зима
+            } else { 
                 let p = (progress - 0.75) / 0.25; 
                 layerLeaves.style.opacity = 0; layerSnow.style.opacity = p;
                 layerTrees.style.filter = `brightness(${darkness}) grayscale(${p * 0.8}) brightness(${1 + p*0.5})`;
             }
 
-            // Солнце и Луна
             const sunBody = document.getElementById('sunBody');
             const moonBody = document.getElementById('moonBody');
             if (progress <= 0.6) {
@@ -513,15 +509,14 @@
             const ctx = getAudioContext();
             if (!ctx || ctx.state !== 'running') return;
 
-            // Если мотор выключен - заводим дизель
             if (!engineOsc) {
                 engineOsc = ctx.createOscillator();
                 engineFilter = ctx.createBiquadFilter();
                 engineGain = ctx.createGain();
 
-                engineOsc.type = 'sawtooth'; // Грубый бас
+                engineOsc.type = 'sawtooth'; 
                 engineFilter.type = 'lowpass';
-                engineFilter.frequency.value = 150; // Срезаем писк, оставляем гул
+                engineFilter.frequency.value = 150; 
                 engineGain.gain.value = 0; 
 
                 engineOsc.connect(engineFilter);
@@ -531,14 +526,13 @@
                 engineOsc.start();
             }
 
-            // Настраиваем обороты и громкость (ограничено, чтобы не пищало)
-            const targetVol = Math.min(0.2, speed * 0.1);
-            const targetFreq = Math.min(70, 35 + speed * 15); // Четкий лимит частоты!
+            // ЗВУК ПОВЫШЕН (было 0.2, стало 0.35 максимум)
+            const targetVol = Math.min(0.35, speed * 0.15);
+            const targetFreq = Math.min(75, 35 + speed * 15); 
             
             engineGain.gain.setTargetAtTime(targetVol, ctx.currentTime, 0.1);
             engineOsc.frequency.setTargetAtTime(targetFreq, ctx.currentTime, 0.1);
 
-            // Мгновенное глушение и уничтожение объекта при остановке
             clearTimeout(engineTimeout);
             engineTimeout = setTimeout(() => {
                 if (engineGain) {
@@ -551,11 +545,10 @@
                         engineOsc = null;
                     }
                 }, 120);
-            }, 120);
+            }, 150); // Увеличен таймаут затухания
         }
         // ==========================================
 
-        // Рабочая база данных (100% из вашего файла)
         const rawData = `203	8092	ООО "Лента", 620000, Свердловская обл., г. Екатеринбург, Дублер Сибирского тракта, д. 19, корп. 1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
 227	8092	ООО "Лента", 620016, Свердловская обл., г. Екатеринбург, Академика Сахарова пр-кт, д. 107/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
 228	8092	ООО "Лента", 620017, Свердловская обл., г. Екатеринбург, Космонавтов пр-кт, д.1в/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
@@ -754,32 +747,27 @@
             const label = isAll ? '🌐 ВСЕ ГОРОДА' : city;
             const cabHtml = cabVariants[index % cabVariants.length];
 
-            // Фирменный прицеп Ленты с наклейкой
             btn.innerHTML = `
                 <div class="truck-wrapper flex items-end">
                     <div class="trailer h-10 md:h-11 min-w-[150px] max-w-[180px] rounded-l-md border-y border-l border-b-2 bg-white border-gray-300 shadow-md flex relative z-10 overflow-hidden transition-all duration-300">
                         <div class="tail-light"></div>
                         
-                        <!-- Синий задник с подсолнухом -->
                         <div class="w-[45%] h-full bg-[#004182] border-r-2 border-[#FDCB05] relative flex items-center justify-center overflow-hidden">
                             <img src="icon.png" class="w-10 h-10 opacity-90 absolute -right-3 transform scale-125" onerror="this.style.display='none'">
                         </div>
                         
-                        <!-- Белый перед с "фруктами" -->
                         <div class="w-[55%] h-full bg-white relative flex items-center pl-1">
                             <div class="absolute w-4 h-4 bg-green-500 rounded-full blur-[1px] opacity-80" style="bottom: 2px; left: 6px;"></div>
                             <div class="absolute w-5 h-5 bg-red-500 rounded-full blur-[1px] opacity-80" style="bottom: 4px; left: 18px;"></div>
                             <div class="absolute w-4 h-3 bg-yellow-400 rounded-sm transform rotate-12 blur-[1px] opacity-80" style="top: 2px; left: 10px;"></div>
                         </div>
                         
-                        <!-- Плашка с городом -->
                         <div class="absolute inset-0 z-10 flex items-center justify-center px-1 pt-0.5">
                             <span class="city-name text-[9px] md:text-[10px] font-black uppercase tracking-widest text-lentaDark bg-white/95 px-2 py-0.5 rounded shadow-sm border border-gray-200 backdrop-blur-sm truncate max-w-full transition-colors duration-300">
                                 ${label}
                             </span>
                         </div>
                         
-                        <!-- Колеса -->
                         <div class="absolute -bottom-1.5 left-2 flex gap-0.5 z-20">
                             <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
                             <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
