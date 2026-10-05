@@ -73,8 +73,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        /* Отвязка прилипания, если телефон перевернут горизонтально */
-        @media (max-height: 500px) {
+        /* Отвязка прилипания, если телефон перевернут горизонтально (увеличил запас до 550px) */
+        @media (max-height: 550px) {
             .glass-header {
                 position: relative; 
                 border-radius: 0;
@@ -379,11 +379,14 @@
             <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ (МЕХАНИКИ, СЧЕТЧИК, СКОРОСТЬ) -->
             <div class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between">
                 
-                <!-- Левая часть: Новый Надежный Счётчик -->
-                <div class="flex flex-col items-center justify-center shrink-0" title="Счетчик посетителей">
-                    <div class="h-[20px] rounded overflow-hidden shadow-sm border border-gray-300 dark:border-slate-600 relative cursor-default">
-                        <!-- Используем сверхнадежный счетчик Антона Комарева с русским словом "визиты" -->
-                        <img src="https://komarev.com/ghpvc/?username=garionlexa-logistics&style=flat-square&color=0f172a&label=%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B" class="h-full pointer-events-none" alt="Счетчик" onerror="this.style.display='none'">
+                <!-- Левая часть: Новый Надежный Счётчик (С обходом кэша) -->
+                <div class="flex flex-col items-center justify-center shrink-0 min-w-[50px]" title="Счетчик посетителей">
+                    <div class="h-[20px] rounded overflow-hidden shadow-sm border border-gray-300 dark:border-slate-600 relative cursor-default bg-slate-900">
+                        <!-- Скрипт сразу пропишет картинке уникальное время, чтобы браузер скачал свежую цифру -->
+                        <img id="visitCounter" class="h-full pointer-events-none" alt="Счетчик" onerror="this.style.display='none'">
+                        <script>
+                            document.getElementById('visitCounter').src = "https://komarev.com/ghpvc/?username=garionlexa-logistics&style=flat-square&color=0f172a&label=%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&t=" + new Date().getTime();
+                        </script>
                     </div>
                 </div>
 
@@ -1466,8 +1469,8 @@
             "По рации тишина...",
             "Кофе выпью — и в рейс.",
             "Сцепку проверил?",
-            "Слышь, только не жми на подсолнух наверху...",
-            "Главное — не нажимай на логотип!"
+            "Слышь, только не нажимай на подсолнух наверху...",
+            "Главное — не жми на логотип!"
         ];
 
         function showMechanicPhrase() {
@@ -1487,7 +1490,7 @@
 
         function updateSpeedLimit() {
             const month = new Date().getMonth();
-            const isWinter = month === 11 || month === 0 || month === 1;
+            const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
             
             document.getElementById('speedLimitNumber').innerText = isWinter ? '60' : '80';
             const icon = document.getElementById('seasonIcon');
