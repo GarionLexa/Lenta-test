@@ -320,7 +320,7 @@
         </div>
     </div>
 
-    <!-- Модал вызова Механика (Отвязан от кнопки, теперь по центру экрана) -->
+    <!-- Модал вызова Механика -->
     <div id="mechanicModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
         <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
             <button onclick="closeMechanicModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
@@ -379,12 +379,11 @@
             <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ (МЕХАНИКИ, СЧЕТЧИК, СКОРОСТЬ) -->
             <div class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between">
                 
-                <!-- Левая часть: Широкий Счётчик (Новый стабильный провайдер) -->
+                <!-- Левая часть: Новый Надежный Счётчик -->
                 <div class="flex flex-col items-center justify-center shrink-0" title="Счетчик посетителей">
-                    <div class="h-[22px] w-[54px] bg-[#0f172a] rounded overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.9)] border border-gray-300 dark:border-slate-600 relative cursor-default">
-                        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgarionlexa.github.io&count_bg=%230f172a&title_bg=%230f172a&icon=&icon_color=%23E7E7E7&title=%20&edge_flat=true" class="absolute right-0 top-0 bottom-0 m-auto h-[20px] max-w-none pointer-events-none" style="margin-right: -2px;" alt="Счетчик" onerror="this.style.display='none'">
-                        <!-- Заглушка, если инет слабый -->
-                        <div class="absolute inset-0 flex items-center justify-center text-[10px] text-gray-500 opacity-30 font-mono pointer-events-none">...</div>
+                    <div class="h-[20px] rounded overflow-hidden shadow-sm border border-gray-300 dark:border-slate-600 relative cursor-default">
+                        <!-- Используем сверхнадежный счетчик Антона Комарева с русским словом "визиты" -->
+                        <img src="https://komarev.com/ghpvc/?username=garionlexa-logistics&style=flat-square&color=0f172a&label=%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B" class="h-full pointer-events-none" alt="Счетчик" onerror="this.style.display='none'">
                     </div>
                 </div>
 
