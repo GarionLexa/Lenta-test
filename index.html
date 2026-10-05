@@ -169,24 +169,17 @@
             transform: scaleX(-1);
         }
         .police-car.active { display: block; animation: driveOpposite 4.5s linear forwards; }
-        .police-siren-red {
-            position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
-            animation: sirenRed 0.6s infinite;
-        }
-        .police-siren-blue {
-            position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
-            animation: sirenBlue 0.6s infinite;
-        }
+        .police-siren-red { position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px; animation: sirenRed 0.6s infinite; }
+        .police-siren-blue { position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px; animation: sirenBlue 0.6s infinite; }
         @keyframes sirenRed { 0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 50%, 100% { box-shadow: none; background: #991b1b; } }
         @keyframes sirenBlue { 0%, 49% { box-shadow: none; background: #1e3a8a; } 50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } }
         @keyframes driveOpposite { 0% { left: 120vw; } 100% { left: -150px; } }
 
-        /* ИСПРАВЛЕНИЕ: Блокировка выделения при ПК скролле */
         .city-slider {
             display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; 
             scrollbar-width: none; overscroll-behavior-x: contain;
             height: 100%; align-items: flex-end; padding-bottom: 2px; padding-left: 10px;
-            user-select: none; -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none; /* Защита от синего выделения на ПК */
         }
         .city-slider::-webkit-scrollbar { display: none; }
 
@@ -215,6 +208,7 @@
         }
         .dark .city-name-plaque { background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important; }
 
+        /* --- АНИМАЦИИ МЕХАНИКОВ --- */
         @keyframes fadeScene1 { 0%, 22% { opacity: 1; } 25%, 100% { opacity: 0; } }
         @keyframes fadeScene2 { 0%, 22% { opacity: 0; } 25%, 47% { opacity: 1; } 50%, 100% { opacity: 0; } }
         @keyframes fadeScene3 { 0%, 47% { opacity: 0; } 50%, 72% { opacity: 1; } 75%, 100% { opacity: 0; } }
@@ -238,7 +232,7 @@
         .welding-sparks circle:nth-child(3) { animation-delay: 0.1s; }
         @keyframes sparkFlash { 0% { opacity: 0; transform: scale(0.5) translate(0,0); } 100% { opacity: 1; transform: scale(2) translate(3px, -3px); } }
 
-        /* ПАРТИ МОД (КЛАСС party-active на body) */
+        /* --- ПАРТИ МОД (ДИСКОТЕКА) --- */
         body.party-active .dancing-scene { display: block; }
         body.party-active .normal-scenes { display: none; }
         body:not(.party-active) .dancing-scene { display: none; }
@@ -256,8 +250,8 @@
         .music-notes text:nth-child(2) { animation-delay: 0.6s; }
         @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
 
-        /* НОВЫЕ ФИШКИ ДЛЯ ПАРТИ МОДА: Диспетчер и Тягачи */
-        .dark .day-party-only { display: none; } /* Диспетчер и Босс уходят ночью */
+        /* ЭЛЕМЕНТЫ ТУСОВКИ (ШАР И ФУРЫ НОЧЬЮ) */
+        .dark .day-party-only { display: none; } /* Начальник и диспетчер скрываются ночью */
         
         .disco-ball {
             position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
@@ -275,7 +269,6 @@
         .party-truck-right { right: -100px; transform: scaleX(-1); }
         body.party-active.dark .party-truck-left { left: -5px; opacity: 1; }
         body.party-active.dark .party-truck-right { right: -5px; opacity: 1; }
-
     </style>
 </head>
 <body class="relative flex flex-col min-h-screen">
@@ -387,8 +380,8 @@
                     <div id="mechanicSpeech" class="absolute bottom-[85%] mb-1 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] opacity-0 transform scale-95 transition-all duration-300 whitespace-nowrap pointer-events-none z-[110]">
                     </div>
 
+                    <!-- ЭЛЕМЕНТЫ ТУСОВКИ -->
                     <div id="discoBall" class="disco-ball"></div>
-                    
                     <div class="party-truck-left">
                         🚛<div class="headlight-beam" style="top:10px;right:-15px;width:30px;height:5px;animation: sparkFlash 0.3s infinite;background:white"></div>
                     </div>
@@ -397,7 +390,7 @@
                     </div>
 
                     <div class="w-full h-14 md:h-16 relative" id="mechanicSvgContainer">
-                        <svg viewBox="0 0 120 60" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full text-gray-400 dark:text-gray-500 group-hover:text-emerald-500 transition-colors" id="mechanicSvgElement">
+                        <svg viewBox="0 0 120 60" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full text-gray-400 dark:text-gray-500 group-hover:text-emerald-500 transition-colors normal-mode" id="mechanicSvgElement">
                             
                             <g class="normal-scenes absolute inset-0">
                                 <g class="anim-scene-1 anim-scene-3 anim-scene-4">
@@ -504,7 +497,6 @@
                                     <path d="M105 27 V 35 M 105 50 L 100 58 M 105 50 L 110 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     <g class="dance-arm-disco"><path d="M105 28 L 115 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></g>
                                 </g>
-
                             </g>
                         </svg>
                     </div>
@@ -618,43 +610,51 @@
             document.getElementById('weatherModal').classList.add('hidden');
         }
 
+        // Защита от бесконечной загрузки (таймаут 10 секунд)
         async function acceptWeatherGeo() {
             closeWeatherModal();
             const numEl = document.getElementById('speedLimitNumber');
             const iconEl = document.getElementById('seasonIcon');
             iconEl.innerText = "⏳";
             
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    try {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                        const data = await res.json();
-                        const temp = Math.round(data.current_weather.temperature);
-                        const code = data.current_weather.weathercode;
-                        
-                        let emoji = "☀️";
-                        if (code >= 1 && code <= 3) emoji = "⛅";
-                        if (code >= 45 && code <= 48) emoji = "🌫️";
-                        if (code >= 51 && code <= 67) emoji = "🌧️";
-                        if (code >= 71 && code <= 77) emoji = "❄️";
-                        if (code >= 80 && code <= 82) emoji = "🌦️";
-                        if (code >= 95) emoji = "⛈️";
+            if (!navigator.geolocation) {
+                iconEl.innerText = "❌";
+                setTimeout(updateSpeedLimit, 2000);
+                return;
+            }
 
-                        numEl.innerText = temp > 0 ? "+" + temp + "°" : temp + "°";
-                        numEl.classList.remove('text-base');
-                        numEl.classList.add('text-sm');
-                        iconEl.innerText = emoji;
-                    } catch(e) {
-                        iconEl.innerText = "❌";
-                        setTimeout(updateSpeedLimit, 2000);
-                    }
-                }, (error) => {
+            // Запрашиваем с лимитом времени, чтобы не висело бесконечно
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                try {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    // Используем Open-Meteo, т.к. он работает везде и без платных ключей
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const data = await res.json();
+                    const temp = Math.round(data.current_weather.temperature);
+                    const code = data.current_weather.weathercode;
+                    
+                    let emoji = "☀️";
+                    if (code >= 1 && code <= 3) emoji = "⛅";
+                    if (code >= 45 && code <= 48) emoji = "🌫️";
+                    if (code >= 51 && code <= 67) emoji = "🌧️";
+                    if (code >= 71 && code <= 77) emoji = "❄️";
+                    if (code >= 80 && code <= 82) emoji = "🌦️";
+                    if (code >= 95) emoji = "⛈️";
+
+                    numEl.innerText = temp > 0 ? "+" + temp + "°" : temp + "°";
+                    numEl.classList.remove('text-base');
+                    numEl.classList.add('text-sm');
+                    iconEl.innerText = emoji;
+                } catch(e) {
                     iconEl.innerText = "❌";
                     setTimeout(updateSpeedLimit, 2000);
-                });
-            }
+                }
+            }, (error) => {
+                // Если водитель запретил или произошла ошибка
+                iconEl.innerText = "❌";
+                setTimeout(updateSpeedLimit, 2000);
+            }, { timeout: 10000 }); // Максимум ждем 10 секунд
         }
 
         let audioCtx = null;
@@ -762,7 +762,7 @@
 
         citySlider.addEventListener('mousedown', (e) => {
             if (isMusicPlaying) return;
-            e.preventDefault(); // Блокирует выделение
+            e.preventDefault(); // Блокирует выделение текста
             isMouseDown = true;
             citySlider.style.cursor = 'grabbing';
             startX = e.pageX - citySlider.offsetLeft;
@@ -781,7 +781,7 @@
 
         citySlider.addEventListener('mousemove', (e) => {
             if (!isMouseDown || isMusicPlaying) return;
-            e.preventDefault(); // Блокирует выделение
+            e.preventDefault(); // Блокирует выделение текста
             const x = e.pageX - citySlider.offsetLeft;
             const walk = (x - startX) * 2;
             citySlider.scrollLeft = scrollLeftPos - walk;
@@ -798,7 +798,7 @@
                 bgMusic.currentTime = 0;
                 isMusicPlaying = false;
                 document.getElementById('logoImage').classList.remove('record-spin');
-                document.body.classList.remove('party-active');
+                document.body.classList.remove('party-active'); // ВЫКЛЮЧАЕТ ШАР И ФУРЫ И ТАНЦЫ
 
                 stopAutoScroll(); 
                 resetTrucksToStart();
@@ -817,7 +817,7 @@
                 bgMusic.pause();
                 isMusicPlaying = false;
                 logo.classList.remove('record-spin');
-                document.body.classList.remove('party-active');
+                document.body.classList.remove('party-active'); // ВЫКЛЮЧАЕТ ШАР И ФУРЫ И ТАНЦЫ
                 stopAutoScroll(); 
             } else {
                 const playPromise = bgMusic.play();
@@ -825,7 +825,7 @@
                     playPromise.then(() => {
                         isMusicPlaying = true;
                         logo.classList.add('record-spin');
-                        document.body.classList.add('party-active');
+                        document.body.classList.add('party-active'); // ВКЛЮЧАЕТ ШАР И ФУРЫ И ТАНЦЫ
                         startAutoScroll();
                     }).catch((e) => {
                         isMusicPlaying = true; 
@@ -1558,6 +1558,31 @@
             "Главное — не жми на логотип!"
         ];
 
+        // 20 Фраз для дискотеки
+        const partyPhrases = [
+            "Опа-опа-опа-па! 🕺",
+            "Давай, жги!",
+            "Сабвуфер качает! 🔊",
+            "Шеф не видит, танцуем! 😎",
+            "Вот это бит!",
+            "Сургут на связи! 🤙",
+            "Музыка нас связала!",
+            "Рейс подождет! 🚛",
+            "Камаз тоже танцует!",
+            "Сделай погромче! 📻",
+            "Отдыхаем, мужики!",
+            "Ух, хорошо пошла!",
+            "Дискотека века! 🪩",
+            "Диспетчер, давай к нам!",
+            "А теперь медляк! шучу 😂",
+            "Соляра стынет, а мы нет!",
+            "Держим ритм!",
+            "Эх, щас бы на юга 🌴",
+            "Монетка подождет!",
+            "Гуляем на все суточные! 💸"
+        ];
+
+        // Фразы недовольства, когда выключают музыку
         const disappointedPhrases = [
             "Ну блин, было же классно! 😩",
             "Эх, на самом интересном месте...",
@@ -1574,7 +1599,11 @@
             
             if (isDisappointed) {
                 phrase = disappointedPhrases[Math.floor(Math.random() * disappointedPhrases.length)];
+            } else if (isMusicPlaying) {
+                // Если играет музыка, берем фразы для тусовки
+                phrase = partyPhrases[Math.floor(Math.random() * partyPhrases.length)];
             } else {
+                // Если тишина, берем обычные рабочие фразы
                 phrase = mechanicPhrases[Math.floor(Math.random() * mechanicPhrases.length)];
             }
             
