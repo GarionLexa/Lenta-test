@@ -267,17 +267,17 @@
         .normal-mode .dancing-scene { display: none; }
         .normal-mode .normal-scenes { display: block; }
 
-        .dance-bob-left { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
-        @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-5px) scaleY(1.05); } }
+        .dance-full-body-left { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
+        @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-3px) scaleY(1.05); } }
         
         .dance-arms-left { animation: waveArms 0.4s infinite alternate ease-in-out; transform-origin: 35px 28px; }
-        @keyframes waveArms { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
+        @keyframes waveArms { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
 
-        .dance-bob-right { animation: discoSway 0.5s infinite alternate ease-in-out; transform-origin: 85px 58px; }
-        @keyframes discoSway { 0% { transform: rotate(-8deg); } 100% { transform: rotate(8deg); } }
+        .dance-full-body-right { animation: discoSway 0.5s infinite alternate ease-in-out; transform-origin: bottom center; }
+        @keyframes discoSway { 0% { transform: translateX(-2px) rotate(-3deg); } 100% { transform: translateX(2px) rotate(3deg); } }
         
         .dance-arm-disco { animation: discoPoint 0.5s infinite alternate ease-in-out; transform-origin: 85px 30px; }
-        @keyframes discoPoint { 0% { transform: rotate(-40deg); } 100% { transform: rotate(20deg); } }
+        @keyframes discoPoint { 0% { transform: rotate(-40deg); } 100% { transform: rotate(10deg); } }
 
         .music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; }
         .music-notes text:nth-child(2) { animation-delay: 0.6s; }
@@ -374,14 +374,9 @@
             <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ (МЕХАНИКИ, СЧЕТЧИК, СКОРОСТЬ) -->
             <div class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between">
                 
-                <!-- Левая часть: Новый СВОЙ Счётчик (Считает каждый клик через API) -->
-                <div class="flex flex-col items-center justify-center shrink-0 min-w-[60px]" title="Счетчик визитов (считает каждое открытие)">
-                    <div class="h-[20px] rounded overflow-hidden shadow-sm border border-gray-300 dark:border-slate-600 flex text-[10px] font-bold cursor-default">
-                        <div class="bg-slate-900 text-white px-1.5 flex items-center tracking-wider">ВИЗИТЫ</div>
-                        <div class="bg-gray-100 dark:bg-slate-800 text-slate-800 dark:text-gray-200 px-2 flex items-center justify-center min-w-[24px]" id="visitCounterText">
-                            <svg class="animate-spin h-3 w-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        </div>
-                    </div>
+                <!-- Левая часть: Бронебойный Счётчик-Картинка (Без скриптов, обходит блокировки) -->
+                <div class="flex flex-col items-center justify-center shrink-0 min-w-[60px]" title="Счетчик визитов (считает каждое обновление)">
+                    <img id="visitCounterBadge" alt="Визиты" class="h-[20px] rounded shadow-sm opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0')" onerror="this.style.display='none'">
                 </div>
 
                 <!-- Центральная часть: Многосерийная сценка с механиками и Танцами -->
@@ -470,8 +465,8 @@
                                     <text x="45" y="20" font-size="12" fill="currentColor">♪</text>
                                     <text x="65" y="15" font-size="16" fill="currentColor">♫</text>
                                 </g>
-                                <!-- Танцор 1 -->
-                                <g class="dance-bob-left">
+                                <!-- Танцор 1: Волна / Ламбада -->
+                                <g class="dance-full-body-left">
                                     <circle cx="35" cy="20" r="6" />
                                     <path d="M35 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     <path d="M35 45 L 25 58 M 35 45 L 45 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -479,13 +474,15 @@
                                         <path d="M20 15 Q 35 35 50 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     </g>
                                 </g>
-                                <!-- Танцор 2 -->
-                                <g class="dance-bob-right">
+                                <!-- Танцор 2: Король Диско -->
+                                <g class="dance-full-body-right">
                                     <circle cx="85" cy="20" r="6" />
                                     <path d="M85 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     <path d="M85 45 L 75 58 M 85 45 L 95 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     <path d="M85 30 L 78 37 L 82 42" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/> 
-                                    <path d="M85 30 L 98 15" class="dance-arm-disco" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <g class="dance-arm-disco">
+                                        <path d="M85 30 L 98 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    </g>
                                 </g>
                             </g>
                         </svg>
@@ -565,27 +562,16 @@
     </main>
 
     <script>
-        // === НАШ СОБСТВЕННЫЙ СЧЕТЧИК (Считает каждый перезапуск страницы) ===
-        async function updateLocalCounter() {
-            const counterText = document.getElementById('visitCounterText');
-            try {
-                // Обращаемся к открытой базе (API)
-                // Ключ: garionlexa_logistics_app. Действие: /up (Прибавить 1)
-                const response = await fetch('https://api.counterapi.dev/v1/garionlexa/logistics_app/up');
-                const data = await response.json();
-                
-                if (data && data.count) {
-                    counterText.innerHTML = data.count; // Вставляем живую цифру
-                } else {
-                    counterText.innerHTML = '---';
-                }
-            } catch (error) {
-                counterText.innerHTML = '---';
-            }
+        // === БРОНЕБОЙНЫЙ СЧЕТЧИК (Картинка, обходит блокировки скриптов) ===
+        // Работает напрямую как изображение, поэтому его не режут блокировщики рекламы.
+        function initCounter() {
+            const badge = document.getElementById('visitCounterBadge');
+            const uniqueTime = Date.now(); // Приклеиваем время, чтобы засчитывал КАЖДОЕ обновление
+            // Используем надежный сервис hits.sh
+            badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v1.svg?label=%D0%92%D0%98%D0%97%D0%98%D0%A2%D0%AB&color=0f172a&labelColor=1e293b&nocache=${uniqueTime}`;
         }
-        // Запускаем счетчик сразу при загрузке страницы
-        updateLocalCounter();
-        // ======================================================================
+        initCounter();
+        // ====================================================================
 
         function toggleTheme() {
             const html = document.documentElement;
