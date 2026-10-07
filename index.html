@@ -7,7 +7,6 @@
     <title>ЛЕНТА: Мониторинг доставок</title>
     <meta name="description" content="База гипермаркетов и схем заездов для водителей логистики.">
     
-    <!-- PWA Настройки для полного экрана без адресной строки -->
     <link rel="icon" href="icon.png" type="image/png">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="mobile-web-app-capable" content="yes">
@@ -74,38 +73,11 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        @media (max-height: 600px) and (orientation: landscape) {
-            .glass-header { position: relative !important; border-radius: 0 0 16px 16px; }
-            .scenic-bg { height: 110px !important; }
-            .truck-chip { transform: scale(0.85); transform-origin: bottom center; margin-bottom: -5px; }
-        }
-
-        .store-card {
-            background: white;
-            border-radius: 24px;
-            padding: 1.25rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0,0,0,0.04);
-            transition: all 0.2s ease;
-        }
-        .dark .store-card {
-            background: #1e293b;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        .store-card:hover { box-shadow: 0 15px 40px rgba(0, 65, 130, 0.08); transform: translateY(-2px); }
-        .dark .store-card:hover { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); }
-
-        .glass-modal {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 25px 50px rgba(0, 30, 60, 0.15);
-        }
-        .dark .glass-modal {
-            background: rgba(15, 23, 42, 0.98);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        @media (max-height: 550px) {
+            .glass-header {
+                position: relative; 
+                border-radius: 0;
+            }
         }
 
         @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
@@ -177,42 +149,37 @@
         @keyframes weatherFallSnow { 0% { background-position: 0 0, 20px 20px; } 100% { background-position: 30px 60px, 0px 40px; } }
         @keyframes weatherFallLeaves { 0% { background-position: 0 -70px, 30px -90px, 15px -50px; } 100% { background-position: 70px 70px, -30px 90px, 65px 50px; } }
 
-        /* ЗНАКИ И ПОЛИЦИЯ */
         .parallax-signs {
-            position: absolute; bottom: 18px; left: 0; width: 2000vw; height: 40px; z-index: 9;
+            position: absolute; bottom: 18px; left: 0; width: 3000vw; height: 40px; z-index: 9;
             background-image: 
-                /* Уступи дорогу (Перевернутый белый треугольник с красной каймой) */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='40' viewBox='0 0 1200 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"),
-                /* Главная дорога (Желтый ромб) */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1700' height='40' viewBox='0 0 1700 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
-            /* Огромный отступ между знаками, чтобы они встречались редко */
-            background-size: 1200px 40px, 1700px 40px;
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='40' viewBox='0 0 1500 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2200' height='40' viewBox='0 0 2200 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 1500px 40px, 2200px 40px;
             background-repeat: repeat-x;
             will-change: transform;
         }
 
         .police-car {
-            position: absolute; bottom: 4px; right: -150px; width: 60px; height: 20px;
+            position: absolute; bottom: 4px; left: 120vw; width: 60px; height: 20px;
             background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%);
-            border-radius: 6px 10px 4px 4px;
-            z-index: 25; /* Между дорогой и фурами */
-            transform: scaleX(-1); /* Едет влево */
+            border-radius: 4px 4px 10px 6px;
+            z-index: 25; 
             display: none;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transform: scaleX(-1);
         }
         .police-car.active {
             display: block;
-            animation: driveOpposite 4.5s linear forwards; /* Сильно замедлили машину (было 2s, стало 4.5s) */
+            animation: driveOpposite 4.5s linear forwards;
         }
         .police-siren-red {
-            position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
-            animation: sirenRed 0.4s infinite;
+            position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
+            animation: sirenRed 0.6s infinite;
         }
         .police-siren-blue {
-            position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
-            animation: sirenBlue 0.4s infinite;
+            position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
+            animation: sirenBlue 0.6s infinite;
         }
-        /* Строгое чередование свечения сирен */
         @keyframes sirenRed { 
             0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 
             50%, 100% { box-shadow: none; background: #991b1b; } 
@@ -221,7 +188,7 @@
             0%, 49% { box-shadow: none; background: #1e3a8a; } 
             50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } 
         }
-        @keyframes driveOpposite { 0% { right: -150px; } 100% { right: 120vw; } }
+        @keyframes driveOpposite { 0% { left: 120vw; } 100% { left: -150px; } }
 
         .city-slider {
             display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; 
@@ -234,6 +201,14 @@
         .truck-chip.active { opacity: 1; transform: scale(1.03) translateY(-2px); z-index: 30; }
         
         .truck-wrapper { filter: brightness(var(--truck-body-brightness)); transition: filter 0.2s ease-out; }
+
+        @keyframes truckBump {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-2px); }
+        }
+        .auto-driving .truck-wrapper {
+            animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s);
+        }
 
         .headlight-beam {
             position: absolute; width: 70px; height: 20px;
@@ -253,55 +228,70 @@
             opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 1px;
         }
         
-        .lenta-trailer-bg {
-            background: linear-gradient(90deg, #1e3a8a 35%, #ffffff 35%);
-        }
-        .lenta-fruit-bg {
-            background-image: 
-                radial-gradient(circle at 70% 30%, #84cc16 4px, transparent 5px), 
-                radial-gradient(circle at 60% 70%, #ef4444 6px, transparent 7px), 
-                radial-gradient(circle at 85% 60%, #eab308 5px, transparent 6px), 
-                radial-gradient(circle at 50% 50%, #f97316 4px, transparent 5px); 
-            background-size: 30px 100%;
-            background-repeat: no-repeat;
-        }
-        
-        @keyframes truckBump {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-2px); }
-        }
-        
-        .auto-driving .truck-wrapper {
-            animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s);
-        }
-
         .dark .city-name-plaque {
             background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
         }
+
+        @keyframes fadeScene1 { 0%, 22% { opacity: 1; } 25%, 100% { opacity: 0; } }
+        @keyframes fadeScene2 { 0%, 22% { opacity: 0; } 25%, 47% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        @keyframes fadeScene3 { 0%, 47% { opacity: 0; } 50%, 72% { opacity: 1; } 75%, 100% { opacity: 0; } }
+        @keyframes fadeScene4 { 0%, 72% { opacity: 0; } 75%, 97% { opacity: 1; } 100% { opacity: 0; } }
+        
+        .normal-mode .anim-scene-1 { animation: fadeScene1 20s infinite; }
+        .normal-mode .anim-scene-2 { animation: fadeScene2 20s infinite; opacity: 0; }
+        .normal-mode .anim-scene-3 { animation: fadeScene3 20s infinite; opacity: 0; }
+        .normal-mode .anim-scene-4 { animation: fadeScene4 20s infinite; opacity: 0; }
+
+        .wrench-arm { animation: wrenchMotion 0.6s infinite alternate ease-in-out; transform-origin: 30px 28px; }
+        @keyframes wrenchMotion { 0% { transform: rotate(-10deg); } 100% { transform: rotate(15deg); } }
+        
+        .hammer-arm { animation: hammerMotion 0.4s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 75px 28px; }
+        @keyframes hammerMotion { 0% { transform: rotate(25deg); } 100% { transform: rotate(-20deg); } }
+
+        .urea-drips circle { animation: dripDrop 0.8s infinite linear; }
+        @keyframes dripDrop { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+
+        .roll-tire { animation: tireRoll 2s infinite linear; transform-origin: 80px 40px; }
+        @keyframes tireRoll { 0% { transform: translateX(10px) rotate(0deg); } 100% { transform: translateX(-15px) rotate(-180deg); } }
+
+        .welding-sparks circle { animation: sparkFlash 0.15s infinite alternate; transform-origin: center; }
+        .welding-sparks circle:nth-child(2) { animation-delay: 0.05s; }
+        .welding-sparks circle:nth-child(3) { animation-delay: 0.1s; }
+        @keyframes sparkFlash { 
+            0% { opacity: 0; transform: scale(0.5) translate(0,0); } 
+            100% { opacity: 1; transform: scale(2) translate(3px, -3px); } 
+        }
+
+        .party-mode .dancing-scene { display: block; }
+        .party-mode .normal-scenes { display: none; }
+        .normal-mode .dancing-scene { display: none; }
+        .normal-mode .normal-scenes { display: block; }
+
+        .dance-full-body-left { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
+        @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-3px) scaleY(1.05); } }
+        
+        .dance-arms-left { animation: waveArms 0.4s infinite alternate ease-in-out; transform-origin: 35px 28px; }
+        @keyframes waveArms { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
+
+        .dance-full-body-right { animation: discoSway 0.5s infinite alternate ease-in-out; transform-origin: bottom center; }
+        @keyframes discoSway { 0% { transform: translateX(-2px) rotate(-3deg); } 100% { transform: translateX(2px) rotate(3deg); } }
+        
+        .dance-arm-disco { animation: discoPoint 0.5s infinite alternate ease-in-out; transform-origin: 85px 30px; }
+        @keyframes discoPoint { 0% { transform: rotate(-40deg); } 100% { transform: rotate(10deg); } }
+
+        .music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; }
+        .music-notes text:nth-child(2) { animation-delay: 0.6s; }
+        @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
+
     </style>
 </head>
-<body class="relative">
+<body class="relative flex flex-col min-h-screen">
 
     <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
 
-    <div id="localWarningModal" class="fixed inset-0 z-[200] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal">
-            <div class="w-16 h-16 mx-auto bg-amber-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-md">
-                <svg class="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </div>
-            <h3 class="text-xl font-black text-lentaDark dark:text-white mb-2 tracking-tight">Внимание</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 font-medium leading-relaxed">
-                Вы открыли файл с памяти телефона.<br><br>Для скачивания APK, работы микрофона и музыки откройте сайт по ссылке <b>github.io</b>!
-            </p>
-            <button onclick="document.getElementById('localWarningModal').classList.add('hidden');" class="w-full bg-lentaBlue hover:bg-[#003366] text-white font-bold py-3.5 rounded-xl tactile-btn">
-                Понятно
-            </button>
-        </div>
-    </div>
-
-    <!-- Модалка навигации -->
+    <!-- Навигационный Модал -->
     <div id="navModal" class="fixed inset-0 z-[100] bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal">
+        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
             <button onclick="closeNavModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
@@ -325,14 +315,37 @@
         </div>
     </div>
 
-    <header class="glass-header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pb-4">
+    <!-- Модал вызова Механика -->
+    <div id="mechanicModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
+            <button onclick="closeMechanicModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
             
+            <div class="w-20 h-20 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-gray-200 dark:border-slate-600 shadow-inner">
+                <svg class="w-10 h-10 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            
+            <h3 class="text-xl font-black text-lentaDark dark:text-white mb-1 tracking-tight uppercase">Механик</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">Дежурный гараж</p>
+            
+            <a href="tel:+79826209051" class="block font-black text-gray-800 dark:text-white text-3xl mb-6 hover:text-emerald-500 transition-colors tracking-tight">8 (982) 620-90-51</a>
+            
+            <a href="tel:+79826209051" onclick="closeMechanicModal()" class="block w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-base font-bold transition-all tactile-btn shadow-[0_8px_25px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                Позвонить
+            </a>
+        </div>
+    </div>
+
+    <header class="glass-header">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 relative z-10 pb-4">
+            
+            <!-- СТРОКА 1: Логотип и кнопки -->
             <div class="flex flex-row items-center justify-between gap-4 mb-4">
                 <div class="flex items-center gap-3 shrink-0">
-                    <!-- ИНТЕРАКТИВНЫЙ ПОДСОЛНУХ (Музыка и Автопилот) -->
-                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Музыка/Пауза. 2 Тапа: Сброс в начало!">
-                        <img id="logoImage" src="icon.png" alt="Логотип" class="w-full h-full object-cover transition-transform group-hover:scale-105">
+                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Плей/Пауза">
+                        <img id="logoImage" src="icon.png" alt="Логотип" class="w-full h-full object-cover transition-transform group-hover:scale-105" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ccircle cx=\\'50\\' cy=\\'50\\' r=\\'50\\' fill=\\'%23FDCB05\\'/%3E%3Ccircle cx=\\'50\\' cy=\\'50\\' r=\\'20\\' fill=\\'%23004182\\'/%3E%3C/svg%3E'">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent pointer-events-none rounded-full mix-blend-overlay"></div>
                     </div>
                     <div>
@@ -345,22 +358,150 @@
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-2 shrink-0">
-                    <!-- Кнопка Темы (День/Ночь) Ручное управление -->
+                <div class="flex items-center gap-1.5 shrink-0">
                     <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-10 h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn" title="Сменить тему">
                         <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
                     </button>
-                    <!-- Кнопка APK -->
-                    <a href="app.apk" download onclick="checkLocal(event)" class="flex items-center justify-center gap-1.5 bg-[#004182] hover:bg-[#003366] text-white h-10 px-3 rounded-xl shadow-[0_6px_15px_rgba(0,65,130,0.2)] transition-all tactile-btn cursor-pointer">
+                    <a href="app.apk" download class="flex items-center justify-center gap-1.5 bg-[#004182] hover:bg-[#003366] text-white h-10 px-3 rounded-xl shadow-[0_6px_15px_rgba(0,65,130,0.2)] transition-all tactile-btn cursor-pointer">
                         <svg class="w-4 h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         <span class="text-[11px] font-bold tracking-wide uppercase">APK</span>
                     </a>
                 </div>
             </div>
+
+            <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ (МЕХАНИКИ, СЧЕТЧИК, СКОРОСТЬ) -->
+            <div class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between">
+                
+                <!-- Левая часть: Новый Надежный Счётчик (Картинка без скриптов) -->
+                <div class="flex flex-col items-center justify-center shrink-0 min-w-[70px]" title="Счетчик визитов">
+                    <img id="visitCounterBadge" alt="Визиты" class="h-[20px] rounded shadow-sm opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0')" onerror="this.style.display='none'">
+                </div>
+
+                <!-- Центральная часть: Многосерийная сценка с механиками и Танцами -->
+                <div class="relative flex flex-col items-center cursor-pointer tactile-btn group mx-auto w-[120px]" onclick="playTickSound(); openMechanicModal();">
+                    
+                    <div id="mechanicSpeech" class="absolute bottom-[85%] mb-1 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] opacity-0 transform scale-95 transition-all duration-300 whitespace-nowrap pointer-events-none z-[110]">
+                        <!-- Текст подставится скриптом -->
+                    </div>
+
+                    <div class="w-full h-14 md:h-16 relative" id="mechanicSvgContainer">
+                        <svg viewBox="0 0 120 60" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full text-gray-400 dark:text-gray-500 group-hover:text-emerald-500 transition-colors normal-mode" id="mechanicSvgElement">
+                            
+                            <!-- НОРМАЛЬНЫЕ СЦЕНЫ РАБОТЫ -->
+                            <g class="normal-scenes absolute inset-0">
+                                <g class="anim-scene-1 anim-scene-3 anim-scene-4">
+                                    <circle cx="55" cy="40" r="14" stroke-width="4"/>
+                                    <circle cx="55" cy="40" r="4" fill="currentColor"/>
+                                </g>
+                                <g class="anim-scene-1 absolute inset-0">
+                                    <circle cx="30" cy="18" r="6" />
+                                    <path d="M30 24 V 45" />
+                                    <path d="M30 45 L 20 58 M 30 45 L 40 58" />
+                                    <path d="M30 28 L 20 38" />
+                                    <g class="wrench-arm">
+                                        <path d="M30 28 L 45 38" />
+                                        <path d="M43 35 L 50 42" stroke-width="2"/>
+                                        <path d="M52 38 C 50 36, 47 39, 50 42" stroke-width="2" fill="none"/>
+                                    </g>
+                                    <circle cx="80" cy="18" r="6" />
+                                    <path d="M80 24 V 45" />
+                                    <path d="M80 45 L 70 58 M 80 45 L 90 58" />
+                                    <path d="M80 28 L 90 38" />
+                                    <g class="hammer-arm">
+                                        <path d="M80 28 L 65 35" />
+                                        <path d="M62 32 L 59 38" stroke-width="2"/>
+                                        <rect x="57" y="30" width="4" height="4" fill="currentColor" stroke="none" transform="rotate(-30 59 32)"/>
+                                    </g>
+                                </g>
+                                <g class="anim-scene-2 absolute inset-0">
+                                    <circle cx="35" cy="20" r="6" />
+                                    <path d="M35 26 V 45" />
+                                    <path d="M35 45 L 25 58 M 35 45 L 45 58" />
+                                    <path d="M35 30 L 50 38" />
+                                    <rect x="65" y="25" width="45" height="33" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
+                                    <path d="M75 25 V 20 H 80 V 25" fill="none"/>
+                                    <path d="M50 38 C 60 48, 70 15, 77 20" fill="none" stroke="currentColor" stroke-width="2"/>
+                                    <g class="urea-drips">
+                                        <circle cx="77.5" cy="23" r="1.5" fill="#3b82f6" stroke="none"/>
+                                    </g>
+                                </g>
+                                <g class="anim-scene-3 absolute inset-0">
+                                    <circle cx="30" cy="18" r="6" />
+                                    <path d="M30 24 V 45" />
+                                    <path d="M30 45 L 20 58 M 30 45 L 40 58" />
+                                    <path d="M30 28 L 20 38" />
+                                    <path d="M30 28 C 30 20, 35 15, 35 18" stroke-width="2"/> 
+                                    <circle cx="95" cy="18" r="6" />
+                                    <path d="M95 24 V 45" />
+                                    <path d="M95 45 L 85 58 M 95 45 L 105 58" />
+                                    <path d="M95 30 L 105 40" />
+                                    <path d="M95 30 L 80 40" />
+                                    <g class="roll-tire">
+                                        <circle cx="80" cy="40" r="10" stroke-width="3"/>
+                                        <path d="M80 30 V 50 M 70 40 H 90" stroke-width="1"/>
+                                    </g>
+                                </g>
+                                <g class="anim-scene-4 absolute inset-0">
+                                    <circle cx="35" cy="20" r="6" />
+                                    <path d="M30 15 L 42 16 L 41 24 L 32 23 Z" fill="currentColor"/>
+                                    <path d="M35 26 V 45" />
+                                    <path d="M35 45 L 25 58 M 35 45 L 45 58" />
+                                    <path d="M35 30 L 48 38" />
+                                    <path d="M35 28 L 45 35" />
+                                    <path d="M48 38 L 53 43" stroke-width="2"/>
+                                    <g class="welding-sparks">
+                                        <circle cx="55" cy="45" r="1.5" fill="#facc15" stroke="none"/>
+                                        <circle cx="58" cy="42" r="1" fill="#facc15" stroke="none"/>
+                                        <circle cx="52" cy="48" r="2" fill="#ef4444" stroke="none"/>
+                                    </g>
+                                </g>
+                            </g>
+
+                            <!-- СЦЕНА ДИСКОТЕКИ -->
+                            <g class="dancing-scene absolute inset-0">
+                                <g class="music-notes">
+                                    <text x="45" y="20" font-size="12" fill="currentColor">♪</text>
+                                    <text x="65" y="15" font-size="16" fill="currentColor">♫</text>
+                                </g>
+                                <!-- Танцор 1: Волна / Ламбада -->
+                                <g class="dance-full-body-left">
+                                    <circle cx="35" cy="20" r="6" />
+                                    <path d="M35 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M35 45 L 25 58 M 35 45 L 45 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <g class="dance-arms-left">
+                                        <path d="M20 15 Q 35 35 50 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    </g>
+                                </g>
+                                <!-- Танцор 2: Король Диско -->
+                                <g class="dance-full-body-right">
+                                    <circle cx="85" cy="20" r="6" />
+                                    <path d="M85 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M85 45 L 75 58 M 85 45 L 95 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M85 30 L 78 37 L 82 42" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/> 
+                                    <g class="dance-arm-disco">
+                                        <path d="M85 30 L 98 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0 text-center w-full">Механик</div>
+                </div>
+                
+                <!-- Правая часть: Умный знак скорости -->
+                <div class="flex flex-col items-center justify-center cursor-default shrink-0" title="Ограничение скорости на этот сезон">
+                    <div class="w-10 h-10 rounded-full border-[3px] border-red-500 bg-white dark:bg-gray-100 flex items-center justify-center shadow-[0_4px_10px_rgba(239,68,68,0.2)] relative">
+                        <span id="speedLimitNumber" class="text-slate-800 font-black text-base leading-none tracking-tighter">80</span>
+                        <div id="seasonIcon" class="absolute -bottom-1 -right-2 w-4 h-4 rounded-full flex items-center justify-center text-[8px] shadow-sm border"></div>
+                    </div>
+                </div>
+
+            </div>
             
-            <div class="flex items-center gap-2 w-full mb-4">
+            <!-- СТРОКА 3: Поиск -->
+            <div class="flex items-center gap-2 w-full mb-4 mt-2">
                 <div class="relative flex-1 group">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-lentaBlue dark:group-focus-within:text-blue-400 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -379,6 +520,7 @@
                 </button>
             </div>
 
+            <!-- СТРОКА 4: Анимация окружения -->
             <div class="relative overflow-hidden rounded-[16px] shadow-[inset_0_4px_15px_rgba(0,0,0,0.05)] border border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-900">
                 <div class="scenic-bg group">
                     <div id="skyDay" class="sky-layer sky-day"></div>
@@ -395,7 +537,6 @@
                     <div id="layerLeaves" class="weather-layer leaves-anim"></div>
                     <div id="layerSnow" class="weather-layer snow-anim"></div>
 
-                    <!-- Добавленные знаки и полицейская машина -->
                     <div id="layerSigns" class="parallax-signs"></div>
                     <div id="layerRoad" class="parallax-road"></div>
                     
@@ -406,65 +547,46 @@
                         <div class="absolute top-1 right-2 w-6 h-3 bg-sky-200/50 rounded-sm"></div>
                         <div class="absolute bottom-[-2px] left-2 w-3.5 h-3.5 bg-gray-800 rounded-full border border-gray-400"></div>
                         <div class="absolute bottom-[-2px] right-2 w-3.5 h-3.5 bg-gray-800 rounded-full border border-gray-400"></div>
-                        <!-- Фары -->
                         <div class="absolute bottom-1 right-0 w-2 h-2 bg-yellow-200 rounded-full shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]"></div>
                         <div class="absolute bottom-1 left-0 w-1 h-2 bg-red-500 rounded-full"></div>
                     </div>
 
-                    <!-- Контейнер для фур -->
                     <div id="citySlider" class="city-slider relative z-30 cursor-pointer"></div>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 relative z-10">
-        <div class="flex justify-between items-center mb-5 px-1">
-            <span id="rowCount" class="text-[11px] md:text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700">Загрузка...</span>
-            <span class="text-[11px] md:text-xs font-bold text-lentaBlue dark:text-blue-300 bg-blue-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-blue-100 dark:border-slate-700">Маршрут: 8092</span>
-        </div>
-        
-        <!-- Сетка для карточек -->
-        <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 relative z-10 flex-1">
+        <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 mb-8"></div>
     </main>
 
     <script>
-        function checkLocal(e) {
-            if (window.location.protocol === 'file:' || window.location.protocol === 'content:') {
-                if(e) e.preventDefault();
-                document.getElementById('localWarningModal').classList.remove('hidden');
-            }
+        // === НАДЕЖНЫЙ СЧЕТЧИК БЕЗ КЭША ===
+        function initCounter() {
+            const badge = document.getElementById('visitCounterBadge');
+            const uniqueTime = Date.now(); 
+            badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v2.svg?label=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&color=1e293b&labelColor=334155&nocache=${uniqueTime}`;
         }
+        initCounter();
 
-        // ==========================================
-        // РУЧНАЯ ТЕМА (День/Ночь)
-        // ==========================================
         function toggleTheme() {
             const html = document.documentElement;
             html.classList.toggle('dark');
-            updateThemeIcon();
-        }
-
-        function updateThemeIcon() {
-            const isDark = document.documentElement.classList.contains('dark');
+            const isDark = html.classList.contains('dark');
             const themeIcon = document.getElementById('themeIcon');
             const themeBtn = document.getElementById('themeToggleBtn');
             if (isDark) {
-                // Солнце
                 themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
                 themeBtn.classList.add('text-amber-500');
                 themeBtn.classList.remove('text-gray-400', 'dark:text-gray-400');
             } else {
-                // Луна
                 themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
                 themeBtn.classList.remove('text-amber-500');
                 themeBtn.classList.add('text-gray-400', 'dark:text-gray-400');
             }
         }
 
-        // ==========================================
-        // ПРОФЕССИОНАЛЬНЫЙ АУДИО ДВИЖОК
-        // ==========================================
         let audioCtx = null;
         let engineOsc = null;
         let engineGain = null;
@@ -473,39 +595,30 @@
         function unlockAudio() {
             if (isAudioUnlocked) return;
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (AudioContext) audioCtx = new AudioContext();
-            
-            if (audioCtx) {
+            if (AudioContext) {
+                audioCtx = new AudioContext();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-                
                 try {
-                    // Создаем вечный мотор
                     engineOsc = audioCtx.createOscillator();
                     engineGain = audioCtx.createGain();
                     const filter = audioCtx.createBiquadFilter();
-                    
                     engineOsc.type = 'sawtooth';
-                    engineOsc.frequency.value = 35; // Басовитый дизель
+                    engineOsc.frequency.value = 35;
                     filter.type = 'lowpass';
                     filter.frequency.value = 150; 
-                    
-                    engineGain.gain.value = 0; // Изначально тишина
-                    
+                    engineGain.gain.value = 0; 
                     engineOsc.connect(filter);
                     filter.connect(engineGain);
                     engineGain.connect(audioCtx.destination);
-                    
                     engineOsc.start();
                     isAudioUnlocked = true;
                 } catch(e) {}
             }
         }
 
-        // Разблокировка по первому касанию экрана (Свайпу)
         document.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
         document.addEventListener('mousedown', unlockAudio, { passive: true, once: true });
 
-        // Звук трещотки (Вертикальный скролл)
         function playTickSound() {
             if (!isAudioUnlocked || !audioCtx) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -513,42 +626,35 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'square'; 
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.015);
-                
-                // Приятная, тактильная громкость
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime); 
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
-                
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.02);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); 
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.02);
+                osc.stop(audioCtx.currentTime + 0.03);
             } catch (e) {}
         }
 
-        // Управление мотором фуры
         let engineTimeout;
         function playEngineSound(speed) {
             if (!isAudioUnlocked || !audioCtx || !engineGain) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
-            // Вычисляем мощь дизеля
-            const vol = Math.min(0.6, speed * 0.4); 
-            const freq = Math.min(65, 35 + speed * 20);
+            // ЗНАЧИТЕЛЬНО УМЕНЬШЕНА ГРОМКОСТЬ МОТОРА (чтобы не перебивал музыку)
+            const vol = Math.min(0.12, speed * 0.15); 
             
+            const freq = Math.min(70, 35 + speed * 25);
             engineGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
             engineOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
-            
             clearTimeout(engineTimeout);
             engineTimeout = setTimeout(() => {
-                // Плавно глушим мотор при остановке
                 engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
                 engineOsc.frequency.setTargetAtTime(35, audioCtx.currentTime, 0.2);
             }, 150);
         }
 
-        // Вертикальный скроллинг (Трещотка)
         let lastScrollY = window.scrollY;
         let accumulatedVerticalDist = 0;
         let lastVerticalTickTime = 0;
@@ -557,10 +663,9 @@
             const currentY = window.scrollY;
             const dist = Math.abs(currentY - lastScrollY);
             lastScrollY = currentY;
-
             if (dist > 1) {
                 accumulatedVerticalDist += dist;
-                if (accumulatedVerticalDist > 80) { 
+                if (accumulatedVerticalDist > 60) { 
                     const now = Date.now();
                     if (now - lastVerticalTickTime > 40) { 
                         playTickSound();
@@ -572,35 +677,68 @@
         }, { passive: true });
 
         const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = 0.12; // Комфортный фон, не глушит спецэффекты
+        bgMusic.volume = 0.45; // Увеличена громкость для компьютеров
         let isMusicPlaying = false;
         let lastLogoTapTime = 0;
         let autoScrollAnimationId = null;
+        const citySlider = document.getElementById('citySlider');
+        let virtualScrollX = 0;
+        let lastActualScrollLeft = 0;
 
-        // ==========================================
-        // ЛОГИКА ПОДСОЛНУХА (Одиночный и Двойной ТАП)
-        // ==========================================
+        // === ПЕРЕТАСКИВАНИЕ МАШИНОК МЫШКОЙ (ДЛЯ ПК) ===
+        let isMouseDown = false;
+        let startX;
+        let scrollLeftPos;
+
+        citySlider.addEventListener('mousedown', (e) => {
+            if (isMusicPlaying) return;
+            isMouseDown = true;
+            citySlider.style.cursor = 'grabbing';
+            startX = e.pageX - citySlider.offsetLeft;
+            scrollLeftPos = citySlider.scrollLeft;
+        });
+
+        citySlider.addEventListener('mouseleave', () => {
+            isMouseDown = false;
+            citySlider.style.cursor = 'grab';
+        });
+
+        citySlider.addEventListener('mouseup', () => {
+            isMouseDown = false;
+            citySlider.style.cursor = 'grab';
+        });
+
+        citySlider.addEventListener('mousemove', (e) => {
+            if (!isMouseDown || isMusicPlaying) return;
+            e.preventDefault();
+            const x = e.pageX - citySlider.offsetLeft;
+            const walk = (x - startX) * 2; // Множитель скорости прокрутки
+            citySlider.scrollLeft = scrollLeftPos - walk;
+        });
+        citySlider.style.cursor = 'grab';
+        // =============================================
+
         function handleLogoTap() {
-            unlockAudio(); // Гарантированная разблокировка
+            unlockAudio();
             const now = Date.now();
-            
             if (now - lastLogoTapTime < 400) {
-                // ----------------------------------------------------
-                // ДВОЙНОЙ ТАП - СТОП И СБРОС (Reset to start)
-                // ----------------------------------------------------
+                // Двойной тап - выключаем
+                if (isMusicPlaying) {
+                    showMechanicPhrase(true); // Показываем фразу разочарования
+                }
+                
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
                 isMusicPlaying = false;
                 document.getElementById('logoImage').classList.remove('record-spin');
+                
+                const mechSvg = document.getElementById('mechanicSvgElement');
+                mechSvg.classList.remove('party-mode');
+                mechSvg.classList.add('normal-mode');
+
                 stopAutoScroll(); 
-                
-                // Сброс сцены и фур в самое начало!
                 resetTrucksToStart();
-                
             } else {
-                // ----------------------------------------------------
-                // ОДИНОЧНЫЙ ТАП - ПЛЕЙ / ПАУЗА
-                // ----------------------------------------------------
                 toggleMusicState();
             }
             lastLogoTapTime = now;
@@ -608,26 +746,31 @@
 
         function toggleMusicState() {
             const logo = document.getElementById('logoImage');
+            const mechSvg = document.getElementById('mechanicSvgElement');
+
             if (isMusicPlaying) {
-                // СТАВИМ НА ПАУЗУ
+                showMechanicPhrase(true); // Показываем фразу разочарования при паузе
+                
                 bgMusic.pause();
                 isMusicPlaying = false;
-                logo.classList.remove('record-spin'); // Останавливаем пластинку
-                stopAutoScroll(); // Останавливаем караван (фуры замирают на месте)
-                // *После этого можно листать фуры вручную*
+                logo.classList.remove('record-spin');
+                mechSvg.classList.remove('party-mode'); // Убираем дискотеку
+                mechSvg.classList.add('normal-mode');   // Возвращаем обычный режим работы
+                stopAutoScroll(); 
             } else {
-                // ИГРАЕМ МУЗЫКУ И ЗАПУСКАЕМ КИНО
                 const playPromise = bgMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         isMusicPlaying = true;
-                        logo.classList.add('record-spin'); // Крутим пластинку
-                        startAutoScroll(); // Запускаем караван
+                        logo.classList.add('record-spin');
+                        mechSvg.classList.remove('normal-mode');
+                        mechSvg.classList.add('party-mode');
+                        startAutoScroll();
                     }).catch((e) => {
-                        console.log("Музыка не найдена, но запускаем автопилот фур!", e);
-                        // Если аудио файла нет, всё равно запускаем визуальную часть (кино)
                         isMusicPlaying = true; 
                         logo.classList.add('record-spin');
+                        mechSvg.classList.remove('normal-mode');
+                        mechSvg.classList.add('party-mode');
                         startAutoScroll();
                     });
                 }
@@ -635,29 +778,21 @@
         }
 
         function resetTrucksToStart() {
-            // Заново собираем список фур в исходном порядке
             buildCitySlider(); 
-            // Сбрасываем скролл и переменные
             citySlider.scrollLeft = 0;
             virtualScrollX = 0;
+            window.fractionalScroll = 0;
             lastActualScrollLeft = 0;
-            // Отматываем природу на 0 (Утро, чистое небо)
             updateParallax(0);
         }
 
-        const citySlider = document.getElementById('citySlider');
-        let virtualScrollX = 0;
-        let lastActualScrollLeft = 0;
         let lastSliderScrollTime = Date.now();
-
-        // Ручная прокрутка
         citySlider.addEventListener('scroll', () => {
-            if (isMusicPlaying) return; // Во время автопилота ручной скролл блокируется логикой
+            if (isMusicPlaying) return; 
             const currentScroll = citySlider.scrollLeft;
             const dx = currentScroll - lastActualScrollLeft;
-            
             if (Math.abs(dx) > 0) {
-                virtualScrollX += dx;
+                virtualScrollX += Math.abs(dx); 
                 const now = Date.now();
                 const dt = now - lastSliderScrollTime;
                 if (dt > 16) {
@@ -670,7 +805,6 @@
             lastActualScrollLeft = currentScroll;
         }, { passive: true });
 
-        // Автопилот (Бесконечный цикл)
         function startAutoScroll() {
             if (!autoScrollAnimationId) {
                 lastActualScrollLeft = citySlider.scrollLeft;
@@ -685,48 +819,48 @@
                 autoScrollAnimationId = null;
             }
             citySlider.classList.remove('auto-driving');
-            // Глушим мотор при остановке автопилота
-            if (engineGain) {
-                engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
-            }
-            // Прячем полицию, если она была на экране
+            if (engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
             document.getElementById('policeCar').classList.remove('active');
         }
 
         let policeTimer = 0;
-
+        
         function autoScrollLoop() {
             if (!isMusicPlaying) return;
 
-            // ЗАМЕДЛИЛИ ФУРЫ (было 1.2, стало 0.6)
-            const speed = 0.6; 
-            virtualScrollX += speed;
-            citySlider.scrollLeft += speed;
-            
-            playEngineSound(0.4); // Легкое урчание дизеля на автопилоте
+            const speed = 0.5; 
+            virtualScrollX += speed; 
+            playEngineSound(0.4); 
 
-            // Полицейская машина пролетает навстречу (примерно раз в 10-15 сек)
             policeTimer++;
-            if (policeTimer > 600) { 
+            if (policeTimer > 700) { 
                 if (Math.random() > 0.98) {
                     const pCar = document.getElementById('policeCar');
                     if (!pCar.classList.contains('active')) {
                         pCar.classList.add('active');
-                        setTimeout(() => { pCar.classList.remove('active'); }, 4500); // Время совпадает с анимацией 4.5s
+                        setTimeout(() => { pCar.classList.remove('active'); }, 4500); 
                         policeTimer = 0;
                     }
                 }
             }
 
-            // Магия бесконечной ленты: если первая фура уехала за край экрана, переставляем её в конец!
             if (citySlider.firstElementChild) {
-                const firstItem = citySlider.firstElementChild;
-                const itemWidth = firstItem.offsetWidth + 20; // 20 - это margin-right
+                window.fractionalScroll = (window.fractionalScroll || 0) + speed;
                 
-                if (citySlider.scrollLeft >= itemWidth) {
-                    citySlider.appendChild(firstItem); // Перенос в конец
-                    citySlider.scrollLeft -= itemWidth; // Сброс скролла без дерганий
-                    lastActualScrollLeft = citySlider.scrollLeft; // Синхронизация
+                if (window.fractionalScroll >= 1) {
+                    let shift = Math.floor(window.fractionalScroll);
+                    window.fractionalScroll -= shift;
+                    
+                    citySlider.scrollLeft -= shift;
+                    
+                    if (citySlider.scrollLeft <= 0) {
+                        const lastItem = citySlider.lastElementChild;
+                        const itemWidth = lastItem.offsetWidth + 20;
+                        citySlider.insertBefore(lastItem, citySlider.firstElementChild);
+                        citySlider.scrollLeft += itemWidth;
+                    }
+                    
+                    lastActualScrollLeft = citySlider.scrollLeft;
                 }
             }
 
@@ -735,16 +869,14 @@
         }
 
         function updateParallax(vX) {
-            // Бесконечное движение фона (Остаток от деления защищает от переполнения)
             document.getElementById('layerMountains').style.transform = `translate3d(-${(vX * 0.2) % 200}px, 0, 0)`;
             document.getElementById('layerTrees').style.transform = `translate3d(-${(vX * 0.5) % 100}px, 0, 0)`;
             document.getElementById('layerRoad').style.transform = `translate3d(-${(vX * 0.9) % 40}px, 0, 0)`;
-            document.getElementById('layerSigns').style.transform = `translate3d(-${(vX * 0.9) % 1000}px, 0, 0)`; // Знаки едут вместе с дорогой
+            document.getElementById('layerSigns').style.transform = `translate3d(-${(vX * 0.9) % 2200}px, 0, 0)`;
 
-            // Смена дня и ночи (Плавный цикл туда-обратно каждые 3000 пикселей)
             const cycleLength = 3000;
             let rawProgress = (Math.abs(vX) % cycleLength) / cycleLength; 
-            let progress = 1 - Math.abs(rawProgress * 2 - 1); // Дает плавное 0 -> 1 -> 0
+            let progress = 1 - Math.abs(rawProgress * 2 - 1); 
 
             document.getElementById('skyDay').style.opacity = Math.max(0, 1 - (progress * 2));
             document.getElementById('skySunset').style.opacity = progress < 0.5 ? (progress * 2) : Math.max(0, 1 - ((progress - 0.5) * 2));
@@ -753,7 +885,6 @@
 
             const darkness = 1 - (progress * 0.7); 
             
-            // Включение фар ночью на всех фурах
             if (progress > 0.6) {
                 document.documentElement.style.setProperty('--truck-light-opacity', '1');
                 document.documentElement.style.setProperty('--truck-body-brightness', '0.6');
@@ -762,7 +893,6 @@
                 document.documentElement.style.setProperty('--truck-body-brightness', '1');
             }
 
-            // Погода и листья
             const layerTrees = document.getElementById('layerTrees');
             const layerLeaves = document.getElementById('layerLeaves');
             const layerSnow = document.getElementById('layerSnow');
@@ -783,7 +913,6 @@
                 layerTrees.style.filter = `brightness(${darkness}) grayscale(${p * 0.8}) brightness(${1 + p*0.5})`;
             }
 
-            // Солнце и луна летят по дуге
             const sunBody = document.getElementById('sunBody');
             const moonBody = document.getElementById('moonBody');
             if (progress <= 0.6) {
@@ -941,36 +1070,67 @@
         });
 
         const cabVariants = [
-            // MAN (Синий)
-            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-[#1e3a8a] border-y border-r border-b-2 border-[#172554] shadow-md rounded-tr-md rounded-br-sm relative ml-[1px] z-20">
-                <div class="headlight-beam" style="top: 18px; right: -45px;"></div><div class="marker-light" style="right: 2px;"></div>
-                <div class="absolute top-1 right-1 w-3 md:w-3.5 h-4 md:h-5 bg-sky-100/90 rounded-tr-sm border-b border-l border-sky-300"></div>
-                <div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div>
-            </div>`,
-            // Kamaz K5 (Белый)
-            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-gray-50 border-y border-r border-b-2 border-gray-300 shadow-md rounded-tr-[12px] rounded-br-sm relative ml-[1px] z-20">
-                <div class="headlight-beam" style="top: 22px; right: -45px;"></div><div class="marker-light" style="right: 4px;"></div>
-                <div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-[8px] border-b border-l border-sky-300"></div>
-                <div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div>
-            </div>`,
-            // Dongfeng (Красный)
-            `<div class="cab w-8 md:w-9 h-9 md:h-10 bg-[#dc2626] border-y border-r border-b-2 border-[#991b1b] shadow-md rounded-tr-[24px] rounded-br-sm relative ml-[1px] z-20 overflow-hidden">
-                <div class="headlight-beam" style="top: 24px; right: -40px; transform: skewX(-30deg);"></div>
-                <div class="absolute top-1 right-1 w-4 md:w-5 h-3 md:h-4 bg-sky-200/80 rounded-tr-[16px] border-b border-l border-sky-300 transform -skew-x-12"></div>
-                <div class="absolute -bottom-1.5 right-1.5"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div>
-            </div>`,
-            // Scania (Темно-синий)
-            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-[#0f172a] border-y border-r border-b-2 border-black shadow-md rounded-tr-lg rounded-br-md relative ml-[1px] z-20">
-                <div class="headlight-beam" style="top: 26px; right: -45px;"></div><div class="marker-light" style="right: 2px;"></div>
-                <div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-md border-b border-l border-sky-300 transform -skew-x-6"></div>
-                <div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div>
-            </div>`,
-            // FAW (Серый)
-            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-gray-300 border-y border-r border-b-2 border-gray-400 shadow-md rounded-tr-2xl rounded-br-sm relative ml-[1px] z-20">
-                <div class="headlight-beam" style="top: 20px; right: -45px;"></div><div class="marker-light" style="right: 6px; top: -1px;"></div>
-                <div class="absolute top-1.5 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-xl border-b border-l border-sky-300"></div>
-                <div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-400 shadow-sm"></div></div>
-            </div>`
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-[#1e3a8a] border-y border-r border-b-2 border-[#172554] shadow-md rounded-tr-md rounded-br-sm relative ml-[1px] z-20"><div class="headlight-beam" style="top: 18px; right: -45px;"></div><div class="marker-light" style="right: 2px;"></div><div class="absolute top-1 right-1 w-3 md:w-3.5 h-4 md:h-5 bg-sky-100/90 rounded-tr-sm border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-gray-50 border-y border-r border-b-2 border-gray-300 shadow-md rounded-tr-[12px] rounded-br-sm relative ml-[1px] z-20"><div class="headlight-beam" style="top: 22px; right: -45px;"></div><div class="marker-light" style="right: 4px;"></div><div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-[8px] border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-8 md:w-9 h-9 md:h-10 bg-[#dc2626] border-y border-r border-b-2 border-[#991b1b] shadow-md rounded-tr-[24px] rounded-br-sm relative ml-[1px] z-20 overflow-hidden"><div class="headlight-beam" style="top: 24px; right: -40px; transform: skewX(-30deg);"></div><div class="absolute top-1 right-1 w-4 md:w-5 h-3 md:h-4 bg-sky-200/80 rounded-tr-[16px] border-b border-l border-sky-300 transform -skew-x-12"></div><div class="absolute -bottom-1.5 right-1.5"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-[#0f172a] border-y border-r border-b-2 border-black shadow-md rounded-tr-lg rounded-br-md relative ml-[1px] z-20"><div class="headlight-beam" style="top: 26px; right: -45px;"></div><div class="marker-light" style="right: 2px;"></div><div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-md border-b border-l border-sky-300 transform -skew-x-6"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-gray-300 border-y border-r border-b-2 border-gray-400 shadow-md rounded-tr-2xl rounded-br-sm relative ml-[1px] z-20"><div class="headlight-beam" style="top: 20px; right: -45px;"></div><div class="marker-light" style="right: 6px; top: -1px;"></div><div class="absolute top-1.5 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-xl border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-400 shadow-sm"></div></div></div>`
+        ];
+
+        const trailerVariants = [
+            {
+                border: 'border-gray-300', bg: 'bg-white',
+                html: `
+                    <div class="absolute left-0 top-0 w-[55%] h-full bg-[#004182] flex items-center justify-center gap-1 pl-1 z-10" style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);">
+                        <div class="w-3 md:w-4 h-3 md:h-4 bg-lentaYellow rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-1 md:w-1.5 h-1 md:h-1.5 bg-[#004182] rounded-full"></div>
+                        </div>
+                        <div class="text-white font-black text-[8px] md:text-[10px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div>
+                    </div>
+                    <div class="absolute right-[5%] top-[15%] w-4 md:w-5 h-4 md:h-5 bg-green-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-[15%] bottom-[10%] w-3 md:w-4 h-3 md:h-4 bg-red-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-[22%] top-[30%] w-2 md:w-3 h-2 md:h-3 bg-yellow-400 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-[10%] top-[40%] w-3 h-3 bg-orange-500 rounded-full blur-[0.5px]"></div>
+                `
+            },
+            {
+                border: 'border-gray-300', bg: 'bg-white',
+                html: `
+                    <div class="absolute left-[10%] top-[10%] w-5 md:w-6 h-5 md:h-6 bg-red-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute left-[22%] bottom-[10%] w-4 md:w-5 h-4 md:h-5 bg-green-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute left-[32%] top-[20%] w-3 md:w-4 h-3 md:h-4 bg-orange-400 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute left-[15%] top-[40%] w-4 h-4 bg-yellow-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-0 top-0 w-[45%] h-full bg-[#004182] flex flex-row-reverse items-center justify-center gap-1 pr-1 z-10" style="clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); border-bottom: 2px solid #FDCB05;">
+                        <div class="text-lentaYellow font-black text-[8px] md:text-[10px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div>
+                        <div class="w-3 md:w-4 h-3 md:h-4 bg-lentaYellow rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-1 md:w-1.5 h-1 md:h-1.5 bg-[#004182] rounded-full"></div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                border: 'border-[#172554]', bg: 'bg-gradient-to-b from-[#004182] to-[#002B5E]',
+                html: `
+                    <div class="absolute bottom-0 w-full h-1 bg-lentaYellow z-10"></div>
+                    <div class="absolute -left-2 -top-2 w-12 h-12 bg-lentaYellow rounded-full opacity-20 blur-md"></div>
+                    <div class="absolute inset-0 flex items-center justify-center gap-1.5">
+                        <div class="w-4 md:w-5 h-4 md:h-5 bg-lentaYellow rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-1.5 md:w-2 h-1.5 md:h-2 bg-[#004182] rounded-full"></div>
+                        </div>
+                        <div class="text-white font-black text-[10px] md:text-[12px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div>
+                    </div>
+                `
+            },
+            {
+                border: 'border-gray-300', bg: 'bg-gray-50',
+                html: `
+                       <div class="absolute bottom-0 w-full h-[3px] bg-gray-200"></div>
+                       <div class="absolute right-4 top-0 w-[1px] h-full bg-gray-300"></div>
+                       <div class="absolute right-12 top-0 w-[1px] h-full bg-gray-300"></div>
+                       <div class="absolute right-20 top-0 w-[1px] h-full bg-gray-300"></div>
+                       <div class="absolute right-28 top-0 w-[1px] h-full bg-gray-300"></div>
+                `
+            }
         ];
 
         function createTruckButton(city, isAll = false, index = 0) {
@@ -978,25 +1138,24 @@
             btn.setAttribute('data-city', city);
             btn.className = `truck-chip group flex items-end shrink-0 cursor-pointer ${isAll ? 'active' : ''}`;
             const label = isAll ? '🌐 ВСЕ ГОРОДА' : city;
+            
             const cabHtml = cabVariants[index % cabVariants.length];
+            const trailer = trailerVariants[index % trailerVariants.length];
 
             const bumpDelay = (index * 0.37) % 2; 
             const bumpDuration = 1.1 + (index % 3) * 0.15; 
 
             btn.innerHTML = `
                 <div class="truck-wrapper flex items-end" style="--bump-del: -${bumpDelay}s; --bump-dur: ${bumpDuration}s;">
-                    <div class="trailer h-10 md:h-11 min-w-[150px] max-w-[180px] rounded-l-md border-y border-l border-b-2 border-gray-300 shadow-md flex relative z-10 overflow-hidden transition-all duration-300 group-hover:border-lentaBlue lenta-trailer-bg">
+                    <div class="trailer h-10 md:h-11 min-w-[150px] max-w-[180px] rounded-l-md border-y border-l border-b-2 ${trailer.border} shadow-md flex relative z-10 overflow-hidden transition-all duration-300 group-hover:brightness-110 ${trailer.bg}">
                         <div class="tail-light"></div>
-                        <div class="w-full h-full relative flex items-center justify-center overflow-hidden lenta-fruit-bg">
-                            <!-- Подсолнух с GitHub -->
-                            <img src="icon.png" class="w-8 h-8 opacity-95 absolute -left-1 object-contain" alt="*">
-                        </div>
-                        <div class="absolute inset-0 z-10 flex items-center justify-center px-1 pt-0.5" style="left: 20px;">
+                        ${trailer.html}
+                        <div class="absolute inset-0 z-20 flex items-center justify-center px-1 pt-0.5" style="left: 20px;">
                             <span class="city-name-plaque city-name text-[9px] md:text-[10px] font-black uppercase tracking-widest text-lentaDark bg-white/95 px-2 py-0.5 rounded shadow-sm border border-gray-200 backdrop-blur-sm truncate max-w-full">
                                 ${label}
                             </span>
                         </div>
-                        <div class="absolute -bottom-1.5 left-2 flex gap-0.5 z-20">
+                        <div class="absolute -bottom-1.5 left-2 flex gap-0.5 z-30">
                             <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
                             <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
                             <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
@@ -1013,8 +1172,6 @@
             citySlider.innerHTML = '';
             const uniqueCities = [...new Set(stores.map(s => s.city))];
             let allCities = ['all', ...uniqueCities];
-
-            // Создаем фуры ОДИН РАЗ (Без дублей, чтобы список был конечным в ручном режиме)
             allCities.forEach((city, idx) => citySlider.appendChild(createTruckButton(city, city === 'all', idx)));
         }
         buildCitySlider();
@@ -1022,7 +1179,6 @@
         const cardsGrid = document.getElementById('cardsGrid');
         const searchInput = document.getElementById('searchInput');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
-        const rowCountText = document.getElementById('rowCount');
         const autocompleteList = document.getElementById('autocompleteList');
 
         window.clearSearch = function() {
@@ -1046,7 +1202,6 @@
             document.querySelectorAll('.truck-chip').forEach(el => {
                 if (el.getAttribute('data-city') === city) {
                     el.classList.add('active');
-                    // Скроллим только если автопилот выключен
                     if (!isMusicPlaying) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 } else {
                     el.classList.remove('active');
@@ -1063,13 +1218,16 @@
         };
         window.closeNavModal = function() { document.getElementById('navModal').classList.add('hidden'); };
 
-        window.executeNavigation = function(appType) {
-            closeNavModal();
-            let url = '';
-            if (appType === 'yandex') url = `https://yandex.ru/maps/?text=${encodeURIComponent(currentNavAddress)}`;
-            else if (appType === '2gis') url = `https://2gis.ru/search/${encodeURIComponent(currentNavFullAddress)}`;
-            else if (appType === 'google') url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(currentNavFullAddress)}`;
-            if (url) window.open(url, '_blank');
+        window.openMechanicModal = function() { document.getElementById('mechanicModal').classList.remove('hidden'); };
+        window.closeMechanicModal = function() { document.getElementById('mechanicModal').classList.add('hidden'); };
+
+        // Открываем схемы просто в новой вкладке.
+        // Принудительный вызов yandexmaps:// на Android ломает отображение пользовательских слоев (полигонов),
+        // поэтому мы передаем ссылку браузеру. Если у пользователя приложение настроено на перехват — 
+        // оно само откроется корректно, либо откроется веб-версия, где схемы 100% рисуются.
+        window.openApproachMap = function(url) {
+            playTickSound();
+            window.open(url, '_blank');
         };
 
         function getDropdownItemHTML(store) {
@@ -1179,10 +1337,10 @@
                     if (storeCustomRouteUrl) {
                         customApproachHtml = `
                             <div class="flex flex-col gap-0.5 w-full sm:w-auto">
-                                <a href="${storeCustomRouteUrl}" target="_blank" onclick="playTickSound()" title="Схема заезда на разгрузку" class="flex items-center justify-center gap-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(16,185,129,0.3)] cursor-pointer">
+                                <button onclick="openApproachMap('${storeCustomRouteUrl}')" title="Схема заезда на разгрузку" class="flex items-center justify-center gap-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(16,185,129,0.3)] cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                     Подъезд 🚛
-                                </a>
+                                </button>
                             </div>
                         `;
                     }
@@ -1229,7 +1387,6 @@
                     cardsGrid.innerHTML += card;
                 }
             });
-            rowCountText.textContent = `Показано: ${count} из ${stores.length}`;
             if (count === 0) cardsGrid.innerHTML = `<div class="col-span-full py-16 text-center text-gray-400 dark:text-gray-500 font-medium bg-white dark:bg-slate-800 rounded-[24px] shadow-sm border border-gray-100 dark:border-slate-700">По вашему запросу ничего не найдено</div>`;
         }
 
@@ -1283,11 +1440,6 @@
         window.startVoiceSearch = function() {
             const micBtn = document.getElementById('voiceSearchBtn');
             const searchInput = document.getElementById('searchInput');
-
-            if (window.location.protocol === 'file:' || window.location.protocol === 'content:') {
-                document.getElementById('localWarningModal').classList.remove('hidden');
-                return;
-            }
             
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) { searchInput.placeholder = "Микрофон не поддерживается"; return; }
@@ -1320,6 +1472,109 @@
                 searchInput.placeholder = "Ошибка микрофона";
             }
         };
+
+        const mechanicPhrases = [
+            "Ни гвоздя, ни жезла!",
+            "На РЦ снова очередь?",
+            "Шершавой дорожки!",
+            "Опять перегруз?",
+            "Соляра нынче кусается...",
+            "Холодильник пашет?",
+            "Где путевой лист?",
+            "Лента ждёт, погнали!",
+            "Тахограф включил?",
+            "Запаску проверил?",
+            "Доки на базе забрал?",
+            "Кто крайний на ворота?",
+            "Гайки протяни после рейса.",
+            "Мочевину долил?",
+            "Аккуратно на весах!",
+            "В Екате опять пробки...",
+            "Не спи за рулём!",
+            "Фары протри.",
+            "По рации тишина...",
+            "Кофе выпью — и в рейс.",
+            "Сцепку проверил?",
+            "Слышь, только не нажимай на подсолнух наверху...",
+            "Главное — не жми на логотип!"
+        ];
+
+        // Специальные фразы недовольства, когда музыку выключают
+        const disappointedPhrases = [
+            "Ну блин, было же классно! 😩",
+            "Эх, на самом интересном месте...",
+            "Опять гайки крутить 🔧",
+            "Дискотека окончена, за работу!",
+            "А я только ритм поймал 🕺",
+            "Шеф пришел, сворачиваемся!",
+            "Эй, верните музыку! 🎵"
+        ];
+
+        function showMechanicPhrase(isDisappointed = false) {
+            const bubble = document.getElementById('mechanicSpeech');
+            let phrase = "";
+            
+            // Если выключили музыку — механики расстраиваются
+            if (isDisappointed) {
+                phrase = disappointedPhrases[Math.floor(Math.random() * disappointedPhrases.length)];
+            } else {
+                phrase = mechanicPhrases[Math.floor(Math.random() * mechanicPhrases.length)];
+            }
+            
+            bubble.innerHTML = phrase + '<div class="absolute top-full left-1/2 w-2 h-2 bg-white dark:bg-slate-700 border-b border-r border-gray-200 dark:border-slate-600 transform rotate-45 -translate-x-1/2 -mt-[5px]"></div>';
+            
+            bubble.classList.remove('opacity-0', 'scale-95');
+            bubble.classList.add('opacity-100', 'scale-100');
+            
+            setTimeout(() => {
+                bubble.classList.remove('opacity-100', 'scale-100');
+                bubble.classList.add('opacity-0', 'scale-95');
+            }, 4000); 
+        }
+
+        function updateSpeedLimit() {
+            const month = new Date().getMonth();
+            const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
+            
+            document.getElementById('speedLimitNumber').innerText = isWinter ? '60' : '80';
+            const icon = document.getElementById('seasonIcon');
+            
+            if (isWinter) {
+                icon.innerText = '❄️';
+                icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-blue-50 border-blue-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full';
+            } else {
+                icon.innerText = '☀️';
+                icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-amber-50 border-amber-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full';
+            }
+        }
+
+        window.executeNavigation = function(type) {
+            playTickSound();
+            let navUrl = '';
+            const encAddr = encodeURIComponent(currentNavAddress);
+            const encFullAddr = encodeURIComponent(currentNavFullAddress);
+            
+            if (type === 'yandex') {
+                navUrl = `yandexnavi://build_route_on_map?text_to=${encAddr}`;
+                const fallbackUrl = `https://yandex.ru/maps/?text=${encAddr}`;
+                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+            } else if (type === '2gis') {
+                navUrl = `dgis://2gis.ru/routeSearch/rsType/car/to/${encFullAddr}`;
+                const fallbackUrl = `https://2gis.ru/search/${encFullAddr}`;
+                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+            } else if (type === 'google') {
+                navUrl = `comgooglemaps://?daddr=${encFullAddr}&directionsmode=driving`;
+                const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${encFullAddr}`;
+                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+            }
+            
+            window.location.href = navUrl;
+            closeNavModal();
+        };
+
+        updateSpeedLimit();
+        setTimeout(showMechanicPhrase, 2000);
+        setInterval(showMechanicPhrase, 10000);
 
         renderCards();
         setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
