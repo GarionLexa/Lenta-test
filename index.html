@@ -374,7 +374,7 @@
             <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ (МЕХАНИКИ, СЧЕТЧИК, СКОРОСТЬ) -->
             <div class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between">
                 
-                <!-- Левая часть: Надежный Счётчик (Картинка без скриптов) -->
+                <!-- Левая часть: Надежный Счётчик -->
                 <div class="flex flex-col items-center justify-center shrink-0 min-w-[70px]" title="Счетчик визитов">
                     <img id="visitCounterBadge" alt="Визиты" class="h-[20px] rounded shadow-sm opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0')" onerror="this.style.display='none'">
                 </div>
@@ -562,13 +562,11 @@
     </main>
 
     <script>
-        // === НАДЕЖНЫЙ СЧЕТЧИК БЕЗ КЭША ===
+        // === НАДЕЖНЫЙ СЧЕТЧИК ===
         function initCounter() {
             const badge = document.getElementById('visitCounterBadge');
-            if (badge) {
-                const uniqueTime = Date.now(); 
-                badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v2.svg?label=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&color=1e293b&labelColor=334155&nocache=${uniqueTime}`;
-            }
+            const uniqueTime = Date.now(); 
+            badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v2.svg?label=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&color=1e293b&labelColor=334155&nocache=${uniqueTime}`;
         }
         initCounter();
 
@@ -645,6 +643,7 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
             const vol = Math.min(0.12, speed * 0.15); 
+            
             const freq = Math.min(70, 35 + speed * 25);
             engineGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
             engineOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
@@ -1228,9 +1227,7 @@
                 document.body.appendChild(toast);
             }
             toast.innerHTML = message;
-            
-            void toast.offsetWidth; // force reflow
-            
+            void toast.offsetWidth; 
             toast.classList.remove('opacity-0', 'scale-95');
             toast.classList.add('opacity-100', 'scale-100');
             
@@ -1241,10 +1238,24 @@
             }, 3000);
         }
 
-        window.handleApproachClick = function(url) {
+        // ==========================================================
+        // ЛОГИКА ОТКРЫТИЯ КАРТ БЕЗ "ПРОКЛАДОК" (ВИДЖЕТ)
+        // ==========================================================
+        window.openApproachMap = function(url) {
             playTickSound();
             if (url && url !== 'undefined' && url !== 'null' && url.trim() !== '') {
-                window.open(url, '_blank');
+                
+                let finalUrl = url;
+                
+                // Ищем в ссылке уникальный идентификатор Конструктора Карт
+                const match = url.match(/um=constructor%3A([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    const cid = match[1];
+                    // Преобразуем в ссылку-виджет. Она открывает ТОЛЬКО саму карту сразу на весь экран.
+                    finalUrl = `https://yandex.ru/map-widget/v1/?um=constructor%3A${cid}`;
+                }
+
+                window.open(finalUrl, '_blank');
             } else {
                 showToast("Схема заезда еще не добавлена 🛠");
             }
@@ -1353,15 +1364,6 @@
                         panoLabel = "Панорама 3D";
                     }
 
-                    let customApproachHtml = `
-                        <div class="flex flex-col gap-0.5 w-full sm:w-auto shrink-0">
-                            <button onclick="handleApproachClick('${storeCustomRouteUrl}')" title="Схема заезда на разгрузку" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(16,185,129,0.3)] cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                Подъезд 🚛
-                            </button>
-                        </div>
-                    `;
-
                     const encodedAddr = cleanNavAddress.trim();
                     const encodedFullAddr = store.city + ", " + cleanAddressText;
 
@@ -1388,7 +1390,14 @@
                                     <span class="px-2 py-1 rounded-md text-[10px] font-bold border ${is24Color}">${is24Text}</span>
                                 </div>
                                 <div class="flex flex-wrap gap-2 pt-2">
-                                    ${customApproachHtml}
+                                    
+                                    <div class="flex flex-col gap-0.5 w-full sm:w-auto shrink-0">
+                                        <button onclick="openApproachMap('${storeCustomRouteUrl}')" title="Схема заезда на разгрузку" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(16,185,129,0.3)] cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                            Подъезд 🚛
+                                        </button>
+                                    </div>
+                                    
                                     <button onclick="playTickSound(); openNavModal('${encodedAddr.replace(/'/g, "\\'")}', '${encodedFullAddr.replace(/'/g, "\\'")}');" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-lentaBlue hover:bg-[#003366] text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(0,65,130,0.2)] cursor-pointer">
                                         <svg class="w-4 h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
                                         Навигатор 🗺
