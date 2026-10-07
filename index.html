@@ -558,7 +558,7 @@
     </header>
 
     <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 relative z-10 flex-1">
-        <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 mb-8"></div>
+        <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8"></div>
     </main>
 
     <script>
@@ -642,7 +642,6 @@
             if (!isAudioUnlocked || !audioCtx || !engineGain) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
-            // ЗНАЧИТЕЛЬНО УМЕНЬШЕНА ГРОМКОСТЬ МОТОРА (чтобы не перебивал музыку)
             const vol = Math.min(0.12, speed * 0.15); 
             
             const freq = Math.min(70, 35 + speed * 25);
@@ -677,7 +676,7 @@
         }, { passive: true });
 
         const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = 0.45; // Увеличена громкость для компьютеров
+        bgMusic.volume = 0.45; 
         let isMusicPlaying = false;
         let lastLogoTapTime = 0;
         let autoScrollAnimationId = null;
@@ -712,7 +711,7 @@
             if (!isMouseDown || isMusicPlaying) return;
             e.preventDefault();
             const x = e.pageX - citySlider.offsetLeft;
-            const walk = (x - startX) * 2; // Множитель скорости прокрутки
+            const walk = (x - startX) * 2;
             citySlider.scrollLeft = scrollLeftPos - walk;
         });
         citySlider.style.cursor = 'grab';
@@ -722,10 +721,7 @@
             unlockAudio();
             const now = Date.now();
             if (now - lastLogoTapTime < 400) {
-                // Двойной тап - выключаем
-                if (isMusicPlaying) {
-                    showMechanicPhrase(true); // Показываем фразу разочарования
-                }
+                if (isMusicPlaying) showMechanicPhrase(true);
                 
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
@@ -749,13 +745,13 @@
             const mechSvg = document.getElementById('mechanicSvgElement');
 
             if (isMusicPlaying) {
-                showMechanicPhrase(true); // Показываем фразу разочарования при паузе
+                showMechanicPhrase(true); 
                 
                 bgMusic.pause();
                 isMusicPlaying = false;
                 logo.classList.remove('record-spin');
-                mechSvg.classList.remove('party-mode'); // Убираем дискотеку
-                mechSvg.classList.add('normal-mode');   // Возвращаем обычный режим работы
+                mechSvg.classList.remove('party-mode');
+                mechSvg.classList.add('normal-mode');   
                 stopAutoScroll(); 
             } else {
                 const playPromise = bgMusic.play();
@@ -1221,10 +1217,7 @@
         window.openMechanicModal = function() { document.getElementById('mechanicModal').classList.remove('hidden'); };
         window.closeMechanicModal = function() { document.getElementById('mechanicModal').classList.add('hidden'); };
 
-        // Открываем схемы просто в новой вкладке.
-        // Принудительный вызов yandexmaps:// на Android ломает отображение пользовательских слоев (полигонов),
-        // поэтому мы передаем ссылку браузеру. Если у пользователя приложение настроено на перехват — 
-        // оно само откроется корректно, либо откроется веб-версия, где схемы 100% рисуются.
+        // Простое открытие схем — всегда работает безотказно
         window.openApproachMap = function(url) {
             playTickSound();
             window.open(url, '_blank');
@@ -1349,7 +1342,7 @@
                     const encodedFullAddr = store.city + ", " + cleanAddressText;
 
                     const card = `
-                        <div class="store-card relative flex flex-col justify-between animate-reveal">
+                        <div class="store-card relative flex flex-col justify-between animate-reveal bg-white dark:bg-slate-800 rounded-[24px] p-5 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow">
                             <button onclick="closeCard(this)" class="absolute top-4 right-4 text-gray-300 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-300 bg-gray-50 dark:bg-slate-700 p-2 rounded-full z-10 transition-colors cursor-pointer tactile-btn" title="Скрыть">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
@@ -1357,7 +1350,7 @@
                                 <div class="flex items-center gap-2 mb-3 pr-8">
                                     <span class="px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase shadow-sm ${badgeClass}">${displayBrand}</span>
                                     <span class="text-xs font-bold text-gray-500 dark:text-gray-300">${displayNumber}</span>
-                                    <span class="ml-auto text-[11px] font-extrabold text-lentaBlue dark:text-blue-300 bg-blue-50 dark:bg-slate-800 px-2 py-1 rounded-md border border-blue-100 dark:border-slate-700">${store.city}</span>
+                                    <span class="ml-auto text-[11px] font-extrabold text-lentaBlue dark:text-blue-300 bg-blue-50 dark:bg-slate-700/50 px-2 py-1 rounded-md border border-blue-100 dark:border-slate-600">${store.city}</span>
                                 </div>
                                 <div class="text-sm font-semibold text-gray-800 dark:text-white leading-snug mb-5" title='${store.address}'>${cleanAddressText}</div>
                             </div>
@@ -1499,7 +1492,6 @@
             "Главное — не жми на логотип!"
         ];
 
-        // Специальные фразы недовольства, когда музыку выключают
         const disappointedPhrases = [
             "Ну блин, было же классно! 😩",
             "Эх, на самом интересном месте...",
@@ -1514,7 +1506,6 @@
             const bubble = document.getElementById('mechanicSpeech');
             let phrase = "";
             
-            // Если выключили музыку — механики расстраиваются
             if (isDisappointed) {
                 phrase = disappointedPhrases[Math.floor(Math.random() * disappointedPhrases.length)];
             } else {
