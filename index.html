@@ -1,390 +1,865 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    
-    <title>ЛЕНТА: Мониторинг доставок</title>
-    <meta name="description" content="База гипермаркетов и схем заездов для водителей логистики.">
-    
-    <link rel="icon" href="icon.png" type="image/png">
-    <link rel="apple-touch-icon" href="icon.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#0A1628">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ee3b38">
+  <meta name="description" content="ЛЕНТА ЛОГИСТИКА: мониторинг доставок, контакты дежурного механика, время работы, подъезды и маршруты через Яндекс, 2ГИС и Google Maps.">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        lentaBlue: '#004182',
-                        lentaDark: '#002B5E',
-                        lentaYellow: '#FDCB05',
-                        lentaWarm: '#FBF9F4',
-                        lentaDeep: '#0A1628',
-                        lentaCardDark: '#132441'
-                    }
+  <title>ЛЕНТА: Мониторинг доставок</title>
+
+  <!-- Встроенная иконка, чтобы не было ошибки 404 -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23ee3b38'/%3E%3Ctext x='50' y='67' font-size='58' text-anchor='middle' fill='white' font-family='Arial, sans-serif'%3E%D0%9B%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ee3b38;
+      --accent-dark: #c92a27;
+      --focus: rgba(238, 59, 56, 0.35);
+      --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+      --radius: 18px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1220;
+        --card: #111827;
+        --text: #f9fafb;
+        --muted: #9ca3af;
+        --border: #1f2937;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        "Noto Sans",
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding:
+        max(16px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: var(--card);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 0 0 12px 0;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      left: 0;
+    }
+
+    .topbar {
+      max-width: 960px;
+      margin: 0 auto 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-title,
+    .brand-subtitle {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .brand-title {
+      font-weight: 800;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+
+    .quick-call {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .quick-call:hover {
+      background: var(--accent-dark);
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 3vw, 24px);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.15rem, 3vw, 1.45rem);
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: var(--muted);
+    }
+
+    .btn-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 12px 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 800;
+      text-align: center;
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        background 0.12s ease,
+        border-color 0.12s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(238, 59, 56, 0.35);
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    .btn[aria-disabled="true"] {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .status::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex: none;
+    }
+
+    .status.open::before {
+      background: #22c55e;
+    }
+
+    .status.closed::before {
+      background: #ef4444;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 700;
+      width: 45%;
+    }
+
+    address {
+      font-style: normal;
+      color: var(--text);
+      margin-bottom: 12px;
+      white-space: pre-line;
+    }
+
+    ul {
+      margin: 0 0 16px;
+      padding-left: 20px;
+      color: var(--text);
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    .footer {
+      max-width: 960px;
+      margin: 20px auto 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .quick-call {
+        width: 100%;
+      }
+
+      th,
+      td {
+        padding: 10px 4px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">Л</div>
+      <div class="brand-text">
+        <strong class="brand-title">ЛЕНТА ЛОГИСТИКА</strong>
+        <span class="brand-subtitle">Мониторинг доставок</span>
+      </div>
+    </div>
+
+    <a id="callTop" class="quick-call" href="tel:+79826209051" aria-label="Позвонить дежурному механику">
+      Позвонить
+    </a>
+  </header>
+
+  <main id="main">
+    <section class="card">
+      <h1>Быстрая связь и маршрут</h1>
+      <p>
+        Позвоните дежурному механику, откройте маршрут в навигаторе или скачайте APK для Android.
+      </p>
+
+      <div id="openStatus" class="status" role="status" aria-live="polite">
+        Проверяем расписание...
+      </div>
+
+      <div class="btn-grid">
+        <a id="callMain" class="btn primary" href="tel:+79826209051">
+          📞 Механик: 8 (982) 620-90-51
+        </a>
+
+        <a
+          id="yandexBtn"
+          class="btn"
+          href="https://yandex.ru/maps/?rtext=~55.1644%2C61.4368&rtt=auto"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🚗 Яндекс Карты
+        </a>
+
+        <a
+          id="gis2Btn"
+          class="btn"
+          href="https://2gis.ru/search/%D0%9B%D0%95%D0%9D%D0%A2%D0%90%20%D0%A7%D0%B5%D0%BB%D1%8F%D0%B1%D0%B8%D0%BD%D1%81%D0%BA"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          📍 2ГИС
+        </a>
+
+        <a
+          id="googleBtn"
+          class="btn"
+          href="https://www.google.com/maps/dir/?api=1&destination=55.1644%2C61.4368"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🗺️ Google Maps
+        </a>
+
+        <a id="apkLink" class="btn" href="app.apk" download>
+          ⬇️ APK для Android
+        </a>
+      </div>
+
+      <p class="note" id="apkNote">
+        APK подходит только для Android. На iPhone используйте веб-версию страницы.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Время работы</h2>
+
+      <table>
+        <tbody id="scheduleBody">
+          <tr>
+            <th scope="row">Понедельник — Пятница</th>
+            <td>09:00 — 22:00</td>
+          </tr>
+          <tr>
+            <th scope="row">Суббота</th>
+            <td>09:00 — 22:00</td>
+          </tr>
+          <tr>
+            <th scope="row">Воскресенье</th>
+            <td>10:00 — 21:00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        Расписание можно изменить в блоке <code>CONFIG.schedule</code> внутри скрипта.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Адрес и подъезды</h2>
+
+      <address id="addressText">
+Челябинск, ул. Примерная, д. 1
+Подъезд для грузового транспорта: со стороны склада
+Пешеходный вход: главный вход гипермаркета
+      </address>
+
+      <h2 style="margin-top: 20px;">Схема движения</h2>
+      <ul id="drivewayList">
+        <li>Грузовой въезд — для доставки и разгрузки.</li>
+        <li>Лёгковой транспорт — парковка у главного входа.</li>
+        <li>Пешеходная зона — от парковки к входу.</li>
+        <li>Дежурный механик — связь по телефону выше.</li>
+      </ul>
+
+      <div class="btn-grid">
+        <button id="copyAddress" class="btn" type="button">
+          📋 Скопировать адрес
+        </button>
+      </div>
+
+      <p class="note">
+        Адрес и координаты можно изменить в блоке <code>CONFIG</code>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>© <span id="year">2026</span> ЛЕНТА ЛОГИСТИКА. Все права защищены.</div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      try {
+        /*
+          ============================================================
+          ГЛАВНЫЕ НАСТРОЙКИ СТРАНИЦЫ
+          Замените адрес, телефон, координаты и расписание на реальные.
+          ============================================================
+        */
+        var CONFIG = {
+          phone: "+79826209051",
+          phoneDisplay: "8 (982) 620-90-51",
+
+          // Адрес для 2ГИС и копирования
+          address: "ЛЕНТА, Челябинск",
+
+          // Строки адреса, которые показываются на странице
+          addressLines: [
+            "Челябинск, ул. Примерная, д. 1",
+            "Подъезд для грузового транспорта: со стороны склада",
+            "Пешеходный вход: главный вход гипермаркета"
+          ],
+
+          // Координаты для Яндекс и Google Maps: широта, долгота
+          lat: "55.1644",
+          lng: "61.4368",
+
+          // Часовой пояс объекта
+          timeZone: "Asia/Yekaterinburg",
+
+          // Расписание: days: 0 = воскресенье, 1 = понедельник, ..., 6 = суббота
+          // Для круглосуточной работы: open: "00:00", close: "24:00"
+          schedule: [
+            {
+              label: "Понедельник — Пятница",
+              days: [1, 2, 3, 4, 5],
+              open: "09:00",
+              close: "22:00"
+            },
+            {
+              label: "Суббота",
+              days: [6],
+              open: "09:00",
+              close: "22:00"
+            },
+            {
+              label: "Воскресенье",
+              days: [0],
+              open: "10:00",
+              close: "21:00"
+            }
+          ],
+
+          // Пункты схемы подъездов
+          drivewayItems: [
+            "Грузовой въезд — для доставки и разгрузки.",
+            "Лёгковой транспорт — парковка у главного входа.",
+            "Пешеходная зона — от парковки к входу.",
+            "Дежурный механик — связь по телефону выше."
+          ]
+        };
+
+        function $(id) {
+          return document.getElementById(id);
+        }
+
+        // Текущий год
+        var yearEl = $("year");
+        if (yearEl) {
+          yearEl.textContent = String(new Date().getFullYear());
+        }
+
+        // Обновляем все телефонные ссылки
+        var links = document.getElementsByTagName("a");
+        for (var i = 0; i < links.length; i++) {
+          var href = links[i].getAttribute("href");
+          if (href && href.indexOf("tel:") === 0) {
+            links[i].setAttribute("href", "tel:" + CONFIG.phone);
+          }
+        }
+
+        // Текст кнопки механика
+        var callMain = $("callMain");
+        if (callMain) {
+          callMain.textContent = "📞 Механик: " + CONFIG.phoneDisplay;
+        }
+
+        // Ссылки на навигаторы
+        var coords = CONFIG.lat + "," + CONFIG.lng;
+
+        var yandexBtn = $("yandexBtn");
+        if (yandexBtn) {
+          yandexBtn.href =
+            "https://yandex.ru/maps/?rtext=~" +
+            encodeURIComponent(coords) +
+            "&rtt=auto";
+        }
+
+        var googleBtn = $("googleBtn");
+        if (googleBtn) {
+          googleBtn.href =
+            "https://www.google.com/maps/dir/?api=1&destination=" +
+            encodeURIComponent(coords);
+        }
+
+        var gis2Btn = $("gis2Btn");
+        if (gis2Btn) {
+          gis2Btn.href =
+            "https://2gis.ru/search/" +
+            encodeURIComponent(CONFIG.address);
+        }
+
+        // Адрес
+        var addressText = $("addressText");
+        if (addressText) {
+          addressText.textContent = CONFIG.addressLines.join("\n");
+        }
+
+        // Список подъездов
+        var drivewayList = $("drivewayList");
+        if (drivewayList) {
+          drivewayList.innerHTML = "";
+          for (var d = 0; d < CONFIG.drivewayItems.length; d++) {
+            var li = document.createElement("li");
+            li.textContent = CONFIG.drivewayItems[d];
+            drivewayList.appendChild(li);
+          }
+        }
+
+        // Таблица расписания
+        function renderSchedule() {
+          var tbody = $("scheduleBody");
+          if (!tbody) return;
+
+          tbody.innerHTML = "";
+
+          for (var s = 0; s < CONFIG.schedule.length; s++) {
+            var rule = CONFIG.schedule[s];
+            var tr = document.createElement("tr");
+
+            var th = document.createElement("th");
+            th.scope = "row";
+            th.textContent = rule.label;
+
+            var td = document.createElement("td");
+
+            if (!rule.open || !rule.close) {
+              td.textContent = "Выходной";
+            } else if (rule.open === "00:00" && rule.close === "24:00") {
+              td.textContent = "Круглосуточно";
+            } else {
+              td.textContent = rule.open + " — " + rule.close;
+            }
+
+            tr.appendChild(th);
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+          }
+        }
+
+        renderSchedule();
+
+        // Определение времени в часовом поясе объекта
+        function getPart(parts, type) {
+          for (var p = 0; p < parts.length; p++) {
+            if (parts[p].type === type) {
+              return parts[p].value;
+            }
+          }
+          return null;
+        }
+
+        function getBusinessNow() {
+          try {
+            var parts = new Intl.DateTimeFormat("en-US", {
+              timeZone: CONFIG.timeZone,
+              weekday: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+              hourCycle: "h23"
+            }).formatToParts(new Date());
+
+            var weekdayValue = getPart(parts, "weekday");
+            var hourValue = getPart(parts, "hour");
+            var minuteValue = getPart(parts, "minute");
+
+            var weekdayMap = {
+              Sun: 0,
+              Mon: 1,
+              Tue: 2,
+              Wed: 3,
+              Thu: 4,
+              Fri: 5,
+              Sat: 6
+            };
+
+            return {
+              day: weekdayMap[weekdayValue] !== undefined ? weekdayMap[weekdayValue] : new Date().getDay(),
+              minutes: Number(hourValue) * 60 + Number(minuteValue)
+            };
+          } catch (err) {
+            var now = new Date();
+            return {
+              day: now.getDay(),
+              minutes: now.getHours() * 60 + now.getMinutes()
+            };
+          }
+        }
+
+        function parseTime(value) {
+          if (value === "24:00") return 1440;
+          var parts = value.split(":");
+          return Number(parts[0]) * 60 + Number(parts[1]);
+        }
+
+        // Статус "Открыто / Закрыто"
+        var statusEl = $("openStatus");
+
+        function updateStatus() {
+          if (!statusEl) return;
+
+          var now = getBusinessNow();
+          var rule = null;
+
+          for (var r = 0; r < CONFIG.schedule.length; r++) {
+            if (CONFIG.schedule[r].days.indexOf(now.day) !== -1) {
+              rule = CONFIG.schedule[r];
+              break;
+            }
+          }
+
+          if (!rule || !rule.open || !rule.close) {
+            statusEl.className = "status closed";
+            statusEl.textContent = "Сегодня закрыто";
+            return;
+          }
+
+          if (rule.open === "00:00" && rule.close === "24:00") {
+            statusEl.className = "status open";
+            statusEl.textContent = "Открыто круглосуточно";
+            return;
+          }
+
+          var openMinutes = parseTime(rule.open);
+          var closeMinutes = parseTime(rule.close);
+
+          if (now.minutes >= openMinutes && now.minutes < closeMinutes) {
+            statusEl.className = "status open";
+            statusEl.textContent = "Открыто до " + rule.close;
+          } else if (now.minutes < openMinutes) {
+            statusEl.className = "status closed";
+            statusEl.textContent = "Откроется в " + rule.open;
+          } else {
+            statusEl.className = "status closed";
+            statusEl.textContent = "Закрыто";
+          }
+        }
+
+        updateStatus();
+        setInterval(updateStatus, 60000);
+
+        // APK: проверка, есть ли файл app.apk, и отключение на iOS
+        var apkLink = $("apkLink");
+        var apkNote = $("apkNote");
+        var defaultApkNote = apkNote ? apkNote.textContent : "";
+
+        function setApkState(enabled, message) {
+          if (!apkLink) return;
+
+          if (enabled) {
+            apkLink.removeAttribute("aria-disabled");
+            apkLink.title = "";
+          } else {
+            apkLink.setAttribute("aria-disabled", "true");
+            apkLink.title = message || "";
+          }
+
+          if (apkNote) {
+            apkNote.textContent = message || defaultApkNote;
+          }
+        }
+
+        var isIOS =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+        if (apkLink) {
+          if (isIOS) {
+            setApkState(false, "APK не устанавливается на iPhone/iPad. Используйте веб-версию страницы.");
+          } else if (window.location.protocol === "file:") {
+            setApkState(
+              false,
+              "Локально APK недоступен. Откройте страницу на GitHub Pages и положите app.apk рядом с index.html."
+            );
+          } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open("HEAD", "app.apk", true);
+            xhr.timeout = 5000;
+
+            xhr.onreadystatechange = function () {
+              if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                  setApkState(true, "APK доступен для Android. На iPhone не устанавливается.");
+                } else {
+                  setApkState(false, "Файл app.apk пока не найден. Добавьте его в репозиторий рядом с index.html.");
                 }
+              }
+            };
+
+            xhr.onerror = function () {
+              setApkState(false, "Не удалось проверить наличие app.apk. Откройте страницу на GitHub Pages.");
+            };
+
+            xhr.ontimeout = function () {
+              setApkState(false, "Не удалось проверить app.apk: превышен таймаут.");
+            };
+
+            xhr.send(null);
+          }
+        }
+
+        // Копирование адреса
+        function showCopied(button) {
+          var original = button.textContent;
+          button.textContent = "✅ Скопировано";
+
+          setTimeout(function () {
+            button.textContent = original;
+          }, 2000);
+        }
+
+        function fallbackCopy(text, button) {
+          var textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "absolute";
+          textarea.style.left = "-9999px";
+
+          document.body.appendChild(textarea);
+          textarea.select();
+          textarea.setSelectionRange(0, textarea.value.length);
+
+          var success = false;
+
+          try {
+            success = document.execCommand("copy");
+          } catch (err) {
+            success = false;
+          }
+
+          document.body.removeChild(textarea);
+
+          if (success) {
+            showCopied(button);
+          } else {
+            button.textContent = "Не удалось скопировать";
+          }
+        }
+
+        var copyButton = $("copyAddress");
+        if (copyButton) {
+          copyButton.addEventListener("click", function () {
+            var text = CONFIG.addressLines.join(", ");
+
+            if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+              navigator.clipboard.writeText(text).then(function () {
+                showCopied(copyButton);
+              }).catch(function () {
+                fallbackCopy(text, copyButton);
+              });
+            } else {
+              fallbackCopy(text, copyButton);
             }
+          });
         }
-    </script>
-    
-    <style>
-        :root {
-            --truck-light-opacity: 0;
-            --truck-body-brightness: 1;
-            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-sm: 0 2px 8px rgba(0,65,130,0.06);
-            --shadow-md: 0 8px 24px rgba(0,65,130,0.10);
-            --shadow-lg: 0 16px 40px rgba(0,65,130,0.15);
-            --shadow-xl: 0 24px 60px rgba(0,65,130,0.20);
+      } catch (err) {
+        if (window.console && console.warn) {
+          console.warn("ЛЕНТА: предупреждение скрипта страницы:", err);
         }
-
-        body {
-            background-color: #FBF9F4;
-            color: #1F2937;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            width: 100%;
-            overflow-x: hidden;
-            padding-bottom: env(safe-area-inset-bottom);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .dark body {
-            background-color: #0A1628; 
-            color: #f1f5f9;
-        }
-
-        .glass-header {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(251, 249, 244, 0.95) 100%);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid rgba(0, 65, 130, 0.06);
-            box-shadow: 0 10px 40px rgba(0, 65, 130, 0.08);
-            padding-top: max(1rem, env(safe-area-inset-top));
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            border-radius: 0 0 28px 28px;
-            transition: all 0.3s ease;
-        }
-        .dark .glass-header {
-            background: linear-gradient(180deg, rgba(10, 22, 40, 0.98) 0%, rgba(19, 36, 65, 0.95) 100%);
-            border-bottom: 1px solid rgba(253, 203, 5, 0.08);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        @media (max-height: 550px) {
-            .glass-header {
-                position: relative; 
-                border-radius: 0;
-            }
-        }
-
-        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        .animate-reveal { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-        .store-card:nth-child(1) { animation-delay: 0.03s; }
-        .store-card:nth-child(2) { animation-delay: 0.06s; }
-        .store-card:nth-child(3) { animation-delay: 0.09s; }
-        .store-card:nth-child(4) { animation-delay: 0.12s; }
-        .store-card:nth-child(5) { animation-delay: 0.15s; }
-        .store-card:nth-child(6) { animation-delay: 0.18s; }
-        .store-card:nth-child(7) { animation-delay: 0.21s; }
-        .store-card:nth-child(8) { animation-delay: 0.24s; }
-        .store-card:nth-child(n+9) { animation-delay: 0.27s; }
-
-        .tactile-btn { transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease; }
-        .tactile-btn:active { transform: scale(0.92); }
-
-        .record-spin { animation: recordSpin 4s linear infinite; }
-        @keyframes recordSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .scenic-bg { background-color: #0f172a; overflow: hidden; position: relative; height: 180px; width: 100%; border-radius: 20px; }
-
-        .sky-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.2s ease-out; }
-        .sky-day { background: linear-gradient(to bottom, #38bdf8 0%, #bae6fd 100%); opacity: 1; z-index: 1;}
-        .sky-sunset { background: linear-gradient(to bottom, #f97316 0%, #fde047 100%); opacity: 0; z-index: 2;}
-        .sky-night { background: linear-gradient(to bottom, #0f172a 0%, #1e1b4b 100%); opacity: 0; z-index: 3;}
-        
-        .sky-stars {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 4;
-            background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px), radial-gradient(#ffffff 1px, transparent 1px);
-            background-size: 50px 50px; background-position: 0 0, 25px 25px;
-            opacity: 0; transition: opacity 0.2s ease-out;
-        }
-
-        .celestial-body {
-            position: absolute; border-radius: 50%;
-            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
-            will-change: transform; z-index: 5;
-        }
-        
-        .parallax-layer {
-            position: absolute; top: 0; left: 0; width: 1000vw; 
-            height: 100%;
-            background-repeat: repeat-x; background-position: bottom left;
-            will-change: transform;
-        }
-
-        .parallax-mountains {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='70' viewBox='0 0 160 70'%3E%3Cpath d='M0,70 L40,20 L80,70 Z' fill='%2394a3b8' opacity='0.5'/%3E%3Cpath d='M50,70 L90,10 L130,70 Z' fill='%23cbd5e1' opacity='0.7'/%3E%3C/svg%3E");
-            background-size: 200px auto; z-index: 6;
-            filter: blur(1px);
-        }
-        
-        .parallax-trees {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='50' viewBox='0 0 120 50'%3E%3Cpath d='M20,50 L20,35 L10,35 L25,15 L15,15 L30,-5 L45,15 L35,15 L50,35 L40,35 L40,50 Z' fill='%23064e3b' opacity='0.9'/%3E%3Cpath d='M70,50 L70,30 L60,30 L75,5 L65,5 L80,-15 L95,5 L85,5 L100,30 L90,30 L90,50 Z' fill='%230f766e' opacity='0.8'/%3E%3C/svg%3E");
-            background-size: 100px auto; z-index: 7;
-            filter: blur(0.3px);
-        }
-        
-        .parallax-road {
-            position: absolute; bottom: 0; left: 0; width: 1000vw; height: 22px; z-index: 10;
-            background-color: #475569; 
-            background-image: linear-gradient(90deg, transparent 50%, #cbd5e1 50%);
-            background-size: 40px 2px; background-position: top 6px left 0; background-repeat: repeat-x;
-            border-top: 3px solid #64748b;
-            will-change: transform;
-        }
-
-        .weather-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; transition: opacity 0.2s ease-out; z-index: 8; }
-        .snow-anim {
-            background-image: radial-gradient(circle, white 1.5px, transparent 1.5px), radial-gradient(circle, white 1px, transparent 1px);
-            background-size: 60px 60px, 40px 40px; background-position: 0 0, 20px 20px;
-            animation: weatherFallSnow 3s linear infinite; opacity: 0;
-        }
-        .leaves-anim {
-            background-image: radial-gradient(ellipse at center, #ea580c 2px, transparent 3px), radial-gradient(ellipse at center, #dc2626 2px, transparent 3px), radial-gradient(ellipse at center, #eab308 1.5px, transparent 2.5px);
-            background-size: 70px 70px, 90px 90px, 50px 50px; background-position: 0 0, 30px 30px, 15px 15px;
-            animation: weatherFallLeaves 4s linear infinite; opacity: 0;
-        }
-        @keyframes weatherFallSnow { 0% { background-position: 0 0, 20px 20px; } 100% { background-position: 30px 60px, 0px 40px; } }
-        @keyframes weatherFallLeaves { 0% { background-position: 0 -70px, 30px -90px, 15px -50px; } 100% { background-position: 70px 70px, -30px 90px, 65px 50px; } }
-
-        .parallax-signs {
-            position: absolute; bottom: 22px; left: 0; width: 3000vw; height: 40px; z-index: 9;
-            background-image: 
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='40' viewBox='0 0 1500 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"),
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2200' height='40' viewBox='0 0 2200 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
-            background-size: 1500px 40px, 2200px 40px;
-            background-repeat: repeat-x;
-            will-change: transform;
-        }
-
-        .police-car {
-            position: absolute; bottom: 4px; left: 120vw; width: 60px; height: 20px;
-            background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%);
-            border-radius: 4px 4px 10px 6px;
-            z-index: 25; 
-            display: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transform: scaleX(-1);
-        }
-        .police-car.active {
-            display: block;
-            animation: driveOpposite 4.5s linear forwards;
-        }
-        .police-siren-red {
-            position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
-            animation: sirenRed 0.6s infinite;
-        }
-        .police-siren-blue {
-            position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
-            animation: sirenBlue 0.6s infinite;
-        }
-        @keyframes sirenRed { 
-            0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 
-            50%, 100% { box-shadow: none; background: #991b1b; } 
-        }
-        @keyframes sirenBlue { 
-            0%, 49% { box-shadow: none; background: #1e3a8a; } 
-            50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } 
-        }
-        @keyframes driveOpposite { 0% { left: 120vw; } 100% { left: -150px; } }
-
-        .city-slider {
-            display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; 
-            scrollbar-width: none; overscroll-behavior-x: contain;
-            height: 100%; align-items: flex-end; padding-bottom: 6px; padding-left: 10px;
-        }
-        .city-slider::-webkit-scrollbar { display: none; }
-
-        .truck-chip { outline: none; opacity: 0.85; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-right: 22px; }
-        .truck-chip.active { opacity: 1; transform: scale(1.06) translateY(-3px); z-index: 30; filter: drop-shadow(0 0 12px rgba(253, 203, 5, 0.6)); }
-        
-        .truck-chip.active .truck-wrapper::after {
-            content: '';
-            position: absolute;
-            top: -8px; right: 4px;
-            width: 8px; height: 8px;
-            background: #FDCB05;
-            border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(253, 203, 5, 0.7);
-            animation: pulseActive 1.5s infinite;
-            z-index: 100;
-        }
-        @keyframes pulseActive {
-            0% { box-shadow: 0 0 0 0 rgba(253, 203, 5, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(253, 203, 5, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(253, 203, 5, 0); }
-        }
-        
-        .truck-wrapper { filter: brightness(var(--truck-body-brightness)); transition: filter 0.2s ease-out; position: relative; }
-
-        @keyframes truckBump {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-2px); }
-        }
-        .auto-driving .truck-wrapper {
-            animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s);
-        }
-
-        .headlight-beam {
-            position: absolute; width: 70px; height: 20px;
-            background: linear-gradient(to right, rgba(253,224,71,0.95), transparent);
-            transform: skewX(-15deg);
-            opacity: var(--truck-light-opacity); transition: opacity 0.3s;
-            border-radius: 50%; filter: blur(2px); z-index: 50; pointer-events: none;
-        }
-        .tail-light {
-            position: absolute; bottom: 4px; left: -1px; width: 3px; height: 8px;
-            background-color: #ef4444; box-shadow: 0 0 12px 3px rgba(239,68,68,0.95);
-            opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 2px; z-index: 20;
-        }
-        .marker-light {
-            position: absolute; top: 2px; width: 4px; height: 2px;
-            background-color: #fde047; box-shadow: 0 0 8px 2px rgba(253,224,71,0.9);
-            opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 1px;
-        }
-        
-        .dark .city-name-plaque {
-            background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
-        }
-
-        .city-name-plaque {
-            background: linear-gradient(135deg, #004182 0%, #002B5E 100%) !important;
-            color: #ffffff !important;
-            border-color: rgba(253, 203, 5, 0.4) !important;
-            box-shadow: 0 2px 8px rgba(0, 65, 130, 0.25) !important;
-        }
-        .dark .city-name-plaque {
-            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
-            color: #f1f5f9 !important;
-            border-color: rgba(253, 203, 5, 0.3) !important;
-        }
-
-        @keyframes fadeScene1 { 0%, 22% { opacity: 1; } 25%, 100% { opacity: 0; } }
-        @keyframes fadeScene2 { 0%, 22% { opacity: 0; } 25%, 47% { opacity: 1; } 50%, 100% { opacity: 0; } }
-        @keyframes fadeScene3 { 0%, 47% { opacity: 0; } 50%, 72% { opacity: 1; } 75%, 100% { opacity: 0; } }
-        @keyframes fadeScene4 { 0%, 72% { opacity: 0; } 75%, 97% { opacity: 1; } 100% { opacity: 0; } }
-        
-        .normal-mode .anim-scene-1 { animation: fadeScene1 20s infinite; }
-        .normal-mode .anim-scene-2 { animation: fadeScene2 20s infinite; opacity: 0; }
-        .normal-mode .anim-scene-3 { animation: fadeScene3 20s infinite; opacity: 0; }
-        .normal-mode .anim-scene-4 { animation: fadeScene4 20s infinite; opacity: 0; }
-
-        .wrench-arm { animation: wrenchMotion 0.6s infinite alternate ease-in-out; transform-origin: 30px 28px; }
-        @keyframes wrenchMotion { 0% { transform: rotate(-10deg); } 100% { transform: rotate(15deg); } }
-        
-        .hammer-arm { animation: hammerMotion 0.4s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 75px 28px; }
-        @keyframes hammerMotion { 0% { transform: rotate(25deg); } 100% { transform: rotate(-20deg); } }
-
-        .urea-drips circle { animation: dripDrop 0.8s infinite linear; }
-        @keyframes dripDrop { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
-
-        .roll-tire { animation: tireRoll 2s infinite linear; transform-origin: 80px 40px; }
-        @keyframes tireRoll { 0% { transform: translateX(10px) rotate(0deg); } 100% { transform: translateX(-15px) rotate(-180deg); } }
-
-        .welding-sparks circle { animation: sparkFlash 0.15s infinite alternate; transform-origin: center; }
-        .welding-sparks circle:nth-child(2) { animation-delay: 0.05s; }
-        .welding-sparks circle:nth-child(3) { animation-delay: 0.1s; }
-        @keyframes sparkFlash { 
-            0% { opacity: 0; transform: scale(0.5) translate(0,0); } 
-            100% { opacity: 1; transform: scale(2) translate(3px, -3px); } 
-        }
-
-        .party-mode .dancing-scene { display: block; }
-        .party-mode .normal-scenes { display: none; }
-        .normal-mode .dancing-scene { display: none; }
-        .normal-mode .normal-scenes { display: block; }
-
-        .dance-full-body-left { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
-        @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-3px) scaleY(1.05); } }
-        
-        .dance-arms-left { animation: waveArms 0.4s infinite alternate ease-in-out; transform-origin: 35px 28px; }
-        @keyframes waveArms { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
-
-        .dance-full-body-right { animation: discoSway 0.5s infinite alternate ease-in-out; transform-origin: bottom center; }
-        @keyframes discoSway { 0% { transform: translateX(-2px) rotate(-3deg); } 100% { transform: translateX(2px) rotate(3deg); } }
-        
-        .dance-arm-disco { animation: discoPoint 0.5s infinite alternate ease-in-out; transform-origin: 85px 30px; }
-        @keyframes discoPoint { 0% { transform: rotate(-40deg); } 100% { transform: rotate(10deg); } }
-
-        .music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; }
-        .music-notes text:nth-child(2) { animation-delay: 0.6s; }
-        @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
-
-        .store-card {
-            border-radius: 28px !important;
-            box-shadow: var(--shadow-xs);
-            transition: transform 0.2s ease, box-shadow 0.25s ease;
-            overflow: hidden;
-            position: relative;
-        }
-        .store-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 5px;
-            background: linear-gradient(180deg, var(--brand-color, #FDCB05) 0%, var(--brand-color-dark, #e0b104) 100%);
-            z-index: 5;
-        }
-        .store-card:active {
-            transform: scale(0.985);
-        }
-        @media (hover: hover) {
-            .store-card:hover {
-                box-shadow: var(--shadow-md);
-                transform: translateY(-2px);
-            }
-        }
-
-        .brand-lenta { --brand-color: #FDCB05; --brand-color-dark: #e0b104; }
-        .brand-okey { --brand-color: #dc2626; --brand-color-dark: #991b1b; }
-        .brand-moll { --brand-color: #9333ea; --brand-color-dark: #6b21a8; }
-        .brand-monetka { --brand-color: #f97316; --brand-color-dark: #c2410c; }
-
-        mark {
-            background: linear-gradient(180deg, transparent 55%, rgba(253, 203, 5, 0.5) 55%);
-            color: inherit;
-            padding: 0 2px;
-            border-radius: 2px;
-            font-weight: 800;
-        }
-
-        .shadow-lenta-sm { box-shadow: var(--shadow-sm); }
-        .shadow-lenta-md { box-shadow: var(--shadow-md); }
-        .shadow-lenta-lg { box-shadow: var(--shadow-lg); }
-
-        .btn-lenta-primary {
-            background: linear-gradient(135deg, #004182 0%, #002B5E 100%);
-            box-shadow: 0 4px 14px rgba(0, 65, 130, 0.3);
-        }
-        .btn-lenta-primary:hover { box-shadow: 0 6px 20px rgba(0, 65, 130, 0.4); }
-        
-        .btn-lenta-emerald {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-        }
-        .btn-lenta-emerald:hover { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
-
-        .mic-pulsing { animation
+      }
+    })();
+  </script>
+</body>
+</html>
