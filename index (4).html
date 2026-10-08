@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    
+    <title>ЛЕНТА: Мониторинг доставок</title>
+    <meta name="description" content="База гипермаркетов и схем заездов для водителей логистики.">
+    
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#0f172a">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        lentaBlue: '#004182',
+                        lentaDark: '#002B5E',
+                        lentaYellow: '#FDCB05'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --truck-light-opacity: 0;
+            --truck-body-brightness: 1;
+        }
+
+        body {
+            background-color: #F8FAFC;
+            color: #1F2937;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            width: 100%;
+            overflow-x: hidden;
+            padding-bottom: env(safe-area-inset-bottom);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .dark body {
+            background-color: #0f172a; 
+            color: #f1f5f9;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            padding-top: max(1rem, env(safe-area-inset-top));
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-radius: 0 0 24px 24px;
+            transition: all 0.3s ease;
+        }
+        .dark .glass-header {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-height: 550px) {
+            .glass-header {
+                position: relative; 
+                border-radius: 0;
+            }
+        }
+
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        .animate-reveal { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .tactile-btn { transition: transform 0.1s ease, background-color 0.2s ease; }
+        .tactile-btn:active { transform: scale(0.92); }
+
+        .record-spin { animation: recordSpin 4s linear infinite; }
+        @keyframes recordSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .scenic-bg { background-color: #0f172a; overflow: hidden; position: relative; height: 140px; width: 100%; border-radius: 16px; }
+
+        .sky-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.2s ease-out; }
+        .sky-day { background: linear-gradient(to bottom, #38bdf8 0%, #bae6fd 100%); opacity: 1; z-index: 1;}
+        .sky-sunset { background: linear-gradient(to bottom, #f97316 0%, #fde047 100%); opacity: 0; z-index: 2;}
+        .sky-night { background: linear-gradient(to bottom, #0f172a 0%, #1e1b4b 100%); opacity: 0; z-index: 3;}
+        
+        .sky-stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 4;
+            background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px), radial-gradient(#ffffff 1px, transparent 1px);
+            background-size: 50px 50px; background-position: 0 0, 25px 25px;
+            opacity: 0; transition: opacity 0.2s ease-out;
+        }
+
+        .celestial-body {
+            position: absolute; border-radius: 50%;
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+            will-change: transform; z-index: 5;
+        }
+        
+        .parallax-layer {
+            position: absolute; top: 0; left: 0; width: 1000vw; 
+            height: 100%;
+            background-repeat: repeat-x; background-position: bottom left;
+            will-change: transform;
+        }
+
+        .parallax-mountains {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='70' viewBox='0 0 160 70'%3E%3Cpath d='M0,70 L40,20 L80,70 Z' fill='%2394a3b8' opacity='0.5'/%3E%3Cpath d='M50,70 L90,10 L130,70 Z' fill='%23cbd5e1' opacity='0.7'/%3E%3C/svg%3E");
+            background-size: 200px auto; z-index: 6;
+        }
+        
+        .parallax-trees {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='50' viewBox='0 0 120 50'%3E%3Cpath d='M20,50 L20,35 L10,35 L25,15 L15,15 L30,-5 L45,15 L35,15 L50,35 L40,35 L40,50 Z' fill='%23064e3b' opacity='0.9'/%3E%3Cpath d='M70,50 L70,30 L60,30 L75,5 L65,5 L80,-15 L95,5 L85,5 L100,30 L90,30 L90,50 Z' fill='%230f766e' opacity='0.8'/%3E%3C/svg%3E");
+            background-size: 100px auto; z-index: 7;
+        }
+        
+        .parallax-road {
+            position: absolute; bottom: 0; left: 0; width: 1000vw; height: 18px; z-index: 10;
+            background-color: #475569; 
+            background-image: linear-gradient(90deg, transparent 50%, #cbd5e1 50%);
+            background-size: 40px 2px; background-position: top 4px left 0; background-repeat: repeat-x;
+            border-top: 3px solid #64748b;
+            will-change: transform;
+        }
+
+        .weather-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; transition: opacity 0.2s ease-out; z-index: 8; }
+        .snow-anim {
+            background-image: radial-gradient(circle, white 1.5px, transparent 1.5px), radial-gradient(circle, white 1px, transparent 1px);
+            background-size: 60px 60px, 40px 40px; background-position: 0 0, 20px 20px;
+            animation: weatherFallSnow 3s linear infinite; opacity: 0;
+        }
+        .leaves-anim {
+            background-image: radial-gradient(ellipse at center, #ea580c 2px, transparent 3px), radial-gradient(ellipse at center, #dc2626 2px, transparent 3px), radial-gradient(ellipse at center, #eab308 1.5px, transparent 2.5px);
+            background-size: 70px 70px, 90px 90px, 50px 50px; background-position: 0 0, 30px 30px, 15px 15px;
+            animation: weatherFallLeaves 4s linear infinite; opacity: 0;
+        }
+        @keyframes weatherFallSnow { 0% { background-position: 0 0, 20px 20px; } 100% { background-position: 30px 60px, 0px 40px; } }
+        @keyframes weatherFallLeaves { 0% { background-position: 0 -70px, 30px -90px, 15px -50px; } 100% { background-position: 70px 70px, -30px 90px, 65px 50px; } }
+
+        .parallax-signs {
+            position: absolute; bottom: 18px; left: 0; width: 3000vw; height: 40px; z-index: 9;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='40' viewBox='0 0 1500 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2200' height='40' viewBox='0 0 2200 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 1500px 40px, 2200px 40px;
+            background-repeat: repeat-x;
+            will-change: transform;
+        }
+
+        .police-car {
+            position: absolute; bottom: 4px; left: 120vw; width: 60px; height: 20px;
+            background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%);
+            border-radius: 4px 4px 10px 6px;
+            z-index: 25; 
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transform: scaleX(-1);
+        }
+        .police-car.active {
+            display: block;
+            animation: driveOpposite 4.5s linear forwards;
+        }
+        .police-siren-red {
+            position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px;
+            animation: sirenRed 0.6s infinite;
+        }
+        .police-siren-blue {
+            position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px;
+            animation: sirenBlue 0.6s infinite;
+        }
+        @keyframes sirenRed { 
+            0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 
+            50%, 100% { box-shadow: none; background: #991b1b; } 
+        }
+        @keyframes sirenBlue { 
+            0%, 49% { box-shadow: none; background: #1e3a8a; } 
+            50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } 
+        }
+        @keyframes driveOpposite { 0% { left: 120vw; } 100% { left: -150px; } }
+
+        .city-slider {
+            display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; overscroll-behavior-x: contain;
+            height: 100%; align-items: flex-end; padding-bottom: 2px; padding-left: 10px;
+        }
+        .city-slider::-webkit-scrollbar { display: none; }
+
+        .truck-chip { outline: none; opacity: 0.9; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-right: 20px; }
+        .truck-chip.active { opacity: 1; transform: scale(1.03) translateY(-2px); z-index: 30; }
+        
+        .truck-wrapper { filter: brightness(var(--truck-body-brightness)); transition: filter 0.2s ease-out; }
+
+        @keyframes truckBump {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-2px); }
+        }
+        .auto-driving .truck-wrapper {
+            animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s);
+        }
+
+        .headlight-beam {
+            position: absolute; width: 70px; height: 20px;
+            background: linear-gradient(to right, rgba(253,224,71,0.95), transparent);
+            transform: skewX(-15deg);
+            opacity: var(--truck-light-opacity); transition: opacity 0.3s;
+            border-radius: 50%; filter: blur(2px); z-index: 50; pointer-events: none;
+        }
+        .tail-light {
+            position: absolute; bottom: 4px; left: -1px; width: 3px; height: 8px;
+            background-color: #ef4444; box-shadow: 0 0 12px 3px rgba(239,68,68,0.95);
+            opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 2px; z-index: 20;
+        }
+        .marker-light {
+            position: absolute; top: 2px; width: 4px; height: 2px;
+            background-color: #fde047; box-shadow: 0 0 8px 2px rgba(253,224,71,0.9);
+            opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 1px;
+        }
+        
+        .dark .city-name-plaque {
+            background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
+        }
+
+        @keyframes fadeScene1 { 0%, 22% { opacity: 1; } 25%, 100% { opacity: 0; } }
+        @keyframes fadeScene2 { 0%, 22% { opacity: 0; } 25%, 47% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        @keyframes fadeScene3 { 0%, 47% { opacity: 0; } 50%, 72% { opacity: 1; } 75%, 100% { opacity: 0; } }
+        @keyframes fadeScene4 { 0%, 72% { opacity: 0; } 75%, 97% { opacity: 1; } 100% { opacity: 0; } }
+        
+        .normal-mode .anim-scene-1 { animation: fadeScene1 20s infinite; }
+        .normal-mode .anim-scene-2 { animation: fadeScene2 20s infinite; opacity: 0; }
+        .normal-mode .anim-scene-3 { animation: fadeScene3 20s infinite; opacity: 0; }
+        .normal-mode .anim-scene-4 { animation: fadeScene4 20s infinite; opacity: 0; }
+
+        .wrench-arm { animation: wrenchMotion 0.6s infinite alternate ease-in-out; transform-origin: 30px 28px; }
+        @keyframes wrenchMotion { 0% { transform: rotate(-10deg); } 100% { transform: rotate(15deg); } }
+        
+        .hammer-arm { animation: hammerMotion 0.4s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); transform-origin: 75px 28px; }
+        @keyframes hammerMotion { 0% { transform: rotate(25deg); } 100% { transform: rotate(-20deg); } }
+
+        .urea-drips circle { animation: dripDrop 0.8s infinite linear; }
+        @keyframes dripDrop { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+
+        .roll-tire { animation: tireRoll 2s infinite linear; transform-origin: 80px 40px; }
+        @keyframes tireRoll { 0% { transform: translateX(10px) rotate(0deg); } 100% { transform: translateX(-15px) rotate(-180deg); } }
+
+        .welding-sparks circle { animation: sparkFlash 0.15s infinite alternate; transform-origin: center; }
+        .welding-sparks circle:nth-child(2) { animation-delay: 0.05s; }
+        .welding-sparks circle:nth-child(3) { animation-delay: 0.1s; }
+        @keyframes sparkFlash { 
+            0% { opacity: 0; transform: scale(0.5) translate(0,0); } 
+            100% { opacity: 1; transform: scale(2) translate(3px, -3px); } 
+        }
+
+        .party-mode .dancing-scene { display: block; }
+        .party-mode .normal-scenes { display: none; }
+        .normal-mode .dancing-scene { display: none; }
+        .normal-mode .normal-scenes { display: block; }
+
+        .dance-full-body-left { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
+        @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-3px) scaleY(1.05); } }
+        
+        .dance-arms-left { animation: waveArms 0.4s infinite alternate ease-in-out; transform-origin: 35px 28px; }
+        @keyframes waveArms { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
+
+        .dance-full-body-right { animation: discoSway 0.5s infinite alternate ease-in-out; transform-origin: bottom center; }
+        @keyframes discoSway { 0% { transform: translateX(-2px) rotate(-3deg); } 100% { transform: translateX(2px) rotate(3deg); } }
+        
+        .dance-arm-disco { animation: discoPoint 0.5s infinite alternate ease-in-out; transform-origin: 85px 30px; }
+        @keyframes discoPoint { 0% { transform: rotate(-40deg); } 100% { transform: rotate(10deg); } }
+
+        .music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; }
+        .music-notes text:nth-child(2) { animation-delay: 0.6s; }
+        @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
+
+    </style>
+</head>
+<body class="relative flex flex-col min-h-screen">
+
+    <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+
+    <!-- Навигационный Модал -->
+    <div id="navModal" class="fixed inset-0 z-[100] bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
+            <button onclick="closeNavModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-black text-lentaDark dark:text-white mb-1 tracking-tight">Маршрут</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">Выберите навигатор для запуска</p>
+            
+            <div class="flex flex-wrap justify-center gap-5 my-2">
+                <button onclick="executeNavigation('yandex');" class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-700 border border-gray-100 dark:border-slate-600 shadow-[0_8px_20px_rgba(253,203,5,0.25)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
+                    <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-xl text-black">Я</span></div>
+                    <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700 dark:text-gray-200">Яндекс</span>
+                </button>
+                <button onclick="executeNavigation('2gis');" class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-700 border border-gray-100 dark:border-slate-600 shadow-[0_8px_20px_rgba(16,185,129,0.2)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-white text-xs font-black">2Г</span></div>
+                    <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700 dark:text-gray-200">2ГИС</span>
+                </button>
+                <button onclick="executeNavigation('google');" class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-700 border border-gray-100 dark:border-slate-600 shadow-[0_8px_20px_rgba(59,130,246,0.2)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-white text-xs font-black">G</span></div>
+                    <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700 dark:text-gray-200">Google</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал вызова Механика -->
+    <div id="mechanicModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
+            <button onclick="closeMechanicModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div class="w-20 h-20 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-gray-200 dark:border-slate-600 shadow-inner">
+                <svg class="w-10 h-10 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            
+            <h3 class="text-xl font-black text-lentaDark dark:text-white mb-1 tracking-tight uppercase">Механик</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">Дежурный гараж</p>
+            
+            <a href="tel:+79826209051" class="block font-black text-gray-800 dark:text-white text-3xl mb-6 hover:text-emerald-500 transition-colors tracking-tight">8 (982) 620-90-51</a>
+            
+            <a href="tel:+79826209051" onclick="closeMechanicModal()" class="block w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-base font-bold transition-all tactile-btn shadow-[0_8px_25px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                Позвонить
+            </a>
+        </div>
+    </div>
+
+    <header class="glass-header">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 relative z-10 pb-4">
+            
+            <!-- СТРОКА 1: Логотип и кнопки -->
+            <div class="flex flex-row items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-3 shrink-0">
+                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Плей/Пауза">
+                        <img id="logoImage" src="icon.png" alt="Логотип" class="w-full h-full object-cover transition-transform group-hover:scale-105" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ccircle cx=\\'50\\' cy=\\'50\\' r=\\'50\\' fill=\\'%23FDCB05\\'/%3E%3Ccircle cx=\\'50\\' cy=\\'50\\' r=\\'20\\' fill=\\'%23004182\\'/%3E%3C/svg%3E'">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent pointer-events-none rounded-full mix-blend-overlay"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-xl font-black text-lentaDark dark:text-blue-50 tracking-tight flex items-center gap-2">
+                            ЛЕНТА <span class="bg-lentaYellow text-lentaDark px-2 py-0.5 rounded text-[10px] font-bold shadow-sm">ЛОГИСТИКА</span>
+                        </h1>
+                        <div class="text-[11px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                            Мониторинг доставок
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-10 h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn" title="Сменить тему">
+                        <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                    <a href="app.apk" download class="flex items-center justify-center gap-1.5 bg-[#004182] hover:bg-[#003366] text-white h-10 px-3 rounded-xl shadow-[0_6px_15px_rgba(0,65,130,0.2)] transition-all tactile-btn cursor-pointer">
+                        <svg class="w-4 h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span class="text-[11px] font-bold tracking-wide uppercase">APK</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ (МЕХАНИКИ, СЧЕТЧИК, СКОРОСТЬ) -->
+            <div class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between">
+                
+                <!-- Левая часть: Надежный Счётчик -->
+                <div class="flex flex-col items-center justify-center shrink-0 min-w-[70px]" title="Счетчик визитов">
+                    <img id="visitCounterBadge" alt="Визиты" class="h-[20px] rounded shadow-sm opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0')" onerror="this.style.display='none'">
+                </div>
+
+                <!-- Центральная часть: Многосерийная сценка с механиками и Танцами -->
+                <div class="relative flex flex-col items-center cursor-pointer tactile-btn group mx-auto w-[120px]" onclick="playTickSound(); openMechanicModal();">
+                    
+                    <div id="mechanicSpeech" class="absolute bottom-[85%] mb-1 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] opacity-0 transform scale-95 transition-all duration-300 whitespace-nowrap pointer-events-none z-[110]">
+                        <!-- Текст подставится скриптом -->
+                    </div>
+
+                    <div class="w-full h-14 md:h-16 relative" id="mechanicSvgContainer">
+                        <svg viewBox="0 0 120 60" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full text-gray-400 dark:text-gray-500 group-hover:text-emerald-500 transition-colors normal-mode" id="mechanicSvgElement">
+                            
+                            <!-- НОРМАЛЬНЫЕ СЦЕНЫ РАБОТЫ -->
+                            <g class="normal-scenes absolute inset-0">
+                                <g class="anim-scene-1 anim-scene-3 anim-scene-4">
+                                    <circle cx="55" cy="40" r="14" stroke-width="4"/>
+                                    <circle cx="55" cy="40" r="4" fill="currentColor"/>
+                                </g>
+                                <g class="anim-scene-1 absolute inset-0">
+                                    <circle cx="30" cy="18" r="6" />
+                                    <path d="M30 24 V 45" />
+                                    <path d="M30 45 L 20 58 M 30 45 L 40 58" />
+                                    <path d="M30 28 L 20 38" />
+                                    <g class="wrench-arm">
+                                        <path d="M30 28 L 45 38" />
+                                        <path d="M43 35 L 50 42" stroke-width="2"/>
+                                        <path d="M52 38 C 50 36, 47 39, 50 42" stroke-width="2" fill="none"/>
+                                    </g>
+                                    <circle cx="80" cy="18" r="6" />
+                                    <path d="M80 24 V 45" />
+                                    <path d="M80 45 L 70 58 M 80 45 L 90 58" />
+                                    <path d="M80 28 L 90 38" />
+                                    <g class="hammer-arm">
+                                        <path d="M80 28 L 65 35" />
+                                        <path d="M62 32 L 59 38" stroke-width="2"/>
+                                        <rect x="57" y="30" width="4" height="4" fill="currentColor" stroke="none" transform="rotate(-30 59 32)"/>
+                                    </g>
+                                </g>
+                                <g class="anim-scene-2 absolute inset-0">
+                                    <circle cx="35" cy="20" r="6" />
+                                    <path d="M35 26 V 45" />
+                                    <path d="M35 45 L 25 58 M 35 45 L 45 58" />
+                                    <path d="M35 30 L 50 38" />
+                                    <rect x="65" y="25" width="45" height="33" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
+                                    <path d="M75 25 V 20 H 80 V 25" fill="none"/>
+                                    <path d="M50 38 C 60 48, 70 15, 77 20" fill="none" stroke="currentColor" stroke-width="2"/>
+                                    <g class="urea-drips">
+                                        <circle cx="77.5" cy="23" r="1.5" fill="#3b82f6" stroke="none"/>
+                                    </g>
+                                </g>
+                                <g class="anim-scene-3 absolute inset-0">
+                                    <circle cx="30" cy="18" r="6" />
+                                    <path d="M30 24 V 45" />
+                                    <path d="M30 45 L 20 58 M 30 45 L 40 58" />
+                                    <path d="M30 28 L 20 38" />
+                                    <path d="M30 28 C 30 20, 35 15, 35 18" stroke-width="2"/> 
+                                    <circle cx="95" cy="18" r="6" />
+                                    <path d="M95 24 V 45" />
+                                    <path d="M95 45 L 85 58 M 95 45 L 105 58" />
+                                    <path d="M95 30 L 105 40" />
+                                    <path d="M95 30 L 80 40" />
+                                    <g class="roll-tire">
+                                        <circle cx="80" cy="40" r="10" stroke-width="3"/>
+                                        <path d="M80 30 V 50 M 70 40 H 90" stroke-width="1"/>
+                                    </g>
+                                </g>
+                                <g class="anim-scene-4 absolute inset-0">
+                                    <circle cx="35" cy="20" r="6" />
+                                    <path d="M30 15 L 42 16 L 41 24 L 32 23 Z" fill="currentColor"/>
+                                    <path d="M35 26 V 45" />
+                                    <path d="M35 45 L 25 58 M 35 45 L 45 58" />
+                                    <path d="M35 30 L 48 38" />
+                                    <path d="M35 28 L 45 35" />
+                                    <path d="M48 38 L 53 43" stroke-width="2"/>
+                                    <g class="welding-sparks">
+                                        <circle cx="55" cy="45" r="1.5" fill="#facc15" stroke="none"/>
+                                        <circle cx="58" cy="42" r="1" fill="#facc15" stroke="none"/>
+                                        <circle cx="52" cy="48" r="2" fill="#ef4444" stroke="none"/>
+                                    </g>
+                                </g>
+                            </g>
+
+                            <!-- СЦЕНА ДИСКОТЕКИ -->
+                            <g class="dancing-scene absolute inset-0">
+                                <g class="music-notes">
+                                    <text x="45" y="20" font-size="12" fill="currentColor">♪</text>
+                                    <text x="65" y="15" font-size="16" fill="currentColor">♫</text>
+                                </g>
+                                <!-- Танцор 1: Волна / Ламбада -->
+                                <g class="dance-full-body-left">
+                                    <circle cx="35" cy="20" r="6" />
+                                    <path d="M35 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M35 45 L 25 58 M 35 45 L 45 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <g class="dance-arms-left">
+                                        <path d="M20 15 Q 35 35 50 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    </g>
+                                </g>
+                                <!-- Танцор 2: Король Диско -->
+                                <g class="dance-full-body-right">
+                                    <circle cx="85" cy="20" r="6" />
+                                    <path d="M85 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M85 45 L 75 58 M 85 45 L 95 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M85 30 L 78 37 L 82 42" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/> 
+                                    <g class="dance-arm-disco">
+                                        <path d="M85 30 L 98 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0 text-center w-full">Механик</div>
+                </div>
+                
+                <!-- Правая часть: Умный знак скорости -->
+                <div class="flex flex-col items-center justify-center cursor-default shrink-0" title="Ограничение скорости на этот сезон">
+                    <div class="w-10 h-10 rounded-full border-[3px] border-red-500 bg-white dark:bg-gray-100 flex items-center justify-center shadow-[0_4px_10px_rgba(239,68,68,0.2)] relative">
+                        <span id="speedLimitNumber" class="text-slate-800 font-black text-base leading-none tracking-tighter">80</span>
+                        <div id="seasonIcon" class="absolute -bottom-1 -right-2 w-4 h-4 rounded-full flex items-center justify-center text-[8px] shadow-sm border"></div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- СТРОКА 3: Поиск -->
+            <div class="flex items-center gap-2 w-full mb-4 mt-2">
+                <div class="relative flex-1 group">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-lentaBlue dark:group-focus-within:text-blue-400 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Поиск по ТК, адресу, городу..." 
+                           class="bg-gray-100 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 border-2 border-transparent focus:border-lentaBlue text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm rounded-xl block w-full pl-10 pr-10 py-2.5 outline-none transition-all shadow-inner">
+                    
+                    <button id="clearSearchBtn" onclick="clearSearch();" class="hidden absolute right-2 top-2 text-gray-400 hover:text-gray-700 bg-white dark:bg-slate-700 p-1 rounded-full shadow-sm cursor-pointer tactile-btn">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div id="autocompleteList" class="absolute z-[100] w-full bg-white dark:bg-slate-800 rounded-xl hidden max-h-[40vh] overflow-y-auto mt-2 text-left text-gray-800 dark:text-gray-200 shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-slate-700 hide-scrollbar"></div>
+                </div>
+
+                <button id="voiceSearchBtn" onclick="startVoiceSearch();" class="bg-white dark:bg-slate-800 text-lentaBlue dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 w-11 h-11 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 cursor-pointer tactile-btn" title="Голосовой поиск">
+                    <svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </button>
+            </div>
+
+            <!-- СТРОКА 4: Анимация окружения -->
+            <div class="relative overflow-hidden rounded-[16px] shadow-[inset_0_4px_15px_rgba(0,0,0,0.05)] border border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-900">
+                <div class="scenic-bg group">
+                    <div id="skyDay" class="sky-layer sky-day"></div>
+                    <div id="skySunset" class="sky-layer sky-sunset"></div>
+                    <div id="skyNight" class="sky-layer sky-night"></div>
+                    <div id="skyStars" class="sky-stars"></div>
+                    
+                    <div id="sunBody" class="celestial-body w-8 h-8 bg-gradient-to-tr from-yellow-400 to-yellow-200 shadow-[0_0_20px_rgba(250,204,21,1)]" style="left: -10%; bottom: -10%; opacity: 0;"></div>
+                    <div id="moonBody" class="celestial-body w-6 h-6 bg-blue-50 shadow-[0_0_15px_rgba(219,234,254,0.8)]" style="left: -10%; bottom: -10%; opacity: 0;"></div>
+
+                    <div id="layerMountains" class="parallax-layer parallax-mountains"></div>
+                    <div id="layerTrees" class="parallax-layer parallax-trees"></div>
+                    
+                    <div id="layerLeaves" class="weather-layer leaves-anim"></div>
+                    <div id="layerSnow" class="weather-layer snow-anim"></div>
+
+                    <div id="layerSigns" class="parallax-signs"></div>
+                    <div id="layerRoad" class="parallax-road"></div>
+                    
+                    <div id="policeCar" class="police-car">
+                        <div class="police-siren-red"></div>
+                        <div class="police-siren-blue"></div>
+                        <div class="absolute top-1 left-2 w-4 h-3 bg-sky-200/50 rounded-sm"></div>
+                        <div class="absolute top-1 right-2 w-6 h-3 bg-sky-200/50 rounded-sm"></div>
+                        <div class="absolute bottom-[-2px] left-2 w-3.5 h-3.5 bg-gray-800 rounded-full border border-gray-400"></div>
+                        <div class="absolute bottom-[-2px] right-2 w-3.5 h-3.5 bg-gray-800 rounded-full border border-gray-400"></div>
+                        <div class="absolute bottom-1 right-0 w-2 h-2 bg-yellow-200 rounded-full shadow-[0_0_10px_2px_rgba(253,224,71,0.8)]"></div>
+                        <div class="absolute bottom-1 left-0 w-1 h-2 bg-red-500 rounded-full"></div>
+                    </div>
+
+                    <div id="citySlider" class="city-slider relative z-30 cursor-pointer"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 relative z-10 flex-1">
+        <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 mb-8"></div>
+    </main>
+
+    <script>
+        // === НАДЕЖНЫЙ СЧЕТЧИК ===
+        function initCounter() {
+            const badge = document.getElementById('visitCounterBadge');
+            const uniqueTime = Date.now(); 
+            badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v2.svg?label=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&color=1e293b&labelColor=334155&nocache=${uniqueTime}`;
+        }
+        initCounter();
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (isDark) {
+                themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+                themeBtn.classList.add('text-amber-500');
+                themeBtn.classList.remove('text-gray-400', 'dark:text-gray-400');
+            } else {
+                themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+                themeBtn.classList.remove('text-amber-500');
+                themeBtn.classList.add('text-gray-400', 'dark:text-gray-400');
+            }
+        }
+
+        let audioCtx = null;
+        let engineOsc = null;
+        let engineGain = null;
+        let isAudioUnlocked = false;
+
+        function unlockAudio() {
+            if (isAudioUnlocked) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                try {
+                    engineOsc = audioCtx.createOscillator();
+                    engineGain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+                    engineOsc.type = 'sawtooth';
+                    engineOsc.frequency.value = 35;
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 150; 
+                    engineGain.gain.value = 0; 
+                    engineOsc.connect(filter);
+                    filter.connect(engineGain);
+                    engineGain.connect(audioCtx.destination);
+                    engineOsc.start();
+                    isAudioUnlocked = true;
+                } catch(e) {}
+            }
+        }
+
+        document.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
+        document.addEventListener('mousedown', unlockAudio, { passive: true, once: true });
+
+        function playTickSound() {
+            if (!isAudioUnlocked || !audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square'; 
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.02);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); 
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.03);
+            } catch (e) {}
+        }
+
+        let engineTimeout;
+        function playEngineSound(speed) {
+            if (!isAudioUnlocked || !audioCtx || !engineGain) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const vol = Math.min(0.12, speed * 0.15); 
+            
+            const freq = Math.min(70, 35 + speed * 25);
+            engineGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
+            engineOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
+            clearTimeout(engineTimeout);
+            engineTimeout = setTimeout(() => {
+                engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
+                engineOsc.frequency.setTargetAtTime(35, audioCtx.currentTime, 0.2);
+            }, 150);
+        }
+
+        let lastScrollY = window.scrollY;
+        let accumulatedVerticalDist = 0;
+        let lastVerticalTickTime = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentY = window.scrollY;
+            const dist = Math.abs(currentY - lastScrollY);
+            lastScrollY = currentY;
+            if (dist > 1) {
+                accumulatedVerticalDist += dist;
+                if (accumulatedVerticalDist > 60) { 
+                    const now = Date.now();
+                    if (now - lastVerticalTickTime > 40) { 
+                        playTickSound();
+                        accumulatedVerticalDist = 0;
+                        lastVerticalTickTime = now;
+                    }
+                }
+            }
+        }, { passive: true });
+
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.45; 
+        let isMusicPlaying = false;
+        let lastLogoTapTime = 0;
+        let autoScrollAnimationId = null;
+        const citySlider = document.getElementById('citySlider');
+        let virtualScrollX = 0;
+        let lastActualScrollLeft = 0;
+
+        let isMouseDown = false;
+        let startX;
+        let scrollLeftPos;
+
+        citySlider.addEventListener('mousedown', (e) => {
+            if (isMusicPlaying) return;
+            isMouseDown = true;
+            citySlider.style.cursor = 'grabbing';
+            startX = e.pageX - citySlider.offsetLeft;
+            scrollLeftPos = citySlider.scrollLeft;
+        });
+
+        citySlider.addEventListener('mouseleave', () => {
+            isMouseDown = false;
+            citySlider.style.cursor = 'grab';
+        });
+
+        citySlider.addEventListener('mouseup', () => {
+            isMouseDown = false;
+            citySlider.style.cursor = 'grab';
+        });
+
+        citySlider.addEventListener('mousemove', (e) => {
+            if (!isMouseDown || isMusicPlaying) return;
+            e.preventDefault();
+            const x = e.pageX - citySlider.offsetLeft;
+            const walk = (x - startX) * 2; 
+            citySlider.scrollLeft = scrollLeftPos - walk;
+        });
+        citySlider.style.cursor = 'grab';
+
+        function handleLogoTap() {
+            unlockAudio();
+            const now = Date.now();
+            if (now - lastLogoTapTime < 400) {
+                if (isMusicPlaying) {
+                    showMechanicPhrase(true); 
+                }
+                
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                isMusicPlaying = false;
+                document.getElementById('logoImage').classList.remove('record-spin');
+                
+                const mechSvg = document.getElementById('mechanicSvgElement');
+                mechSvg.classList.remove('party-mode');
+                mechSvg.classList.add('normal-mode');
+
+                stopAutoScroll(); 
+                resetTrucksToStart();
+            } else {
+                toggleMusicState();
+            }
+            lastLogoTapTime = now;
+        }
+
+        function toggleMusicState() {
+            const logo = document.getElementById('logoImage');
+            const mechSvg = document.getElementById('mechanicSvgElement');
+
+            if (isMusicPlaying) {
+                showMechanicPhrase(true); 
+                
+                bgMusic.pause();
+                isMusicPlaying = false;
+                logo.classList.remove('record-spin');
+                mechSvg.classList.remove('party-mode'); 
+                mechSvg.classList.add('normal-mode');   
+                stopAutoScroll(); 
+            } else {
+                const playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isMusicPlaying = true;
+                        logo.classList.add('record-spin');
+                        mechSvg.classList.remove('normal-mode');
+                        mechSvg.classList.add('party-mode');
+                        startAutoScroll();
+                    }).catch((e) => {
+                        isMusicPlaying = true; 
+                        logo.classList.add('record-spin');
+                        mechSvg.classList.remove('normal-mode');
+                        mechSvg.classList.add('party-mode');
+                        startAutoScroll();
+                    });
+                }
+            }
+        }
+
+        function resetTrucksToStart() {
+            buildCitySlider(); 
+            citySlider.scrollLeft = 0;
+            virtualScrollX = 0;
+            window.fractionalScroll = 0;
+            lastActualScrollLeft = 0;
+            updateParallax(0);
+        }
+
+        let lastSliderScrollTime = Date.now();
+        citySlider.addEventListener('scroll', () => {
+            if (isMusicPlaying) return; 
+            const currentScroll = citySlider.scrollLeft;
+            const dx = currentScroll - lastActualScrollLeft;
+            if (Math.abs(dx) > 0) {
+                virtualScrollX += Math.abs(dx); 
+                const now = Date.now();
+                const dt = now - lastSliderScrollTime;
+                if (dt > 16) {
+                    const speed = Math.abs(dx) / dt;
+                    if (speed > 0.05) playEngineSound(speed);
+                }
+                lastSliderScrollTime = now;
+                updateParallax(virtualScrollX);
+            }
+            lastActualScrollLeft = currentScroll;
+        }, { passive: true });
+
+        function startAutoScroll() {
+            if (!autoScrollAnimationId) {
+                lastActualScrollLeft = citySlider.scrollLeft;
+                citySlider.classList.add('auto-driving');
+                autoScrollLoop();
+            }
+        }
+
+        function stopAutoScroll() {
+            if (autoScrollAnimationId) {
+                cancelAnimationFrame(autoScrollAnimationId);
+                autoScrollAnimationId = null;
+            }
+            citySlider.classList.remove('auto-driving');
+            if (engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
+            document.getElementById('policeCar').classList.remove('active');
+        }
+
+        let policeTimer = 0;
+        
+        function autoScrollLoop() {
+            if (!isMusicPlaying) return;
+
+            const speed = 0.5; 
+            virtualScrollX += speed; 
+            playEngineSound(0.4); 
+
+            policeTimer++;
+            if (policeTimer > 700) { 
+                if (Math.random() > 0.98) {
+                    const pCar = document.getElementById('policeCar');
+                    if (!pCar.classList.contains('active')) {
+                        pCar.classList.add('active');
+                        setTimeout(() => { pCar.classList.remove('active'); }, 4500); 
+                        policeTimer = 0;
+                    }
+                }
+            }
+
+            if (citySlider.firstElementChild) {
+                window.fractionalScroll = (window.fractionalScroll || 0) + speed;
+                
+                if (window.fractionalScroll >= 1) {
+                    let shift = Math.floor(window.fractionalScroll);
+                    window.fractionalScroll -= shift;
+                    
+                    citySlider.scrollLeft -= shift;
+                    
+                    if (citySlider.scrollLeft <= 0) {
+                        const lastItem = citySlider.lastElementChild;
+                        const itemWidth = lastItem.offsetWidth + 20;
+                        citySlider.insertBefore(lastItem, citySlider.firstElementChild);
+                        citySlider.scrollLeft += itemWidth;
+                    }
+                    
+                    lastActualScrollLeft = citySlider.scrollLeft;
+                }
+            }
+
+            updateParallax(virtualScrollX);
+            autoScrollAnimationId = requestAnimationFrame(autoScrollLoop);
+        }
+
+        function updateParallax(vX) {
+            document.getElementById('layerMountains').style.transform = `translate3d(-${(vX * 0.2) % 200}px, 0, 0)`;
+            document.getElementById('layerTrees').style.transform = `translate3d(-${(vX * 0.5) % 100}px, 0, 0)`;
+            document.getElementById('layerRoad').style.transform = `translate3d(-${(vX * 0.9) % 40}px, 0, 0)`;
+            document.getElementById('layerSigns').style.transform = `translate3d(-${(vX * 0.9) % 2200}px, 0, 0)`;
+
+            const cycleLength = 3000;
+            let rawProgress = (Math.abs(vX) % cycleLength) / cycleLength; 
+            let progress = 1 - Math.abs(rawProgress * 2 - 1); 
+
+            document.getElementById('skyDay').style.opacity = Math.max(0, 1 - (progress * 2));
+            document.getElementById('skySunset').style.opacity = progress < 0.5 ? (progress * 2) : Math.max(0, 1 - ((progress - 0.5) * 2));
+            document.getElementById('skyNight').style.opacity = progress > 0.4 ? ((progress - 0.4) / 0.6) : 0;
+            document.getElementById('skyStars').style.opacity = progress > 0.5 ? ((progress - 0.5) / 0.5) : 0;
+
+            const darkness = 1 - (progress * 0.7); 
+            
+            if (progress > 0.6) {
+                document.documentElement.style.setProperty('--truck-light-opacity', '1');
+                document.documentElement.style.setProperty('--truck-body-brightness', '0.6');
+            } else {
+                document.documentElement.style.setProperty('--truck-light-opacity', '0');
+                document.documentElement.style.setProperty('--truck-body-brightness', '1');
+            }
+
+            const layerTrees = document.getElementById('layerTrees');
+            const layerLeaves = document.getElementById('layerLeaves');
+            const layerSnow = document.getElementById('layerSnow');
+
+            if (progress < 0.25) { 
+                layerLeaves.style.opacity = 0; layerSnow.style.opacity = 0;
+                layerTrees.style.filter = `brightness(${darkness}) hue-rotate(-20deg) saturate(1.5)`;
+            } else if (progress < 0.5) { 
+                layerLeaves.style.opacity = 0; layerSnow.style.opacity = 0;
+                layerTrees.style.filter = `brightness(${darkness})`;
+            } else if (progress < 0.75) { 
+                let p = (progress - 0.5) / 0.25; 
+                layerLeaves.style.opacity = p; layerSnow.style.opacity = 0;
+                layerTrees.style.filter = `brightness(${darkness}) sepia(${p*0.6}) hue-rotate(-${p * 40}deg)`;
+            } else { 
+                let p = (progress - 0.75) / 0.25; 
+                layerLeaves.style.opacity = 0; layerSnow.style.opacity = p;
+                layerTrees.style.filter = `brightness(${darkness}) grayscale(${p * 0.8}) brightness(${1 + p*0.5})`;
+            }
+
+            const sunBody = document.getElementById('sunBody');
+            const moonBody = document.getElementById('moonBody');
+            if (progress <= 0.6) {
+                const sunP = progress / 0.6;
+                sunBody.style.transform = `translate3d(calc(${sunP * 100}vw + 20px), calc(-${Math.sin(sunP * Math.PI) * 50}px), 0)`;
+                sunBody.style.opacity = 1;
+            } else { sunBody.style.opacity = 0; }
+
+            if (progress >= 0.4) {
+                const moonP = (progress - 0.4) / 0.6;
+                moonBody.style.transform = `translate3d(calc(${moonP * 100}vw + 20px), calc(-${Math.sin(moonP * Math.PI) * 50}px), 0)`;
+                moonBody.style.opacity = 1;
+            } else { moonBody.style.opacity = 0; }
+        }
+
+        const rawData = `203	8092	ООО "Лента", 620000, Свердловская обл., г. Екатеринбург, Дублер Сибирского тракта, д. 19, корп. 1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+227	8092	ООО "Лента", 620016, Свердловская обл., г. Екатеринбург, Академика Сахарова пр-кт, д. 107/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+228	8092	ООО "Лента", 620017, Свердловская обл., г. Екатеринбург, Космонавтов пр-кт, д.1в/1	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+229	8092	ООО "Лента", 620039, Свердловская обл., г. Екатеринбург, ул. 22 Партсъезда, д. 2	Екатеринбург	22:00-04:00	04:00-09:00	-	Да	Круглосуточно	Круглосуточно
+230	8092	ООО "Лента", 620057, Свердловская обл., г. Екатеринбург, ул.Таганская, д.60, А	Екатеринбург	07:00-12:00	12:00-17:00	-	Нет	08:00	24:00
+176	8092	ООО "Лента", 623430 Свердловская обл., г. Каменск-Уральский, ул. Суворова, д. 48	Каменск-Уральский	08:00-13:00	-	-	Да	Круглосуточно	Круглосуточно
+309	8092	ООО "Лента", 640003, Курганская обл., г. Курган, ул. Коли Мяготина, д.8	Курган	08:00-13:00	13:00-18:00	-	Нет	08:00	24:00
+74	8092	ООО "Лента", 455001, Челябинская обл., г. Магнитогорск, ул. Вокзальная, д.23	Магнитогорск	07:00-12:00	12:00-17:00	-	Нет	08:00	02:00
+192	8092	ООО "Лента", 455048, Челябинская обл., г. Магнитогорск, пр-кт Ленина, д. 119	Магнитогорск	07:00-12:00	12:00-17:00	-	Нет	08:00	02:00
+317	8092	ООО "Лента", 628609, Ханты- Мансийский Автономный округ - Югра АО, г. Нижневартовск, ул. Кузоваткина, 17	Нижневартовск	08:00-13:00	14:00-19:00	-	Да	08:00	23:00
+61	8092	ООО "Лента", 622049, Свердловская обл., г. Нижний Тагил, пр-кт Уральский, д. 75	Нижний Тагил	08:00-13:00	13:00-18:00	-	Нет	Круглосуточно	Круглосуточно
+206	8092	ООО "Лента", 622000, Свердловская обл., г. Нижний Тагил, Свердловское ш., д. 31	Нижний Тагил	08:00-12:00	13:00-17:00	-	Нет	08:00	23:00
+285	8092	ООО "Лента", 629803, Ямало-Ненецкий АО, г. Ноябрьск, мкр.Б-2А, ул. Цоя, д.22	Ноябрьск	08:00-13:00	14:00-19:00	-	Нет	07:00	23:00
+42	8092	ООО "Лента"  614097, г. Пермь, Парковый пр., д.66	Пермь	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+147	8092	ООО "Лента", 614065, г. Пермь, ш. Космонавтов, стр.162 б	Пермь	08:00-12:00	13:00-17:00	-	Да	Круглосуточно	Круглосуточно
+235	8092	ООО "Лента", 614077, г. Пермь, б-р Гагарина, д.65	Пермь	06:00-11:00	12:00-16:00	-	Да	Круглосуточно	Круглосуточно
+297	8092	ООО "Лента", 614025, г. Пермь, ул. Героев Хасана, 105	Пермь	06:00-11:00	12:00-16:00	-	Да	Круглосуточно	Круглосуточно
+92	8092	ООО "Лента", 628403, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, ул. 30 лет Победы, д. 74	Сургут	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+93	8092	ООО "Лента",628403, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, ул. Югорский тракт, д.2	Сургут	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+321	8092	ООО "Лента", 628412, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, Югорский тракт, д.38 (ТК Сити Молл)	Сургут	08:00-13:00	13:00-18:00	-	Да	Круглосуточно	Круглосуточно
+135	8092	ООО "Лента", 626150, Тюменская обл., г. Тобольск, 15-й мкр., д. 21	Тобольск	08:00-13:00	13:00-18:00	-	Да	Круглосуточно	Круглосуточно
+91	8092	ООО "Лента", 625016, Тюменская обл., г.Тюмень, ул.Мельникайте, д. 139	Тюмень	07:00-12:00	13:00-18:00	-	Да	Круглосуточно	Круглосуточно
+94	8092	ООО "Лента", 625014, Тюменская обл., г. Тюмень, ул. Республики, д. 291	Тюмень	08:00-13:00	14:00-19:00	-	Нет	08:00	24:00
+146	8092	ООО "Лента", 625007, Тюменская обл., г. Тюмень, Тобольский тракт, д.101	Тюмень	08:00-13:00	14:00-19:00	-	Да	Круглосуточно	Круглосуточно
+209	8092	ООО "Лента", 625022, Тюменская обл., г. Тюмень, ул. Алебашевская, д. 19	Тюмень	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+245	8092	ООО "Лента", 625046, Тюменская обл., г. Тюмень, ул. Народная, д.76	Тюмень	03:00-08:00	08:00-13:00	13:00-20:00	Да	Круглосуточно	Круглосуточно
+100	8092	ООО "Лента", 628011, Ханты-Мансийский Автономный округ - ЮГРА АО, г. Ханты-Мансийск, ул. Объездная, д. 9	Ханты-Мансийск	03:00-08:00	08:00-13:00	13:00-20:00	Да	Круглосуточно	Круглосуточно
+69	8092	ООО "Лента", 454045, Челябинская обл., г. Челябинск, ул. Блюхера, д. 126	Челябинск	03:00-08:00	08:00-13:00	-	Да	Круглосуточно	Круглосуточно
+154	8092	ООО "Лента", 454021, Челябинская обл., г. Челябинск, ул. Братьев Кашириных, д. 75	Челябинск	03:00-08:00	08:00-14:00	-	Да	Круглосуточно	Круглосуточно
+184	8092	ООО "Лента", 454004, Челябинская обл., г. Челябинск, ул. Академика Сахарова, д. 15	Челябинск	07:00-14:00	-	-	Нет	08:00	00:00
+212	8092	ООО "Лента", 454008, Челябинская обл., г. Челябинск, ул. Черкасская, д. 23	Челябинск	07:00-14:00	-	-	Нет	08:00	24:00
+213	8092	ООО "Лента", 454010, Челябинская обл., г. Челябинск, Копейское ш., д. 64	Челябинск	07:00-14:00	14:00-19:00	-	Нет	09:00	23:00
+301	8092	ООО "Лента", 454007, Челябинская обл., г. Челябинск, ул. Артиллерийская, д. 136	Челябинск	08:00-14:00	-	-	Нет	09:00	24:00
+335	8092	ООО "Лента", 454003, Челябинская область, г. Челябинск, ул. Братьев Кашириных, д. 133	Челябинск	07:00-14:00	-	-	Нет	08:00	23:00
+337	8092	ООО "Лента", 454100, Челябинская область, г. Челябинск, Комсомольский пр., д. 113	Челябинск	08:00-14:00	14:00-17:00	-	Нет	08:00	23:00
+334	8092	ООО "Лента", 454080, Челябинская область, г. Челябинск, ул. Труда, д. 166	Челябинск	07:00-14:00	-	-	Нет	08:00	23:00
+336	8092	ООО "Лента", 454135, Челябинская область, г. Челябинск, ул. Энергетиков, д. 21Б	Челябинск	08:00-14:00	-	-	Нет	08:00	23:00
+338	8092	ООО "Лента", 456300, Челябинская область, г. Миасс, пр. Автозаводцев, д. 65/1	Миасс	09:00-16:00	-	-	Нет	09:00	23:00
+368	8092	620017, Свердловская обл., г.Екатеринбург г.о., Екатеринбург г., ул. Бабушкина, стр.2	Екатеринбург	09:00-12:00	-	-	Нет	08:00	24:00
+396	8092	Свердловская обл., город Екатеринбург г.о, Екатеринбург г., Репина ул., стр.94, помещ.1	Екатеринбург	08:00-11:00	-	-	Нет	08:00	24:00
+369	8092	Свердловская обл., город Екатеринбург г.о., Екатеринбург г., Академика Шварца ул., стр.15	Екатеринбург	08:00-11:00	-	-	Да	Круглосуточно	Круглосуточно
+390	8092	625053, Тюменская обл., Тюмень, Широтная ул., д.199	Тюмень	13:00-16:00	-	-	Нет	08:00	24:00
+389	8092	625048, Тюменская обл., г. Тюмень, Профсоюзная ул., д.1, к.1	Тюмень	08:00-17:00	-	-	Нет	08:00	23:00
+929929	8092	ООО ОКЕЙ, ул. Федюнинского, 67, Тюмень, Тюменская обл., 625062	Тюмень	-	-	-	Нет	-	-
+411	8092	628406, Ханты-Мансийский Автономный округ-Югра АО, Сургут, Нефтеюганское ш.,1	Сургут	08:00-11:00	-	-	Нет	08:00	24:00
+343	8092	ООО "Лента" 628307 Ханты-Мансийский Автономный округ - Югра, г.Нефтеюганск ул. Усть-Балыкская 6	Нефтеюганск	04:00-09:00	09:00-14:00	-	Да	Круглосуточно	Круглосуточно
+929455	-	РЦ "Монетка", Пермский край, Краснокамский муниципальный округ, Шоссейная улица, 1Б, деревня Никитино	Пермь	-	-	-	Нет	-	-
+929453	-	РЦ "Монетка", Тюменская обл., г. Тюмень, Велижанский тракт, 9-й километр, 130	Тюмень	-	-	-	Нет	-	-
+928177	-	РЦ "Монетка", Новосвердловская ул., 5, Берёзовский	Березовский	-	-	-	Нет	-	-
+927898	-	РЦ "Монетка", территория Ново-Свердловская ТЭЦ, 2Г, Екатеринбург	Березовский	-	-	-	Нет	-	-
+929451	-	РЦ "Монетка", Нефтеюганск, территория Восточная Зона, ст2	Нефтеюганск	-	-	-	Нет	-	-
+929452	-	РЦ "Монетка", Интернациональная ул., 1/1, посёлок железнодорожная станция Формачёво	Южноуральск	-	-	-	Нет	-	-
+928817	-	РЦ "Монетка", Гвардейская ул., 57, корп. 1, жилой район Шакша Южная, Уфа	Уфа	-	-	-	Нет	-	-
+929034	-	РЦ "Монетка", ул. 3307-й километр, 3307, село Толмачёво	Новосибирск	-	-	-	Нет	-	-
+929000	-	РЦ "Монетка", д. Валищево, Территория промышленного парка Валищево, 3	Москва	-	-	-	Нет	-	-
+929100	-	РЦ "Монетка", Санкт-Петербург, Невский район, исторический район Стеклянный Городок	Санкт-Петербург	-	-	-	Нет	-	-
+8081	-	РЦ Молл, Радонежская улица, 15, Челябинск, 454036	Челябинск	-	-	-	Нет	-	-
+8082	-	РЦ Молл, Моховая улица, 7, Челябинск, 454005	Челябинск	-	-	-	Нет	-	-
+8083	-	РЦ Молл, шоссе Металлургов, 88, Челябинск, 454052	Челябинск	-	-	-	Нет	-	-`;
+
+        const customRoutes = {
+            '317': 'https://yandex.ru/maps/?um=constructor%3A5f0fb3706ed1ecc385fdf70ddc878fc1b9ed849e91bb04e5cd628df6fb1a899f&source=constructorLink',
+            '368': 'https://yandex.ru/maps/?um=constructor%3A151b677d3b24e5df2ebe6b33ae80a1f4be00314930619040658a6cd4a76487a8&source=constructorLink',
+            '94': 'https://yandex.ru/maps/?um=constructor%3A80d2266d0be153d3f15728239c6084256047cb996bd39ac8fc4f78b2d51a904b&source=constructorLink',
+            '285': 'https://yandex.ru/maps/?um=constructor%3Ad570fc5ad7b24b26c62c97f6c9eeff0a2329bb71c99e20e804f721f7d48b6930&source=constructorLink',
+            '411': 'https://yandex.ru/maps/?um=constructor%3A470180351824d49a21b4401d1920add69200f18e2562b41b1e1c21a61543a89b&source=constructorLink',
+            '321': 'https://yandex.ru/maps/?um=constructor%3Ac107808e783d8f04dbe1c6e31db9c0741ef497a3bdde9d59c569e3bbd0c6ae21&source=constructorLink',
+            '93': 'https://yandex.ru/maps/?um=constructor%3A4a3c5ef8a9c36c3a6268e32da5b2367d0e211814f580f4fc734487ba1154cc7e&source=constructorLink',
+            '92': 'https://yandex.ru/maps/?um=constructor%3Abefa7b198663f4f9dac1b28be923906d1bd235f6ecf8660606e0431ca73895da&source=constructorLink',
+            '929451': 'https://yandex.ru/maps/?um=constructor%3A420a9f2db340ceeb397fa5e7e7f12c68857b9bc6aaf2b35b61004c020c1bd139&source=constructorLink',
+            '343': 'https://yandex.ru/maps/?um=constructor%3A5e9eb6d507f8ecee001eb446ff2579cef0685ac55cf32d267e912db1931b6653&source=constructorLink',
+            '100': 'https://yandex.ru/maps/?um=constructor%3Ab5b3bfc3e1865f88d5bcaa8282519968b4c0ed6a7477fab024157b3cf2228957&source=constructorLink',
+            '135': 'https://yandex.ru/maps/?um=constructor%3Ab4f7660388443e0ecd9dfafa18b7746795f0d279b1e0fe50744c1b4a44363bd7&source=constructorLink',
+            '929453': 'https://yandex.ru/maps/?um=constructor%3A3028b973ac29acd5f685ca7ef7bce016a464bf3321b24bf9f4095e8e752d017c&source=constructorLink',
+            '390': 'https://yandex.ru/maps/?um=constructor%3A9d4973b3dea5e62b714c6109398e8ebd433ce93fabef64fa451d1773554393b0&source=constructorLink',
+            '389': 'https://yandex.ru/maps/?um=constructor%3A3be5b677130256c73ee1b60e7db0c567da71f4033c1962b9ad6ba45523b67e8e&source=constructorLink',
+            '245': 'https://yandex.ru/maps/?um=constructor%3A0de529f08593916d036e3fca75948e592e4e96dc5118d168264bf495de2c276a&source=constructorLink',
+            '209': 'https://yandex.ru/maps/?um=constructor%3A5a8b96301fa84a9e1e2d1d13622b1c5c80c7eb4426a067e288505878a2d4434a&source=constructorLink',
+            '146': 'https://yandex.ru/maps/?um=constructor%3Abec93239bb8b5780b81bf27b15ba9597b3853ad57a51a8ba72c6fb767027504e&source=constructorLink',
+            '91': 'https://yandex.ru/maps/?um=constructor%3A7e3843dbf95debeb6f394b571d74764ba3c05757a160b806c2d09a4dcbfc033c&source=constructorLink',
+            '309': 'https://yandex.ru/maps/?um=constructor%3A6c20f09c2c83dbff2ae0fdc57bcbd3842cc814f45a5ca51befc29afd04188ee4&source=constructorLink',
+            '929455': 'https://yandex.ru/maps/?um=constructor%3Ac3eb4d903ec83ebc36245fe59ee27a74dc740149432bfd08dfd7cae7ed0a9ce9&source=constructorLink',
+            '297': 'https://yandex.ru/maps/?um=constructor%3Aa75a129315b7f4355b33394b2dded4d76289b970a370396ca356e21b366c8630&source=constructorLink',
+            '235': 'https://yandex.ru/maps/?um=constructor%3Ab771dcadd340944a26579888ce38fe70dc593f39951908cf3eb475bba8cf3d05&source=constructorLink',
+            '147': 'https://yandex.ru/maps/?um=constructor%3A8368af7e3b5cabbdf37bdd86008186c79d242a59411ac2a5b2339438f3ebe11a&source=constructorLink',
+            '42': 'https://yandex.ru/maps/?um=constructor%3A99151d994559ab56ba7c294d1996550c8f93d44cc3de85df8ce86f4b98de4d53&source=constructorLink',
+            '192': 'https://yandex.ru/maps/?um=constructor%3A70df2381bcdb8146e97b5aafe9c4620cff122b32366112a60dfdad1cfb3a035d&source=constructorLink',
+            '74': 'https://yandex.ru/maps/?um=constructor%3A44b46439903bc1a07bf07ed2e8ec9fc7191a1951ba135afdbe9044fdcc28e511&source=constructorLink',
+            '338': 'https://yandex.ru/maps/?um=constructor%3Adc5c4a26c30724adc306257c52d3a0bdd1cd6e417b24970a866cd3dfc4b5dd44&source=constructorLink',
+            '8082': 'https://yandex.ru/maps/?um=constructor%3Aee13e717353dee6e83d6fdf6ffc705fbfca70454f79a47386112b16868640b6a&source=constructorLink',
+            '8081': 'https://yandex.ru/maps/?um=constructor%3A30f578dba6e6c5c7f6b3cc850ef3e2ef3d8e6f999aa81a1145802f9192d3c779&source=constructorLink',
+            '337': 'https://yandex.ru/maps/?um=constructor%3A0333198f51212e396565a37e96da14bcf518bce98ec3dde846d187ed9b33a698&source=constructorLink',
+            '336': 'https://yandex.ru/maps/?um=constructor%3Ad45c74340c1badc82e33cbe076f6473667f2c2c364ba84d6b317e1646d7e57e4&source=constructorLink',
+            '335': 'https://yandex.ru/maps/?um=constructor%3Ad4eb63d10e09c4e3f29644b3cc4f4e875b767978e2bb9a1278d7812bad208195&source=constructorLink',
+            '334': 'https://yandex.ru/maps/?um=constructor%3A6ea8e298c8327bdd69101cb911cc9fa123f5bdc6fbf6892af39e01e3efc5bddf&source=constructorLink',
+            '301': 'https://yandex.ru/maps/?um=constructor%3A648863682794f746d51ddff4b87d8cbfe9f149f6bef65fe5465b196befbb16f8&source=constructorLink',
+            '213': 'https://yandex.ru/maps/?um=constructor%3A7d8198b895d73968822a2cd8ec60bbbae734008dba8f72b6d6ebfa8b4471c857&source=constructorLink',
+            '212': 'https://yandex.ru/maps/?um=constructor%3A26cd0a86c58767feae0d22d27ae1106edb04e31bd8e75eba329a64fc9db2bb45&source=constructorLink',
+            '206': 'https://yandex.ru/maps/?um=constructor%3Ab9ec4200fc9c42dd115ced08366bf4dd86b9a232eb72055f2792d699fe33379b&source=constructorLink',
+            '184': 'https://yandex.ru/maps/?um=constructor%3Aadebaa42967fc02a4d6069f6ff0ffbcfddbdf2bc279afbf788450dba6df48164&source=constructorLink',
+            '154': 'https://yandex.ru/maps/?um=constructor%3A5071cafd5666ea999718b9a43e45699e2e2239a76a1b908283a23091304fab9e&source=constructorLink',
+            '69': 'https://yandex.ru/maps/?um=constructor%3Aed384858e04ea5490aa05a3a9b437ce716235c62006f3297a69a8d0de6aed403&source=constructorLink',
+            '61': 'https://yandex.ru/maps/?um=constructor%3A8db1737b6cda103bd35682b1d19410a3961e89794c0aebb42c53dea356eb3697&source=constructorLink',
+            '176': 'https://yandex.ru/maps/?um=constructor%3Acfaeeffd165c2290d760a05c11a6702d3b78a0d8d3e1b01d3460bb68f97cc902&source=constructorLink',
+            '396': 'https://yandex.ru/maps/?um=constructor%3A708ba95f7326db5269da49c1dac69181daa927c5341aa5ee21910a5ea115d738&source=constructorLink',
+            '369': 'https://yandex.ru/maps/?um=constructor%3Aaa003cec101d870ff9738194c6e6ef1558e86e374403a3db7eb4d47034ca9983&source=constructorLink',
+            '230': 'https://yandex.ru/maps/?um=constructor%3A892fdac5d030785a3fab36d6594e835e016d63316274ed0e7781c37ef5b26e10&source=constructorLink',
+            '229': 'https://yandex.ru/maps/?um=constructor%3Ae295d48ef41a970f594af5e748f9d6b56c8a8ac4ff8afde1b2332a333f7d1756&source=constructorLink',
+            '228': 'https://yandex.ru/maps/?um=constructor%3A8fcf241d4a420f1383a3a5340a88946bd3920f05ce6319b3f15c419b9484eb39&source=constructorLink',
+            '227': 'https://yandex.ru/maps/?um=constructor%3A585e886c013d87e06fac691aa947e6c165d773146047bb1343a571bdadfd4646&source=constructorLink',
+            '203': 'https://yandex.ru/maps/?um=constructor%3Afbbd0b022ba16d28a9759e073e3de48d938f03a1cd710ca64ff5c6fad195da4f&source=constructorLink'
+        };
+
+        let stores = [];
+        let selectedCityFilter = 'all';
+
+        const cityOrder = [
+            "Все города", "Екатеринбург", "Березовский", "Каменск-Уральский", "Нижний Тагил",
+            "Челябинск", "Магнитогорск", "Миасс", "Южноуральск", "Уфа", "Пермь",
+            "Курган", "Тюмень", "Тобольск", "Ханты-Мансийск", "Нефтеюганск", "Сургут", 
+            "Ноябрьск", "Нижневартовск", "Новосибирск", "Москва", "Санкт-Петербург"
+        ];
+
+        rawData.trim().split('\n').forEach((line, index) => {
+            const cols = line.split('\t').map(c => c ? c.trim() : '-');
+            if (cols.length >= 4) {
+                stores.push({
+                    id: 'store_' + index,
+                    tk: cols[0], route: cols[1], address: cols[2], city: cols[3],
+                    rc1: cols[4] || '-', rc2: cols[5] || '-', 
+                    is24_7: cols[7] === 'Да', start: cols[8] || '-', end: cols[9] || '-'
+                });
+            }
+        });
+
+        stores.sort((a, b) => {
+            let indexA = cityOrder.indexOf(a.city); let indexB = cityOrder.indexOf(b.city);
+            if (indexA === -1) indexA = 999; if (indexB === -1) indexB = 999;
+            if (indexA !== indexB) return indexA - indexB;
+            return a.tk.localeCompare(b.tk, undefined, {numeric: true});
+        });
+
+        const cabVariants = [
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-[#1e3a8a] border-y border-r border-b-2 border-[#172554] shadow-md rounded-tr-md rounded-br-sm relative ml-[1px] z-20"><div class="headlight-beam" style="top: 18px; right: -45px;"></div><div class="marker-light" style="right: 2px;"></div><div class="absolute top-1 right-1 w-3 md:w-3.5 h-4 md:h-5 bg-sky-100/90 rounded-tr-sm border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-gray-50 border-y border-r border-b-2 border-gray-300 shadow-md rounded-tr-[12px] rounded-br-sm relative ml-[1px] z-20"><div class="headlight-beam" style="top: 22px; right: -45px;"></div><div class="marker-light" style="right: 4px;"></div><div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-[8px] border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-8 md:w-9 h-9 md:h-10 bg-[#dc2626] border-y border-r border-b-2 border-[#991b1b] shadow-md rounded-tr-[24px] rounded-br-sm relative ml-[1px] z-20 overflow-hidden"><div class="headlight-beam" style="top: 24px; right: -40px; transform: skewX(-30deg);"></div><div class="absolute top-1 right-1 w-4 md:w-5 h-3 md:h-4 bg-sky-200/80 rounded-tr-[16px] border-b border-l border-sky-300 transform -skew-x-12"></div><div class="absolute -bottom-1.5 right-1.5"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-[#0f172a] border-y border-r border-b-2 border-black shadow-md rounded-tr-lg rounded-br-md relative ml-[1px] z-20"><div class="headlight-beam" style="top: 26px; right: -45px;"></div><div class="marker-light" style="right: 2px;"></div><div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-md border-b border-l border-sky-300 transform -skew-x-6"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`,
+            `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-gray-300 border-y border-r border-b-2 border-gray-400 shadow-md rounded-tr-2xl rounded-br-sm relative ml-[1px] z-20"><div class="headlight-beam" style="top: 20px; right: -45px;"></div><div class="marker-light" style="right: 6px; top: -1px;"></div><div class="absolute top-1.5 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-xl border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-400 shadow-sm"></div></div></div>`
+        ];
+
+        const trailerVariants = [
+            {
+                border: 'border-gray-300', bg: 'bg-white',
+                html: `
+                    <div class="absolute left-0 top-0 w-[55%] h-full bg-[#004182] flex items-center justify-center gap-1 pl-1 z-10" style="clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);">
+                        <div class="w-3 md:w-4 h-3 md:h-4 bg-lentaYellow rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-1 md:w-1.5 h-1 md:h-1.5 bg-[#004182] rounded-full"></div>
+                        </div>
+                        <div class="text-white font-black text-[8px] md:text-[10px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div>
+                    </div>
+                    <div class="absolute right-[5%] top-[15%] w-4 md:w-5 h-4 md:h-5 bg-green-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-[15%] bottom-[10%] w-3 md:w-4 h-3 md:h-4 bg-red-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-[22%] top-[30%] w-2 md:w-3 h-2 md:h-3 bg-yellow-400 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-[10%] top-[40%] w-3 h-3 bg-orange-500 rounded-full blur-[0.5px]"></div>
+                `
+            },
+            {
+                border: 'border-gray-300', bg: 'bg-white',
+                html: `
+                    <div class="absolute left-[10%] top-[10%] w-5 md:w-6 h-5 md:h-6 bg-red-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute left-[22%] bottom-[10%] w-4 md:w-5 h-4 md:h-5 bg-green-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute left-[32%] top-[20%] w-3 md:w-4 h-3 md:h-4 bg-orange-400 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute left-[15%] top-[40%] w-4 h-4 bg-yellow-500 rounded-full blur-[0.5px]"></div>
+                    <div class="absolute right-0 top-0 w-[45%] h-full bg-[#004182] flex flex-row-reverse items-center justify-center gap-1 pr-1 z-10" style="clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); border-bottom: 2px solid #FDCB05;">
+                        <div class="text-lentaYellow font-black text-[8px] md:text-[10px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div>
+                        <div class="w-3 md:w-4 h-3 md:h-4 bg-lentaYellow rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-1 md:w-1.5 h-1 md:h-1.5 bg-[#004182] rounded-full"></div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                border: 'border-[#172554]', bg: 'bg-gradient-to-b from-[#004182] to-[#002B5E]',
+                html: `
+                    <div class="absolute bottom-0 w-full h-1 bg-lentaYellow z-10"></div>
+                    <div class="absolute -left-2 -top-2 w-12 h-12 bg-lentaYellow rounded-full opacity-20 blur-md"></div>
+                    <div class="absolute inset-0 flex items-center justify-center gap-1.5">
+                        <div class="w-4 md:w-5 h-4 md:h-5 bg-lentaYellow rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-1.5 md:w-2 h-1.5 md:h-2 bg-[#004182] rounded-full"></div>
+                        </div>
+                        <div class="text-white font-black text-[10px] md:text-[12px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div>
+                    </div>
+                `
+            },
+            {
+                border: 'border-gray-300', bg: 'bg-gray-50',
+                html: `
+                       <div class="absolute bottom-0 w-full h-[3px] bg-gray-200"></div>
+                       <div class="absolute right-4 top-0 w-[1px] h-full bg-gray-300"></div>
+                       <div class="absolute right-12 top-0 w-[1px] h-full bg-gray-300"></div>
+                       <div class="absolute right-20 top-0 w-[1px] h-full bg-gray-300"></div>
+                       <div class="absolute right-28 top-0 w-[1px] h-full bg-gray-300"></div>
+                `
+            }
+        ];
+
+        function createTruckButton(city, isAll = false, index = 0) {
+            const btn = document.createElement('button');
+            btn.setAttribute('data-city', city);
+            btn.className = `truck-chip group flex items-end shrink-0 cursor-pointer ${isAll ? 'active' : ''}`;
+            const label = isAll ? '🌐 ВСЕ ГОРОДА' : city;
+            
+            const cabHtml = cabVariants[index % cabVariants.length];
+            const trailer = trailerVariants[index % trailerVariants.length];
+
+            const bumpDelay = (index * 0.37) % 2; 
+            const bumpDuration = 1.1 + (index % 3) * 0.15; 
+
+            btn.innerHTML = `
+                <div class="truck-wrapper flex items-end" style="--bump-del: -${bumpDelay}s; --bump-dur: ${bumpDuration}s;">
+                    <div class="trailer h-10 md:h-11 min-w-[150px] max-w-[180px] rounded-l-md border-y border-l border-b-2 ${trailer.border} shadow-md flex relative z-10 overflow-hidden transition-all duration-300 group-hover:brightness-110 ${trailer.bg}">
+                        <div class="tail-light"></div>
+                        ${trailer.html}
+                        <div class="absolute inset-0 z-20 flex items-center justify-center px-1 pt-0.5" style="left: 20px;">
+                            <span class="city-name-plaque city-name text-[9px] md:text-[10px] font-black uppercase tracking-widest text-lentaDark bg-white/95 px-2 py-0.5 rounded shadow-sm border border-gray-200 backdrop-blur-sm truncate max-w-full">
+                                ${label}
+                            </span>
+                        </div>
+                        <div class="absolute -bottom-1.5 left-2 flex gap-0.5 z-30">
+                            <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
+                            <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
+                            <div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div>
+                        </div>
+                    </div>
+                    ${cabHtml}
+                </div>
+            `;
+            btn.onclick = () => { playTickSound(); filterByCity(city); };
+            return btn;
+        }
+
+        function buildCitySlider() {
+            citySlider.innerHTML = '';
+            const uniqueCities = [...new Set(stores.map(s => s.city))];
+            let allCities = ['all', ...uniqueCities];
+            allCities.forEach((city, idx) => citySlider.appendChild(createTruckButton(city, city === 'all', idx)));
+        }
+        buildCitySlider();
+
+        const cardsGrid = document.getElementById('cardsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const autocompleteList = document.getElementById('autocompleteList');
+
+        window.clearSearch = function() {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            autocompleteList.classList.add('hidden');
+            renderCards();
+        };
+
+        window.closeCard = function(btn) {
+            playTickSound();
+            if (searchInput.value.trim() !== '') clearSearch(); 
+            else {
+                const card = btn.closest('.store-card');
+                if (card) card.style.display = 'none'; 
+            }
+        };
+
+        window.filterByCity = function(city) {
+            selectedCityFilter = city;
+            document.querySelectorAll('.truck-chip').forEach(el => {
+                if (el.getAttribute('data-city') === city) {
+                    el.classList.add('active');
+                    if (!isMusicPlaying) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderCards();
+        };
+
+        let currentNavAddress = ''; let currentNavFullAddress = '';
+        window.openNavModal = function(addr, fullAddr) {
+            currentNavAddress = addr; currentNavFullAddress = fullAddr;
+            document.getElementById('navModal').classList.remove('hidden');
+        };
+        window.closeNavModal = function() { document.getElementById('navModal').classList.add('hidden'); };
+
+        window.openMechanicModal = function() { document.getElementById('mechanicModal').classList.remove('hidden'); };
+        window.closeMechanicModal = function() { document.getElementById('mechanicModal').classList.add('hidden'); };
+
+        function showToast(message) {
+            let toast = document.getElementById('toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800/95 dark:bg-slate-700/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-[13px] text-center border border-gray-700 transition-all duration-300 opacity-0 scale-95 pointer-events-none whitespace-nowrap';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = message;
+            void toast.offsetWidth; 
+            toast.classList.remove('opacity-0', 'scale-95');
+            toast.classList.add('opacity-100', 'scale-100');
+            
+            if (toast.timeoutId) clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'scale-100');
+                toast.classList.add('opacity-0', 'scale-95');
+            }, 3000);
+        }
+
+        // ==========================================================
+        // ЛОГИКА ОТКРЫТИЯ КАРТ БЕЗ "ПРОКЛАДОК" (ВИДЖЕТ)
+        // ==========================================================
+        window.openApproachMap = function(url) {
+            playTickSound();
+            if (url && url !== 'undefined' && url !== 'null' && url.trim() !== '') {
+                
+                let finalUrl = url;
+                
+                // Ищем в ссылке уникальный идентификатор Конструктора Карт
+                const match = url.match(/um=constructor%3A([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    const cid = match[1];
+                    // Преобразуем в ссылку-виджет. Она открывает ТОЛЬКО саму карту сразу на весь экран.
+                    finalUrl = `https://yandex.ru/map-widget/v1/?um=constructor%3A${cid}`;
+                }
+
+                window.open(finalUrl, '_blank');
+            } else {
+                showToast("Схема заезда еще не добавлена 🛠");
+            }
+        };
+
+        function getDropdownItemHTML(store) {
+            let brandColor = "text-lentaBlue dark:text-blue-300"; let bName = "ЛЕНТА"; let badgeClass = "bg-lentaYellow text-lentaDark";
+            if (store.address.includes("ОКЕЙ") || store.tk === "929929") { brandColor = "text-red-500 dark:text-red-400"; bName = "О'КЕЙ"; badgeClass = "bg-red-600 text-white"; } 
+            else if (store.address.includes("Молл")) { brandColor = "text-purple-600 dark:text-purple-400"; bName = "РЦ МОЛЛ"; badgeClass = "bg-purple-600 text-white"; } 
+            else if (store.address.includes("Монетка") || store.tk.startsWith("92")) { brandColor = "text-orange-500 dark:text-orange-400"; bName = "МОНЕТКА"; badgeClass = "bg-orange-500 text-white"; }
+            
+            let tkNum = store.tk !== '-' ? `ТК ${store.tk}` : bName;
+            if(store.tk.startsWith("92") && store.tk !== "929929") tkNum = `РЦ ${store.tk}`;
+            if(store.address.includes("ОКЕЙ") || store.tk === "929929") tkNum = "О'КЕЙ";
+            if(store.tk === '-') tkNum = bName;
+
+            const cleanAddress = store.address.replace('ООО "Лента", ', '').replace('РЦ "Монетка", ', '');
+            return `
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[10px] ${badgeClass} px-2 py-0.5 rounded font-black uppercase tracking-widest">${tkNum}</span>
+                    <span class="font-bold text-xs ${brandColor}">${store.city}</span>
+                </div>
+                <div class="text-[11px] text-gray-500 dark:text-gray-400 font-medium leading-tight">${cleanAddress}</div>
+            `;
+        }
+
+        function getTimeLeftHtml(timeStr) {
+            if (!timeStr || timeStr === '-' || !timeStr.includes('-')) return '';
+            const now = new Date();
+            const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+            const [startStr, endStr] = timeStr.split('-');
+            if (!startStr || !endStr) return '';
+            
+            const [startH, startM] = startStr.split(':').map(Number);
+            const [endH, endM] = endStr.split(':').map(Number);
+            if (isNaN(startH) || isNaN(endH)) return '';
+
+            const startTotalMins = startH * 60 + (startM || 0);
+            let endTotalMins = endH * 60 + (endM || 0);
+            if (endTotalMins < startTotalMins) endTotalMins += 24 * 60; 
+
+            if ((currentTotalMins >= startTotalMins && currentTotalMins <= endTotalMins) || 
+                (startTotalMins > endTotalMins && (currentTotalMins >= startTotalMins || currentTotalMins <= endTotalMins))) {
+                return `<div class="text-[10px] text-emerald-700 dark:text-emerald-400 font-extrabold animate-pulse px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 inline-flex items-center gap-1 border border-emerald-100 dark:border-emerald-800 mt-1"><span>🔥</span> Разгрузка идет</div>`;
+            }
+
+            let diff = startTotalMins - currentTotalMins;
+            if (diff < 0) diff += 24 * 60;
+            const h = Math.floor(diff / 60); const m = diff % 60;
+            let colorClass = 'text-gray-400 dark:text-gray-500';
+            if (h < 4) colorClass = 'text-amber-500 font-bold';
+            return `<div class="text-[10px] ${colorClass} mt-1">⏱ До начала: ${h}ч ${m}м</div>`;
+        }
+
+        function renderCards() {
+            const rawSearch = searchInput.value.toLowerCase().trim();
+            const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
+            
+            if (cleanSearchQuery) clearSearchBtn.classList.remove('hidden');
+            else clearSearchBtn.classList.add('hidden');
+
+            cardsGrid.innerHTML = '';
+            let count = 0;
+            const searchWords = cleanSearchQuery.split(/\s+/).filter(w => w.length > 0);
+
+            stores.forEach(store => {
+                let brandName = "ЛЕНТА";
+                if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
+                else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
+                else if (store.address.includes("Монетка") || store.tk.startsWith("92")) brandName = "МОНЕТКА";
+
+                let matchesSearch = false;
+                if (searchWords.length === 0) matchesSearch = true;
+                else {
+                    const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    matchesSearch = searchWords.every(word => fullText.includes(word));
+                }
+                
+                let matchesFilter = true;
+                if (!cleanSearchQuery && selectedCityFilter !== 'all' && store.city !== selectedCityFilter) {
+                    matchesFilter = false;
+                }
+
+                if (matchesSearch && matchesFilter) {
+                    count++;
+                    let displayBrand = "ЛЕНТА"; let badgeClass = "bg-lentaYellow text-lentaDark"; let displayNumber = store.tk !== '-' ? `ТК ${store.tk}` : '';
+
+                    if (brandName === "ОКЕЙ") { displayBrand = "О'КЕЙ"; badgeClass = "bg-red-600 text-white"; displayNumber = "ГИПЕРМАРКЕТ"; } 
+                    else if (brandName === "РЦ МОЛЛ") { displayBrand = "РЦ МОЛЛ"; badgeClass = "bg-purple-600 text-white"; displayNumber = "СКЛАД"; } 
+                    else if (brandName === "МОНЕТКА") { displayBrand = "МОНЕТКА"; badgeClass = "bg-orange-500 text-white"; displayNumber = store.tk !== '-' ? `РЦ ${store.tk}` : "РЦ"; }
+
+                    const is24Color = store.is24_7 ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-slate-700';
+                    const is24Text = store.is24_7 ? '24/7' : `${store.start} - ${store.end}`;
+                    const rc1Html = store.rc1 !== '-' ? `<div class="flex flex-col items-end md:items-start"><span class="px-2 py-1 bg-emerald-500 text-white font-bold rounded-md shadow-sm text-[10px]">${store.rc1}</span> ${getTimeLeftHtml(store.rc1)}</div>` : '<span class="text-gray-300 dark:text-slate-600 font-bold">-</span>';
+
+                    let cleanNavAddress = store.city + ' ' + store.address;
+                    cleanNavAddress = cleanNavAddress.replace(/ООО ["']?Лента["']?,?\s*/gi, '').replace(/ООО ОКЕЙ,?\s*/gi, '').replace(/РЦ ["']?Монетка["']?,?\s*/gi, '').replace(/РЦ Молл,?\s*/gi, '').replace(/\b\d{6}\b,?\s*/g, ''); 
+                    const cleanAddressText = store.address.replace('ООО "Лента", ', '').replace('ООО "Лента" ', '').replace('РЦ "Монетка", ', '');
+                    
+                    let panoUrl = `https://yandex.ru/maps/?text=${encodeURIComponent(cleanNavAddress.trim())}&l=stv,sta`;
+                    let panoLabel = "Панорама 📸";
+                    let storeCustomRouteUrl = customRoutes[store.tk] || null;
+
+                    if (store.tk === '230') {
+                        panoUrl = "https://yandex.ru/navi?ll=60.628613%2C56.908958&panorama%5Bpoint%5D=60.628613%2C56.908958&panorama%5Bdirection%5D=147.068375%2C6.140484&panorama%5Bid%5D=1435405587_660819353_23_1727782356&panorama%5Bspan%5D=35.690620%2C79.999992";
+                        panoLabel = "Панорама 3D";
+                    }
+
+                    const encodedAddr = cleanNavAddress.trim();
+                    const encodedFullAddr = store.city + ", " + cleanAddressText;
+
+                    const card = `
+                        <div class="store-card relative flex flex-col justify-between animate-reveal bg-white dark:bg-slate-800 rounded-[24px] p-5 shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow">
+                            <button onclick="closeCard(this)" class="absolute top-4 right-4 text-gray-300 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-300 bg-gray-50 dark:bg-slate-700 p-2 rounded-full z-10 transition-colors cursor-pointer tactile-btn" title="Скрыть">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                            <div>
+                                <div class="flex items-center gap-2 mb-3 pr-8">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase shadow-sm ${badgeClass}">${displayBrand}</span>
+                                    <span class="text-xs font-bold text-gray-500 dark:text-gray-300">${displayNumber}</span>
+                                    <span class="ml-auto text-[11px] font-extrabold text-lentaBlue dark:text-blue-300 bg-blue-50 dark:bg-slate-700/50 px-2 py-1 rounded-md border border-blue-100 dark:border-slate-600">${store.city}</span>
+                                </div>
+                                <div class="text-sm font-semibold text-gray-800 dark:text-white leading-snug mb-5" title='${store.address}'>${cleanAddressText}</div>
+                            </div>
+                            <div class="space-y-4 pt-4 border-t border-gray-50 dark:border-slate-700">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Время приёма</span>
+                                    ${rc1Html}
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Режим работы</span>
+                                    <span class="px-2 py-1 rounded-md text-[10px] font-bold border ${is24Color}">${is24Text}</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    
+                                    <div class="flex flex-col gap-0.5 w-full sm:w-auto shrink-0">
+                                        <button onclick="openApproachMap('${storeCustomRouteUrl}')" title="Схема заезда на разгрузку" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(16,185,129,0.3)] cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                            Подъезд 🚛
+                                        </button>
+                                    </div>
+                                    
+                                    <button onclick="playTickSound(); openNavModal('${encodedAddr.replace(/'/g, "\\'")}', '${encodedFullAddr.replace(/'/g, "\\'")}');" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-lentaBlue hover:bg-[#003366] text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(0,65,130,0.2)] cursor-pointer">
+                                        <svg class="w-4 h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                                        Навигатор 🗺
+                                    </button>
+                                    <a href="${panoUrl}" target="_blank" onclick="playTickSound()" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-200 rounded-xl text-xs font-bold transition-all tactile-btn">
+                                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                        ${panoLabel}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    cardsGrid.innerHTML += card;
+                }
+            });
+            if (count === 0) cardsGrid.innerHTML = `<div class="col-span-full py-16 text-center text-gray-400 dark:text-gray-500 font-medium bg-white dark:bg-slate-800 rounded-[24px] shadow-sm border border-gray-100 dark:border-slate-700">По вашему запросу ничего не найдено</div>`;
+        }
+
+        searchInput.addEventListener('input', function() {
+            renderCards(); 
+            const rawSearch = this.value.toLowerCase().trim();
+            const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
+            autocompleteList.innerHTML = ''; 
+            
+            if (!cleanSearchQuery) { autocompleteList.classList.add('hidden'); return; }
+            const searchWords = cleanSearchQuery.split(/\s+/).filter(w => w.length > 0);
+
+            let suggestions = stores.filter(store => {
+                let brandName = "ЛЕНТА";
+                if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
+                else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
+                else if (store.address.includes("Монетка") || store.tk.startsWith("92")) brandName = "МОНЕТКА";
+
+                const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                const matchesSearch = searchWords.every(word => fullText.includes(word));
+                let matchesFilter = true;
+                if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) matchesFilter = false;
+                return matchesSearch && matchesFilter;
+            });
+
+            if (suggestions.length > 0) {
+                autocompleteList.classList.remove('hidden');
+                suggestions.slice(0, 20).forEach(store => {
+                    const item = document.createElement('div');
+                    item.className = 'px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-50 dark:border-slate-700 last:border-none transition-colors mx-1 my-0.5 text-gray-800 dark:text-gray-200';
+                    item.innerHTML = getDropdownItemHTML(store);
+                    item.addEventListener('click', () => {
+                        playTickSound();
+                        searchInput.value = store.tk !== '-' ? store.tk : store.city; 
+                        autocompleteList.classList.add('hidden');
+                        renderCards();
+                    });
+                    autocompleteList.appendChild(item);
+                });
+            } else {
+                autocompleteList.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+                autocompleteList.classList.add('hidden');
+            }
+        });
+
+        window.startVoiceSearch = function() {
+            const micBtn = document.getElementById('voiceSearchBtn');
+            const searchInput = document.getElementById('searchInput');
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { searchInput.placeholder = "Микрофон не поддерживается"; return; }
+            
+            try {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'ru-RU'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+                recognition.onstart = function() {
+                    micBtn.classList.add('mic-pulsing', 'bg-red-500', 'text-white', 'border-red-500');
+                    micBtn.classList.remove('text-lentaBlue', 'dark:text-blue-400');
+                    searchInput.value = ''; searchInput.placeholder = "Слушаю вас...";
+                };
+                recognition.onresult = function(event) {
+                    const speechResult = event.results[0][0].transcript;
+                    searchInput.value = speechResult.replace(/\.$/, '').trim();
+                    searchInput.dispatchEvent(new Event('input'));
+                };
+                recognition.onerror = function() { resetMic(); searchInput.placeholder = "Повторите запрос..."; };
+                recognition.onend = function() { resetMic(); };
+                
+                function resetMic() {
+                    micBtn.classList.remove('mic-pulsing', 'bg-red-500', 'text-white', 'border-red-500');
+                    micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
+                    searchInput.placeholder = "Поиск по ТК, адресу, городу...";
+                }
+                recognition.start();
+            } catch (e) {
+                micBtn.classList.remove('mic-pulsing', 'bg-red-500', 'text-white', 'border-red-500');
+                micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
+                searchInput.placeholder = "Ошибка микрофона";
+            }
+        };
+
+        const mechanicPhrases = [
+            "Ни гвоздя, ни жезла!",
+            "На РЦ снова очередь?",
+            "Шершавой дорожки!",
+            "Опять перегруз?",
+            "Соляра нынче кусается...",
+            "Холодильник пашет?",
+            "Где путевой лист?",
+            "Лента ждёт, погнали!",
+            "Тахограф включил?",
+            "Запаску проверил?",
+            "Доки на базе забрал?",
+            "Кто крайний на ворота?",
+            "Гайки протяни после рейса.",
+            "Мочевину долил?",
+            "Аккуратно на весах!",
+            "В Екате опять пробки...",
+            "Не спи за рулём!",
+            "Фары протри.",
+            "По рации тишина...",
+            "Кофе выпью — и в рейс.",
+            "Сцепку проверил?",
+            "Слышь, только не нажимай на подсолнух наверху...",
+            "Главное — не жми на логотип!"
+        ];
+
+        const disappointedPhrases = [
+            "Ну блин, было же классно! 😩",
+            "Эх, на самом интересном месте...",
+            "Опять гайки крутить 🔧",
+            "Дискотека окончена, за работу!",
+            "А я только ритм поймал 🕺",
+            "Шеф пришел, сворачиваемся!",
+            "Эй, верните музыку! 🎵"
+        ];
+
+        function showMechanicPhrase(isDisappointed = false) {
+            const bubble = document.getElementById('mechanicSpeech');
+            let phrase = "";
+            
+            if (isDisappointed) {
+                phrase = disappointedPhrases[Math.floor(Math.random() * disappointedPhrases.length)];
+            } else {
+                phrase = mechanicPhrases[Math.floor(Math.random() * mechanicPhrases.length)];
+            }
+            
+            bubble.innerHTML = phrase + '<div class="absolute top-full left-1/2 w-2 h-2 bg-white dark:bg-slate-700 border-b border-r border-gray-200 dark:border-slate-600 transform rotate-45 -translate-x-1/2 -mt-[5px]"></div>';
+            
+            bubble.classList.remove('opacity-0', 'scale-95');
+            bubble.classList.add('opacity-100', 'scale-100');
+            
+            setTimeout(() => {
+                bubble.classList.remove('opacity-100', 'scale-100');
+                bubble.classList.add('opacity-0', 'scale-95');
+            }, 4000); 
+        }
+
+        function updateSpeedLimit() {
+            const month = new Date().getMonth();
+            const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
+            
+            document.getElementById('speedLimitNumber').innerText = isWinter ? '60' : '80';
+            const icon = document.getElementById('seasonIcon');
+            
+            if (isWinter) {
+                icon.innerText = '❄️';
+                icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-blue-50 border-blue-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full';
+            } else {
+                icon.innerText = '☀️';
+                icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-amber-50 border-amber-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full';
+            }
+        }
+
+        window.executeNavigation = function(type) {
+            playTickSound();
+            let navUrl = '';
+            const encAddr = encodeURIComponent(currentNavAddress);
+            const encFullAddr = encodeURIComponent(currentNavFullAddress);
+            
+            if (type === 'yandex') {
+                navUrl = `yandexnavi://build_route_on_map?text_to=${encAddr}`;
+                const fallbackUrl = `https://yandex.ru/maps/?text=${encAddr}`;
+                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+            } else if (type === '2gis') {
+                navUrl = `dgis://2gis.ru/routeSearch/rsType/car/to/${encFullAddr}`;
+                const fallbackUrl = `https://2gis.ru/search/${encFullAddr}`;
+                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+            } else if (type === 'google') {
+                navUrl = `comgooglemaps://?daddr=${encFullAddr}&directionsmode=driving`;
+                const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${encFullAddr}`;
+                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+            }
+            
+            window.location.href = navUrl;
+            closeNavModal();
+        };
+
+        updateSpeedLimit();
+        setTimeout(showMechanicPhrase, 2000);
+        setInterval(showMechanicPhrase, 10000);
+
+        renderCards();
+        setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
+    </script>
+</body>
+</html>
