@@ -279,6 +279,9 @@
         .dance-arm-disco { animation: discoPoint 0.5s infinite alternate ease-in-out; transform-origin: 85px 30px; }
         @keyframes discoPoint { 0% { transform: rotate(-40deg); } 100% { transform: rotate(10deg); } }
 
+        .dance-girl-1 { animation: discoSway 0.45s infinite alternate ease-in-out; transform-origin: 18px 58px; }
+        .dance-girl-2 { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: 102px 58px; }
+
         .music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; }
         .music-notes text:nth-child(2) { animation-delay: 0.6s; }
         @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
@@ -334,7 +337,7 @@
                         </div>
                         <div class="text-left">
                             <div class="font-bold text-gray-800 dark:text-gray-100 text-sm">Механик</div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Дежурный гараж</div>
+                            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">Дежурный механик</div>
                         </div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-[0_4px_10px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform">
@@ -343,7 +346,7 @@
                 </a>
 
                 <!-- Светлана -->
-                <a href="tel:+70000000001" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-lentaBlue/10 dark:hover:bg-blue-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
+                <a href="tel:+79826702427" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-lentaBlue/10 dark:hover:bg-blue-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-lentaBlue dark:text-blue-400">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -359,7 +362,7 @@
                 </a>
 
                 <!-- Марина -->
-                <a href="tel:+70000000002" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
+                <a href="tel:+79122719690" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -504,7 +507,16 @@
                                     <text x="45" y="20" font-size="12" fill="currentColor">♪</text>
                                     <text x="65" y="15" font-size="16" fill="currentColor">♫</text>
                                 </g>
-                                <!-- Танцор 1: Волна / Ламбада -->
+                                
+                                <!-- Девочка 1 (Слева) в юбке -->
+                                <g class="dance-girl-1">
+                                    <circle cx="18" cy="21" r="4.5" />
+                                    <path d="M 18 26 L 10 42 L 26 42 Z" fill="currentColor" stroke-width="1"/>
+                                    <path d="M 15 42 L 13 58 M 21 42 L 23 58" stroke-width="2.5"/>
+                                    <path d="M 18 30 Q 12 20 14 10 M 18 30 Q 24 20 22 10" stroke-width="2.5"/>
+                                </g>
+
+                                <!-- Механик 1 (Волна / Ламбада) -->
                                 <g class="dance-full-body-left">
                                     <circle cx="35" cy="20" r="6" />
                                     <path d="M35 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -513,7 +525,8 @@
                                         <path d="M20 15 Q 35 35 50 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     </g>
                                 </g>
-                                <!-- Танцор 2: Король Диско -->
+
+                                <!-- Механик 2 (Король Диско) -->
                                 <g class="dance-full-body-right">
                                     <circle cx="85" cy="20" r="6" />
                                     <path d="M85 26 V 45" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -522,6 +535,14 @@
                                     <g class="dance-arm-disco">
                                         <path d="M85 30 L 98 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                                     </g>
+                                </g>
+
+                                <!-- Девочка 2 (Справа) в юбке -->
+                                <g class="dance-girl-2">
+                                    <circle cx="102" cy="21" r="4.5" />
+                                    <path d="M 102 26 L 94 42 L 110 42 Z" fill="currentColor" stroke-width="1"/>
+                                    <path d="M 99 42 L 97 58 M 105 42 L 107 58" stroke-width="2.5"/>
+                                    <path d="M 102 30 L 95 35 L 99 40 M 102 30 L 109 35 L 105 40" stroke-width="2.5"/>
                                 </g>
                             </g>
                         </svg>
@@ -1370,7 +1391,7 @@
                 let matchesSearch = false;
                 if (searchWords.length === 0) matchesSearch = true;
                 else {
-                    const fullText = `${store.tk}${store.city} ${store.address}${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
                     matchesSearch = searchWords.every(word => fullText.includes(word));
                 }
                 
@@ -1471,7 +1492,7 @@
                 else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
                 else if (store.address.includes("Монетка") || store.tk.startsWith("92")) brandName = "МОНЕТКА";
 
-                const fullText = `${store.tk}${store.city} ${store.address}${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
                 const matchesSearch = searchWords.every(word => fullText.includes(word));
                 let matchesFilter = true;
                 if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) matchesFilter = false;
@@ -1645,11 +1666,3 @@
     </script>
 </body>
 </html>
-```eof
-
-Все готово! Чтобы добавить настоящие номера:
-1. Откройте скачанный `index.html` в любом текстовом редакторе (Блокнот, VS Code).
-2. Нажмите `Ctrl + F` и найдите `+70000000001` — замените на номер Светланы (в двух местах: в ссылке и в тексте, если захотите вывести его текстом).
-3. Так же найдите `+70000000002` — замените на номер Марины.
-
-Окошко получилось очень красивым, в стиле всего остального интерфейса, и отлично работает в темной теме!
