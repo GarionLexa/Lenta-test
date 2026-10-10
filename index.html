@@ -293,26 +293,26 @@
         .music-notes text:nth-child(2) { animation-delay: 0.6s; }
         @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
 
-        /* Облачка с текстом (Защита от обрезания) */
+        /* Облачка с текстом (Исправлено обрезание по краям) */
         .story-bubble {
             position: absolute;
             background: white; border: 2px solid #e2e8f0; color: #1e293b;
             font-size: 10px; font-weight: 800; padding: 6px 10px; border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             opacity: 0; pointer-events: none; z-index: 1000;
-            max-width: 120px; text-align: center; line-height: 1.2;
+            max-width: 140px; text-align: center; line-height: 1.2;
             white-space: normal;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .dark .story-bubble { background: #1e293b; border-color: #475569; color: #f1f5f9; }
         
-        .story-bubble.actor-sveta { bottom: 85%; left: 0; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-sveta { bottom: 85%; left: -20px; transform: scale(0.9) translateY(10px); }
         .story-bubble.actor-sveta.active { transform: scale(1) translateY(0); opacity: 1; }
         
-        .story-bubble.actor-marina { bottom: 85%; left: 15%; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-marina { bottom: 85%; right: -20px; transform: scale(0.9) translateY(10px); }
         .story-bubble.actor-marina.active { transform: scale(1) translateY(0); opacity: 1; }
         
-        .story-bubble.actor-mech { bottom: 85%; right: 0; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-mech { bottom: 100%; left: 50%; margin-left: -50px; transform: scale(0.9) translateY(10px); }
         .story-bubble.actor-mech.active { transform: scale(1) translateY(0); opacity: 1; }
 
         .story-bubble::after {
@@ -328,9 +328,9 @@
         .dark .story-bubble-inner::after { border-color: #1e293b transparent transparent transparent; }
 
         /* Положение хвостиков у облаков */
-        .story-bubble.actor-sveta::after, .story-bubble.actor-sveta .story-bubble-inner::after { left: 20px; }
-        .story-bubble.actor-marina::after, .story-bubble.actor-marina .story-bubble-inner::after { left: 30px; }
-        .story-bubble.actor-mech::after, .story-bubble.actor-mech .story-bubble-inner::after { right: 20px; left: auto; }
+        .story-bubble.actor-sveta::after, .story-bubble.actor-sveta .story-bubble-inner::after { left: 40px; }
+        .story-bubble.actor-marina::after, .story-bubble.actor-marina .story-bubble-inner::after { right: 40px; }
+        .story-bubble.actor-mech::after, .story-bubble.actor-mech .story-bubble-inner::after { left: 50%; margin-left: -5px; }
 
     </style>
 </head>
@@ -470,7 +470,7 @@
                 <!-- Центральная часть: Сценки и Танцы -->
                 <div id="centerStage" class="relative flex flex-col items-center flex-1 cursor-pointer tactile-btn mx-2 group z-20" onclick="playTickSound(); openContactsModal();">
                     
-                    <!-- Облачка для историй (строго привязаны, не обрезаются) -->
+                    <!-- Облачка для историй -->
                     <div id="bubbleSveta" class="story-bubble actor-sveta"><div class="story-bubble-inner"></div></div>
                     <div id="bubbleMarina" class="story-bubble actor-marina"><div class="story-bubble-inner"></div></div>
                     <div id="bubbleMech" class="story-bubble actor-mech"><div class="story-bubble-inner"></div></div>
@@ -659,7 +659,7 @@
                 </div>
 
                 <button id="voiceSearchBtn" onclick="startVoiceSearch();" class="bg-white dark:bg-slate-800 text-lentaBlue dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 w-11 h-11 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 cursor-pointer tactile-btn" title="Голосовой поиск">
-                    <svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    <svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                 </button>
             </div>
 
@@ -703,6 +703,9 @@
     <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 relative z-10 flex-1">
         <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 mb-8"></div>
     </main>
+
+    <!-- Всплывающие уведомления (Toasts) -->
+    <div id="toast-notification" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800/95 dark:bg-slate-700/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-[13px] text-center border border-gray-700 transition-all duration-300 opacity-0 scale-95 pointer-events-none whitespace-nowrap"></div>
 
     <script>
         // === НАДЕЖНЫЙ СЧЕТЧИК ===
@@ -857,13 +860,33 @@
         });
         citySlider.style.cursor = 'grab';
 
-        // ИСПРАВЛЕННАЯ ЛОГИКА НАЖАТИЙ НА ПОДСОЛНУХ
+        // --- ЛОГИКА НАЖАТИЙ НА ПОДСОЛНУХ ---
+        let lastLogoTapTime = 0;
+        let logoTapTimeout;
+
+        function handleLogoTap() {
+            unlockAudio();
+            const now = Date.now();
+            
+            if (now - lastLogoTapTime < 400) {
+                // Двойной клик -> Полный СТОП
+                clearTimeout(logoTapTimeout);
+                fullStopMusic();
+            } else {
+                // Одинарный клик -> ПАУЗА / ПЛЕЙ
+                logoTapTimeout = setTimeout(() => {
+                    togglePlayPause();
+                }, 400); 
+            }
+            lastLogoTapTime = now;
+        }
+
         function togglePlayPause() {
             const logo = document.getElementById('logoImage');
             const mechSvg = document.getElementById('mechanicSvgElement');
 
             if (isMusicPlaying) {
-                // ПАУЗА (Одно нажатие)
+                // ПАУЗА
                 bgMusic.pause();
                 isMusicPlaying = false;
                 logo.classList.remove('record-spin');
@@ -872,7 +895,7 @@
                 stopAutoScroll(); 
                 startStoryTimer(); // Возобновляем сценки
             } else {
-                // ПЛЕЙ (Одно нажатие)
+                // ПЛЕЙ
                 abortStory();
                 clearTimeout(storyTimer);
                 
@@ -885,18 +908,14 @@
                         mechSvg.classList.add('party-mode');
                         startAutoScroll();
                     }).catch((e) => {
-                        isMusicPlaying = true; 
-                        logo.classList.add('record-spin');
-                        mechSvg.classList.remove('normal-mode');
-                        mechSvg.classList.add('party-mode');
-                        startAutoScroll();
+                        showToast("Не удалось запустить музыку 🔇");
                     });
                 }
             }
         }
 
-        function stopMusicComplete() {
-            // СТОП (Двойное нажатие) - Музыка в начало, всё останавливается
+        function fullStopMusic() {
+            // СТОП И СБРОС В НАЧАЛО
             bgMusic.pause();
             bgMusic.currentTime = 0; 
             isMusicPlaying = false;
@@ -909,20 +928,6 @@
             stopAutoScroll(); 
             resetTrucksToStart();
             startStoryTimer(); 
-        }
-
-        let lastLogoTapTime = 0;
-        function handleLogoTap() {
-            unlockAudio();
-            const now = Date.now();
-            if (now - lastLogoTapTime < 400) {
-                // Быстрый двойной клик -> Полный СТОП
-                stopMusicComplete();
-            } else {
-                // Одинарный клик -> ПАУЗА/ПЛЕЙ
-                togglePlayPause();
-            }
-            lastLogoTapTime = now;
         }
 
         function resetTrucksToStart() {
@@ -1474,8 +1479,14 @@
                 let matchesSearch = false;
                 if (searchWords.length === 0) matchesSearch = true;
                 else {
-                    const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
-                    matchesSearch = searchWords.every(word => fullText.includes(word));
+                    const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b/g, ''); 
+                    const fullText = `тк ${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    matchesSearch = searchWords.every(word => {
+                        if (/^\d+$/.test(word)) {
+                            return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
+                        }
+                        return fullText.includes(word);
+                    });
                 }
                 
                 let matchesFilter = true;
@@ -1508,7 +1519,6 @@
                         panoLabel = "Панорама 3D";
                     }
 
-                    const encodedAddr = cleanNavAddress.trim();
                     const encodedFullAddr = store.city + ", " + cleanAddressText;
 
                     const card = `
@@ -1542,7 +1552,7 @@
                                         </button>
                                     </div>
                                     
-                                    <button onclick="playTickSound(); openNavModal('${encodedAddr.replace(/'/g, "\\'")}', '${encodedFullAddr.replace(/'/g, "\\'")}');" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-lentaBlue hover:bg-[#003366] text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(0,65,130,0.2)] cursor-pointer">
+                                    <button onclick="playTickSound(); openNavModal('', '${encodedFullAddr.replace(/'/g, "\\'")}');" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-lentaBlue hover:bg-[#003366] text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(0,65,130,0.2)] cursor-pointer">
                                         <svg class="w-4 h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
                                         Навигатор 🗺
                                     </button>
@@ -1575,8 +1585,19 @@
                 else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
                 else if (store.address.includes("Монетка") || store.tk.startsWith("92")) brandName = "МОНЕТКА";
 
-                const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
-                const matchesSearch = searchWords.every(word => fullText.includes(word));
+                let matchesSearch = false;
+                if (searchWords.length === 0) matchesSearch = true;
+                else {
+                    const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b/g, ''); 
+                    const fullText = `тк ${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    matchesSearch = searchWords.every(word => {
+                        if (/^\d+$/.test(word)) {
+                            return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
+                        }
+                        return fullText.includes(word);
+                    });
+                }
+                
                 let matchesFilter = true;
                 if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) matchesFilter = false;
                 return matchesSearch && matchesFilter;
@@ -1611,35 +1632,57 @@
             const micBtn = document.getElementById('voiceSearchBtn');
             const searchInput = document.getElementById('searchInput');
             
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { searchInput.placeholder = "Микрофон не поддерживается"; return; }
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast("Голосовой поиск работает только в Chrome, Safari и Я.Браузере 🎙");
+                return;
+            }
             
             try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 const recognition = new SpeechRecognition();
-                recognition.lang = 'ru-RU'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+                recognition.lang = 'ru-RU'; 
+                recognition.interimResults = false; 
+                recognition.maxAlternatives = 1;
+                
                 recognition.onstart = function() {
-                    micBtn.classList.add('mic-pulsing', 'bg-red-500', 'text-white', 'border-red-500');
-                    micBtn.classList.remove('text-lentaBlue', 'dark:text-blue-400');
-                    searchInput.value = ''; searchInput.placeholder = "Слушаю вас...";
+                    micBtn.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                    micBtn.classList.remove('text-lentaBlue', 'dark:text-blue-400', 'bg-white', 'dark:bg-slate-800');
+                    searchInput.value = ''; 
+                    searchInput.placeholder = "Говорите...";
                 };
+                
                 recognition.onresult = function(event) {
                     const speechResult = event.results[0][0].transcript;
                     searchInput.value = speechResult.replace(/\.$/, '').trim();
                     searchInput.dispatchEvent(new Event('input'));
                 };
-                recognition.onerror = function() { resetMic(); searchInput.placeholder = "Повторите запрос..."; };
+                
+                recognition.onerror = function(event) { 
+                    resetMic(); 
+                    if (event.error === 'not-allowed') {
+                        showToast("Разрешите доступ к микрофону в браузере 🔒");
+                    } else if (event.error === 'network') {
+                        showToast("Для голосового поиска нужен интернет 📡");
+                    } else {
+                        searchInput.placeholder = "Повторите запрос..."; 
+                    }
+                };
+                
                 recognition.onend = function() { resetMic(); };
                 
                 function resetMic() {
-                    micBtn.classList.remove('mic-pulsing', 'bg-red-500', 'text-white', 'border-red-500');
-                    micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
+                    micBtn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
+                    micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400', 'bg-white', 'dark:bg-slate-800');
                     searchInput.placeholder = "Поиск по ТК, адресу, городу...";
                 }
+                
                 recognition.start();
             } catch (e) {
-                micBtn.classList.remove('mic-pulsing', 'bg-red-500', 'text-white', 'border-red-500');
-                micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
-                searchInput.placeholder = "Ошибка микрофона";
+                showToast("Ошибка запуска микрофона ⚠️");
+                const resetBtn = document.getElementById('voiceSearchBtn');
+                resetBtn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
+                resetBtn.classList.add('text-lentaBlue', 'dark:text-blue-400', 'bg-white', 'dark:bg-slate-800');
+                document.getElementById('searchInput').placeholder = "Поиск по ТК, адресу, городу...";
             }
         };
 
@@ -1720,21 +1763,14 @@
         window.executeNavigation = function(type) {
             playTickSound();
             let navUrl = '';
-            const encAddr = encodeURIComponent(currentNavAddress);
             const encFullAddr = encodeURIComponent(currentNavFullAddress);
             
             if (type === 'yandex') {
-                navUrl = `yandexnavi://build_route_on_map?text_to=${encAddr}`;
-                const fallbackUrl = `https://yandex.ru/maps/?text=${encAddr}`;
-                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+                navUrl = `https://yandex.ru/maps/?rtext=~${encFullAddr}&rtt=auto`;
             } else if (type === '2gis') {
-                navUrl = `dgis://2gis.ru/routeSearch/rsType/car/to/${encFullAddr}`;
-                const fallbackUrl = `https://2gis.ru/search/${encFullAddr}`;
-                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+                navUrl = `https://2gis.ru/search/${encFullAddr}`;
             } else if (type === 'google') {
-                navUrl = `comgooglemaps://?daddr=${encFullAddr}&directionsmode=driving`;
-                const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${encFullAddr}`;
-                setTimeout(() => { window.location.href = fallbackUrl; }, 800);
+                navUrl = `https://www.google.com/maps/dir/?api=1&destination=${encFullAddr}&travelmode=driving`;
             }
             
             window.location.href = navUrl;
@@ -1838,10 +1874,10 @@
             const mech = document.getElementById('mechBody');
             const sweat = document.getElementById('sweatDrop');
 
-            sveta.classList.remove('laughing');
-            marina.classList.remove('laughing');
-            mech.classList.remove('laughing');
-            sweat.classList.remove('show-sweat');
+            if(sveta) sveta.classList.remove('laughing');
+            if(marina) marina.classList.remove('laughing');
+            if(mech) mech.classList.remove('laughing');
+            if(sweat) sweat.classList.remove('show-sweat');
 
             let target = null;
             if (actor === 'sveta') target = sveta;
@@ -1849,7 +1885,7 @@
             if (actor === 'mech') target = mech;
 
             if (target && actionName === 'laughing') target.classList.add('laughing');
-            if (actor === 'mech' && actionName === 'sweat') sweat.classList.add('show-sweat');
+            if (actor === 'mech' && actionName === 'sweat' && sweat) sweat.classList.add('show-sweat');
         }
 
         async function playStory() {
@@ -1878,14 +1914,23 @@
             isStoryPlaying = false;
             document.getElementById('controlPanel').classList.remove('story-mode');
             
-            document.getElementById('bubbleSveta').classList.remove('active');
-            document.getElementById('bubbleMarina').classList.remove('active');
-            document.getElementById('bubbleMech').classList.remove('active');
+            const bS = document.getElementById('bubbleSveta');
+            const bM = document.getElementById('bubbleMarina');
+            const bMe = document.getElementById('bubbleMech');
             
-            document.getElementById('svetaBody').classList.remove('laughing');
-            document.getElementById('marinaBody').classList.remove('laughing');
-            document.getElementById('mechBody').classList.remove('laughing');
-            document.getElementById('sweatDrop').classList.remove('show-sweat');
+            if(bS) bS.classList.remove('active');
+            if(bM) bM.classList.remove('active');
+            if(bMe) bMe.classList.remove('active');
+            
+            const sB = document.getElementById('svetaBody');
+            const mB = document.getElementById('marinaBody');
+            const meB = document.getElementById('mechBody');
+            const sw = document.getElementById('sweatDrop');
+            
+            if(sB) sB.classList.remove('laughing');
+            if(mB) mB.classList.remove('laughing');
+            if(meB) meB.classList.remove('laughing');
+            if(sw) sw.classList.remove('show-sweat');
         }
 
         function startStoryTimer() {
