@@ -263,17 +263,17 @@
         .normal-mode .dancing-scene { display: none; }
         .normal-mode .normal-scenes { display: block; }
 
-        /* Диско-шар и лучи */
+        /* Диско-шар (ПОКАЗЫВАЕТСЯ ТОЛЬКО НОЧЬЮ .dark) */
         #discoBallGroup { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .normal-mode #discoBallGroup { transform: translateY(-60px); }
         .party-mode #discoBallGroup { transform: translateY(0); }
+        html:not(.dark) #discoBallGroup { display: none; } /* Скрыт днем */
         
         .disco-rays { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
-        .party-mode .disco-rays { opacity: 0.4; animation: spinRays 5s linear infinite; }
-        .dark .party-mode .disco-rays { opacity: 0.85; } /* Ярче в темной теме */
-        @keyframes spinRays { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .dark .party-mode .disco-rays { opacity: 0.85; animation: sweepRays 3s ease-in-out infinite alternate; transform-origin: 120px 5px; }
+        @keyframes sweepRays { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
 
-        /* Танцы (с правильным transform-origin прописанным в inline-style) */
+        /* Танцы */
         .dance-jump { animation: raveJump 0.4s infinite alternate ease-in-out; }
         @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-4px) scaleY(1.05); } }
         
@@ -286,37 +286,51 @@
         .dance-arm-point { animation: discoPoint 0.5s infinite alternate ease-in-out; }
         @keyframes discoPoint { 0% { transform: rotate(-45deg); } 100% { transform: rotate(15deg); } }
 
+        .dance-girl-1 { animation: discoSway 0.45s infinite alternate ease-in-out; transform-origin: 18px 58px; }
+        .dance-girl-2 { animation: raveJump 0.4s infinite alternate ease-in-out; transform-origin: 102px 58px; }
+
         .music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; }
         .music-notes text:nth-child(2) { animation-delay: 0.6s; }
         @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
 
-        /* Облачка с текстом */
+        /* Облачка с текстом (Защита от обрезания) */
         .story-bubble {
             position: absolute;
             background: white; border: 2px solid #e2e8f0; color: #1e293b;
             font-size: 10px; font-weight: 800; padding: 6px 10px; border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            opacity: 0; transform: scale(0.9) translateY(10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none; z-index: 110; 
-            max-width: 110px; text-align: center; line-height: 1.2;
+            opacity: 0; pointer-events: none; z-index: 1000;
+            max-width: 120px; text-align: center; line-height: 1.2;
             white-space: normal;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .dark .story-bubble { background: #1e293b; border-color: #475569; color: #f1f5f9; }
-        .story-bubble.active { opacity: 1; transform: scale(1) translateY(0); }
+        
+        .story-bubble.actor-sveta { bottom: 85%; left: 0; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-sveta.active { transform: scale(1) translateY(0); opacity: 1; }
+        
+        .story-bubble.actor-marina { bottom: 85%; left: 15%; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-marina.active { transform: scale(1) translateY(0); opacity: 1; }
+        
+        .story-bubble.actor-mech { bottom: 85%; right: 0; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-mech.active { transform: scale(1) translateY(0); opacity: 1; }
+
         .story-bubble::after {
-            content: ''; position: absolute; top: 100%; left: 50%;
-            margin-left: -5px; border-width: 5px; border-style: solid;
+            content: ''; position: absolute; top: 100%; border-width: 5px; border-style: solid;
             border-color: #e2e8f0 transparent transparent transparent;
         }
         .dark .story-bubble::after { border-color: #475569 transparent transparent transparent; }
+        
         .story-bubble-inner::after {
-            content: ''; position: absolute; top: 100%; left: 50%;
-            margin-left: -5px; border-width: 5px; border-style: solid;
-            border-color: white transparent transparent transparent;
-            margin-top: -2px; z-index: 1;
+            content: ''; position: absolute; top: 100%; border-width: 5px; border-style: solid;
+            border-color: white transparent transparent transparent; margin-top: -2px; z-index: 1;
         }
         .dark .story-bubble-inner::after { border-color: #1e293b transparent transparent transparent; }
+
+        /* Положение хвостиков у облаков */
+        .story-bubble.actor-sveta::after, .story-bubble.actor-sveta .story-bubble-inner::after { left: 20px; }
+        .story-bubble.actor-marina::after, .story-bubble.actor-marina .story-bubble-inner::after { left: 30px; }
+        .story-bubble.actor-mech::after, .story-bubble.actor-mech .story-bubble-inner::after { right: 20px; left: auto; }
 
     </style>
 </head>
@@ -418,7 +432,7 @@
             <!-- СТРОКА 1: Логотип и кнопки -->
             <div class="flex flex-row items-center justify-between gap-4 mb-4">
                 <div class="flex items-center gap-3 shrink-0">
-                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Плей/Пауза">
+                    <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Плей/Пауза, Двойной тап: Сброс">
                         <img id="logoImage" src="icon.png" alt="Логотип" class="w-full h-full object-cover transition-transform group-hover:scale-105" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ccircle cx=\\'50\\' cy=\\'50\\' r=\\'50\\' fill=\\'%23FDCB05\\'/%3E%3Ccircle cx=\\'50\\' cy=\\'50\\' r=\\'20\\' fill=\\'%23004182\\'/%3E%3C/svg%3E'">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent pointer-events-none rounded-full mix-blend-overlay"></div>
                     </div>
@@ -446,7 +460,7 @@
             </div>
 
             <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ -->
-            <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between overflow-hidden transition-all duration-700 min-h-[85px]">
+            <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between transition-all duration-700 min-h-[85px]">
                 
                 <!-- Левая часть: Счетчик -->
                 <div id="visitContainer" class="flex flex-col items-center justify-center shrink-0 min-w-[70px] z-10" title="Счетчик визитов">
@@ -456,17 +470,18 @@
                 <!-- Центральная часть: Сценки и Танцы -->
                 <div id="centerStage" class="relative flex flex-col items-center flex-1 cursor-pointer tactile-btn mx-2 group z-20" onclick="playTickSound(); openContactsModal();">
                     
-                    <!-- Облачка для историй -->
-                    <div id="bubbleLeft" class="story-bubble"><div class="story-bubble-inner"></div></div>
-                    <div id="bubbleRight" class="story-bubble"><div class="story-bubble-inner"></div></div>
+                    <!-- Облачка для историй (строго привязаны, не обрезаются) -->
+                    <div id="bubbleSveta" class="story-bubble actor-sveta"><div class="story-bubble-inner"></div></div>
+                    <div id="bubbleMarina" class="story-bubble actor-marina"><div class="story-bubble-inner"></div></div>
+                    <div id="bubbleMech" class="story-bubble actor-mech"><div class="story-bubble-inner"></div></div>
 
                     <div class="w-full h-14 md:h-16 relative flex items-center justify-center overflow-visible" id="mechanicSvgContainer">
                         <svg viewBox="0 0 240 60" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full text-gray-400 dark:text-gray-500 group-hover:text-emerald-500 transition-colors normal-mode overflow-visible" id="mechanicSvgElement">
                             
-                            <!-- ДИСКО ШАР И ЛУЧИ (Опускается только в party-mode) -->
+                            <!-- ДИСКО ШАР И ЛУЧИ (Опускается только в party-mode и ТОЛЬКО НОЧЬЮ) -->
                             <g id="discoBallGroup" style="transform-origin: 120px 5px;">
                                 <!-- Лучи света -->
-                                <g class="disco-rays" style="transform-origin: 120px 5px;">
+                                <g class="disco-rays">
                                     <polygon points="120,5 0,80 40,80" fill="url(#rayGrad)" stroke="none"/>
                                     <polygon points="120,5 80,80 120,80" fill="url(#rayGrad)" stroke="none"/>
                                     <polygon points="120,5 160,80 200,80" fill="url(#rayGrad)" stroke="none"/>
@@ -806,7 +821,6 @@
         const bgMusic = document.getElementById('bgMusic');
         bgMusic.volume = 0.45; 
         let isMusicPlaying = false;
-        let lastLogoTapTime = 0;
         let autoScrollAnimationId = null;
         const citySlider = document.getElementById('citySlider');
         let virtualScrollX = 0;
@@ -843,34 +857,23 @@
         });
         citySlider.style.cursor = 'grab';
 
-        function handleLogoTap() {
-            unlockAudio();
-            const now = Date.now();
-            if (now - lastLogoTapTime < 400) {
-                toggleMusicState(false);
-            } else {
-                toggleMusicState(true);
-            }
-            lastLogoTapTime = now;
-        }
-
-        function toggleMusicState(play) {
+        // ИСПРАВЛЕННАЯ ЛОГИКА НАЖАТИЙ НА ПОДСОЛНУХ
+        function togglePlayPause() {
             const logo = document.getElementById('logoImage');
             const mechSvg = document.getElementById('mechanicSvgElement');
 
-            if (!play && isMusicPlaying) {
-                abortStory();
+            if (isMusicPlaying) {
+                // ПАУЗА (Одно нажатие)
                 bgMusic.pause();
-                bgMusic.currentTime = 0;
                 isMusicPlaying = false;
                 logo.classList.remove('record-spin');
                 mechSvg.classList.remove('party-mode'); 
                 mechSvg.classList.add('normal-mode');   
                 stopAutoScroll(); 
-                resetTrucksToStart();
                 startStoryTimer(); // Возобновляем сценки
-            } else if (play && !isMusicPlaying) {
-                abortStory(); // Отменяем историю, если она шла
+            } else {
+                // ПЛЕЙ (Одно нажатие)
+                abortStory();
                 clearTimeout(storyTimer);
                 
                 const playPromise = bgMusic.play();
@@ -890,6 +893,36 @@
                     });
                 }
             }
+        }
+
+        function stopMusicComplete() {
+            // СТОП (Двойное нажатие) - Музыка в начало, всё останавливается
+            bgMusic.pause();
+            bgMusic.currentTime = 0; 
+            isMusicPlaying = false;
+            
+            document.getElementById('logoImage').classList.remove('record-spin');
+            const mechSvg = document.getElementById('mechanicSvgElement');
+            mechSvg.classList.remove('party-mode');
+            mechSvg.classList.add('normal-mode');
+
+            stopAutoScroll(); 
+            resetTrucksToStart();
+            startStoryTimer(); 
+        }
+
+        let lastLogoTapTime = 0;
+        function handleLogoTap() {
+            unlockAudio();
+            const now = Date.now();
+            if (now - lastLogoTapTime < 400) {
+                // Быстрый двойной клик -> Полный СТОП
+                stopMusicComplete();
+            } else {
+                // Одинарный клик -> ПАУЗА/ПЛЕЙ
+                togglePlayPause();
+            }
+            lastLogoTapTime = now;
         }
 
         function resetTrucksToStart() {
@@ -1441,7 +1474,7 @@
                 let matchesSearch = false;
                 if (searchWords.length === 0) matchesSearch = true;
                 else {
-                    const fullText = `${store.tk}${store.city} ${store.address}${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
                     matchesSearch = searchWords.every(word => fullText.includes(word));
                 }
                 
@@ -1542,7 +1575,7 @@
                 else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
                 else if (store.address.includes("Монетка") || store.tk.startsWith("92")) brandName = "МОНЕТКА";
 
-                const fullText = `${store.tk}${store.city} ${store.address}${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                const fullText = `${store.tk} ${store.city} ${store.address} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
                 const matchesSearch = searchWords.every(word => fullText.includes(word));
                 let matchesFilter = true;
                 if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) matchesFilter = false;
@@ -1610,6 +1643,64 @@
             }
         };
 
+        const mechanicPhrases = [
+            "Ни гвоздя, ни жезла!",
+            "На РЦ снова очередь?",
+            "Шершавой дорожки!",
+            "Опять перегруз?",
+            "Соляра нынче кусается...",
+            "Холодильник пашет?",
+            "Где путевой лист?",
+            "Лента ждёт, погнали!",
+            "Тахограф включил?",
+            "Запаску проверил?",
+            "Доки на базе забрал?",
+            "Кто крайний на ворота?",
+            "Гайки протяни после рейса.",
+            "Мочевину долил?",
+            "Аккуратно на весах!",
+            "В Екате опять пробки...",
+            "Не спи за рулём!",
+            "Фары протри.",
+            "По рации тишина...",
+            "Кофе выпью — и в рейс.",
+            "Сцепку проверил?",
+            "Слышь, только не нажимай на подсолнух наверху...",
+            "Главное — не жми на логотип!"
+        ];
+
+        const disappointedPhrases = [
+            "Ну блин, было же классно! 😩",
+            "Эх, на самом интересном месте...",
+            "Опять гайки крутить 🔧",
+            "Дискотека окончена, за работу!",
+            "А я только ритм поймал 🕺",
+            "Шеф пришел, сворачиваемся!",
+            "Эй, верните музыку! 🎵"
+        ];
+
+        function showMechanicPhrase(isDisappointed = false) {
+            const bubble = document.getElementById('mechanicSpeech');
+            if(!bubble) return;
+            let phrase = "";
+            
+            if (isDisappointed) {
+                phrase = disappointedPhrases[Math.floor(Math.random() * disappointedPhrases.length)];
+            } else {
+                phrase = mechanicPhrases[Math.floor(Math.random() * mechanicPhrases.length)];
+            }
+            
+            bubble.innerHTML = phrase + '<div class="absolute top-full left-1/2 w-2 h-2 bg-white dark:bg-slate-700 border-b border-r border-gray-200 dark:border-slate-600 transform rotate-45 -translate-x-1/2 -mt-[5px]"></div>';
+            
+            bubble.classList.remove('opacity-0', 'scale-95');
+            bubble.classList.add('opacity-100', 'scale-100');
+            
+            setTimeout(() => {
+                bubble.classList.remove('opacity-100', 'scale-100');
+                bubble.classList.add('opacity-0', 'scale-95');
+            }, 4000); 
+        }
+
         function updateSpeedLimit() {
             const month = new Date().getMonth();
             const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
@@ -1661,43 +1752,57 @@
                 dialogues: [
                     { actor: 'mech', text: 'Девчонки, где мой ключ на 32?!', time: 2500, action: 'sweat' },
                     { actor: 'marina', text: 'Мы им ножку стола подперли.', time: 2500, action: 'laughing' },
-                    { actor: 'mech', text: '...А мне как кардан крутить?', time: 2000, action: 'none' },
-                    { actor: 'sveta', text: 'Крути руками, ты же сильный у нас!', time: 2500, action: 'laughing' }
+                    { actor: 'mech', text: '...А мне как кардан крутить?', time: 2500, action: 'none' },
+                    { actor: 'sveta', text: 'Крути руками, ты же сильный!', time: 2500, action: 'laughing' }
                 ]
             },
             {
                 dialogues: [
-                    { actor: 'sveta', text: 'Водитель с ТК 203 звонит, заблудился...', time: 2500, action: 'none' },
-                    { actor: 'marina', text: 'Снова навигатор завёл в лес?', time: 2000, action: 'laughing' },
-                    { actor: 'mech', text: 'Скажите ему ориентир — старая береза!', time: 2500, action: 'laughing' }
+                    { actor: 'marina', text: 'Водитель говорит, перед ним 20 машин на выгрузку...', time: 3000, action: 'none' },
+                    { actor: 'mech', text: 'Пусть поспит. Я пока ему колодки поменяю.', time: 3000, action: 'laughing' },
+                    { actor: 'sveta', text: 'Он уже спит, мы добудиться не можем!', time: 2500, action: 'sweat' }
                 ]
             },
             {
                 dialogues: [
-                    { actor: 'marina', text: 'Шухер! Директор едет!', time: 2000, action: 'sweat' },
-                    { actor: 'sveta', text: '*усиленно стучит по клавишам*', time: 2000, action: 'none' },
-                    { actor: 'mech', text: '*хватает колесо* Работаем, мужики!', time: 2500, action: 'sweat' }
+                    { actor: 'sveta', text: 'Водитель с 203 ТК в лесу застрял...', time: 2500, action: 'sweat' },
+                    { actor: 'marina', text: 'Опять навигатор по короткой повел?', time: 2500, action: 'laughing' },
+                    { actor: 'mech', text: 'Готовьте трактор, я выезжаю!', time: 2500, action: 'sweat' }
                 ]
             },
             {
                 dialogues: [
-                    { actor: 'mech', text: 'Кто опять фуру криво загрузил?', time: 2500, action: 'sweat' },
-                    { actor: 'sveta', text: 'Это не мы, это склад начудил!', time: 2500, action: 'none' },
-                    { actor: 'mech', text: 'У него сейчас задняя ось в космос улетит...', time: 3000, action: 'none' }
+                    { actor: 'mech', text: 'Кто опять все паллеты сломал?!', time: 2500, action: 'sweat' },
+                    { actor: 'sveta', text: 'Это не мы, это складские!', time: 2000, action: 'none' },
+                    { actor: 'marina', text: 'Они их зубами грызут, что ли?', time: 2500, action: 'laughing' }
                 ]
             },
             {
                 dialogues: [
-                    { actor: 'marina', text: 'Девчонки, чай будем пить? С тортиком!', time: 2500, action: 'laughing' },
-                    { actor: 'mech', text: 'О! А механиков угощаете?', time: 2000, action: 'laughing' },
-                    { actor: 'sveta', text: 'Только если зиму мне на машину перекинешь!', time: 3000, action: 'laughing' }
+                    { actor: 'marina', text: 'У фуры перегруз на заднюю ось...', time: 2500, action: 'sweat' },
+                    { actor: 'sveta', text: 'Скажи водителю, пусть гири на торпеду положит!', time: 3000, action: 'laughing' },
+                    { actor: 'mech', text: 'Я вам сейчас положу! Ось оторвет!', time: 2500, action: 'sweat' }
                 ]
             },
             {
                 dialogues: [
-                    { actor: 'mech', text: 'Кто съел мой беляш?!', time: 2000, action: 'sweat' },
-                    { actor: 'marina', text: 'Это было подношение духам склада...', time: 2500, action: 'laughing' },
-                    { actor: 'mech', text: 'Я вам сейчас путевые листы спрячу!', time: 2500, action: 'laughing' }
+                    { actor: 'mech', text: 'У нас глушитель по дороге отвалился...', time: 2500, action: 'sweat' },
+                    { actor: 'sveta', text: 'Замотай скотчем и в рейс!', time: 2500, action: 'laughing' },
+                    { actor: 'mech', text: 'Тут синяя изолента нужна, скотч не спасет.', time: 3000, action: 'none' }
+                ]
+            },
+            {
+                dialogues: [
+                    { actor: 'marina', text: 'Девчонки, чай будем? С тортиком!', time: 2500, action: 'laughing' },
+                    { actor: 'mech', text: 'О! А механиков угощаете?', time: 2000, action: 'none' },
+                    { actor: 'sveta', text: 'Только если зиму мне на тачку перекинешь!', time: 3000, action: 'laughing' }
+                ]
+            },
+            {
+                dialogues: [
+                    { actor: 'sveta', text: 'Где фура с мороженым?', time: 2000, action: 'none' },
+                    { actor: 'marina', text: 'По ГЛОНАССУ она посреди озера...', time: 2500, action: 'sweat' },
+                    { actor: 'mech', text: 'Надеюсь, караси любят пломбир.', time: 2500, action: 'laughing' }
                 ]
             }
         ];
@@ -1707,34 +1812,23 @@
         async function showBubble(actor, text, duration) {
             if (!isStoryPlaying) return;
             
-            const bubbleL = document.getElementById('bubbleLeft');
-            const bubbleR = document.getElementById('bubbleRight');
-            let targetBubble = bubbleL;
+            const bubbleL = document.getElementById('bubbleSveta');
+            const bubbleR = document.getElementById('bubbleMarina');
+            const bubbleM = document.getElementById('bubbleMech');
             
-            // Если говорит механик - показываем правое облако над ним
-            if (actor === 'mech') {
-                targetBubble = bubbleR;
-                targetBubble.style.right = '10%';
-                targetBubble.style.left = 'auto';
-                targetBubble.style.bottom = '80%';
-            } else if (actor === 'sveta') {
-                targetBubble = bubbleL;
-                targetBubble.style.left = '5%';
-                targetBubble.style.right = 'auto';
-                targetBubble.style.bottom = '80%';
-            } else if (actor === 'marina') {
-                targetBubble = bubbleL;
-                targetBubble.style.left = '25%';
-                targetBubble.style.right = 'auto';
-                targetBubble.style.bottom = '80%';
-            }
+            let targetBubble = null;
+            if (actor === 'mech') targetBubble = bubbleM;
+            else if (actor === 'sveta') targetBubble = bubbleL;
+            else if (actor === 'marina') targetBubble = bubbleR;
 
-            targetBubble.querySelector('.story-bubble-inner').innerText = text;
-            targetBubble.classList.add('active');
-            
-            await sleep(duration);
-            targetBubble.classList.remove('active');
-            await sleep(400); 
+            if (targetBubble) {
+                targetBubble.querySelector('.story-bubble-inner').innerText = text;
+                targetBubble.classList.add('active');
+                
+                await sleep(duration);
+                targetBubble.classList.remove('active');
+                await sleep(400); 
+            }
         }
 
         function triggerAction(actor, actionName) {
@@ -1784,8 +1878,9 @@
             isStoryPlaying = false;
             document.getElementById('controlPanel').classList.remove('story-mode');
             
-            document.getElementById('bubbleLeft').classList.remove('active');
-            document.getElementById('bubbleRight').classList.remove('active');
+            document.getElementById('bubbleSveta').classList.remove('active');
+            document.getElementById('bubbleMarina').classList.remove('active');
+            document.getElementById('bubbleMech').classList.remove('active');
             
             document.getElementById('svetaBody').classList.remove('laughing');
             document.getElementById('marinaBody').classList.remove('laughing');
@@ -1799,14 +1894,13 @@
                 if (!isMusicPlaying && !isStoryPlaying) {
                     playStory();
                 }
-            }, 30000); // Каждые 30 секунд запускаем сценку
+            }, 30000); 
         }
 
         updateSpeedLimit();
         renderCards();
         setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
         
-        // Первый запуск истории
         setTimeout(() => {
             if(!isMusicPlaying) playStory(); 
             startStoryTimer();
@@ -1815,4 +1909,3 @@
     </script>
 </body>
 </html>
-```eof
