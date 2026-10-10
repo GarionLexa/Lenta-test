@@ -237,7 +237,7 @@
         .story-mode #visitContainer, .story-mode #speedContainer { width: 0px !important; min-width: 0 !important; opacity: 0; padding: 0; margin: 0; transform: scale(0.8); }
         .story-mode #centerStage { width: 100%; flex: 1; }
 
-        /* Разбегание персонажей при раскрытии */
+        /* Разбегание персонажей при раскрытии сцены */
         #girlsGroup { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         #mechGroup { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .story-mode #girlsGroup { transform: translateX(-25px); }
@@ -263,11 +263,11 @@
         .normal-mode .dancing-scene { display: none; }
         .normal-mode .normal-scenes { display: block; }
 
-        /* Диско-шар (ПОКАЗЫВАЕТСЯ ТОЛЬКО НОЧЬЮ .dark) */
+        /* Диско-шар (ТОЛЬКО НОЧЬЮ .dark) */
         #discoBallGroup { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .normal-mode #discoBallGroup { transform: translateY(-60px); }
         .party-mode #discoBallGroup { transform: translateY(0); }
-        html:not(.dark) #discoBallGroup { display: none; } /* Скрыт днем */
+        html:not(.dark) #discoBallGroup { display: none; }
         
         .disco-rays { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
         .dark .party-mode .disco-rays { opacity: 0.85; animation: sweepRays 3s ease-in-out infinite alternate; transform-origin: 120px 5px; }
@@ -306,10 +306,10 @@
         }
         .dark .story-bubble { background: #1e293b; border-color: #475569; color: #f1f5f9; }
         
-        .story-bubble.actor-sveta { bottom: 85%; left: -20px; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-sveta { bottom: 85%; left: 0px; transform: scale(0.9) translateY(10px); }
         .story-bubble.actor-sveta.active { transform: scale(1) translateY(0); opacity: 1; }
         
-        .story-bubble.actor-marina { bottom: 85%; right: -20px; transform: scale(0.9) translateY(10px); }
+        .story-bubble.actor-marina { bottom: 85%; right: 0px; transform: scale(0.9) translateY(10px); }
         .story-bubble.actor-marina.active { transform: scale(1) translateY(0); opacity: 1; }
         
         .story-bubble.actor-mech { bottom: 100%; left: 50%; margin-left: -50px; transform: scale(0.9) translateY(10px); }
@@ -327,7 +327,6 @@
         }
         .dark .story-bubble-inner::after { border-color: #1e293b transparent transparent transparent; }
 
-        /* Положение хвостиков у облаков */
         .story-bubble.actor-sveta::after, .story-bubble.actor-sveta .story-bubble-inner::after { left: 40px; }
         .story-bubble.actor-marina::after, .story-bubble.actor-marina .story-bubble-inner::after { right: 40px; }
         .story-bubble.actor-mech::after, .story-bubble.actor-mech .story-bubble-inner::after { left: 50%; margin-left: -5px; }
@@ -364,7 +363,7 @@
         </div>
     </div>
 
-    <!-- Модал Контактов (Механик и Диспетчеры) -->
+    <!-- Модал Контактов -->
     <div id="contactsModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
         <div class="glass-modal rounded-[32px] p-6 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
             <button onclick="closeContactsModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
@@ -375,7 +374,6 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">Кому звоним?</p>
             
             <div class="space-y-3">
-                <!-- Механик -->
                 <a href="tel:+79826209051" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -391,7 +389,6 @@
                     </div>
                 </a>
 
-                <!-- Светлана -->
                 <a href="tel:+79826702427" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-lentaBlue/10 dark:hover:bg-blue-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-lentaBlue dark:text-blue-400">
@@ -407,7 +404,6 @@
                     </div>
                 </a>
 
-                <!-- Марина -->
                 <a href="tel:+79122719690" onclick="closeContactsModal()" class="flex items-center justify-between bg-gray-50 dark:bg-slate-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/30 border border-gray-100 dark:border-slate-600 rounded-2xl p-4 transition-all tactile-btn group">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
@@ -429,7 +425,6 @@
     <header class="glass-header">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 relative z-10 pb-4">
             
-            <!-- СТРОКА 1: Логотип и кнопки -->
             <div class="flex flex-row items-center justify-between gap-4 mb-4">
                 <div class="flex items-center gap-3 shrink-0">
                     <div onclick="handleLogoTap()" class="w-12 h-12 rounded-full bg-white shadow-[0_6px_15px_rgba(0,0,0,0.08)] flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden relative cursor-pointer tactile-btn z-50 group" title="1 Тап: Плей/Пауза. 2 Тапа: Сброс">
@@ -462,15 +457,12 @@
             <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ -->
             <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between transition-all duration-700 min-h-[85px]">
                 
-                <!-- Левая часть: Счетчик -->
                 <div id="visitContainer" class="flex flex-col items-center justify-center shrink-0 min-w-[70px] z-10" title="Счетчик визитов">
                     <img id="visitCounterBadge" alt="Визиты" class="h-[20px] rounded shadow-sm opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0')" onerror="this.style.display='none'">
                 </div>
 
-                <!-- Центральная часть: Сценки и Танцы -->
                 <div id="centerStage" class="relative flex flex-col items-center flex-1 cursor-pointer tactile-btn mx-2 group z-20" onclick="playTickSound(); openContactsModal();">
                     
-                    <!-- Облачка для историй (жесткое позиционирование без обрезки) -->
                     <div id="bubbleSveta" class="story-bubble actor-sveta"><div class="story-bubble-inner"></div></div>
                     <div id="bubbleMarina" class="story-bubble actor-marina"><div class="story-bubble-inner"></div></div>
                     <div id="bubbleMech" class="story-bubble actor-mech"><div class="story-bubble-inner"></div></div>
@@ -478,22 +470,18 @@
                     <div class="w-full h-14 md:h-16 relative flex items-center justify-center overflow-visible" id="mechanicSvgContainer">
                         <svg viewBox="0 0 240 60" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full text-gray-400 dark:text-gray-500 group-hover:text-emerald-500 transition-colors normal-mode overflow-visible" id="mechanicSvgElement">
                             
-                            <!-- ДИСКО ШАР И ЛУЧИ (Опускается только в party-mode и ТОЛЬКО НОЧЬЮ) -->
                             <g id="discoBallGroup" style="transform-origin: 120px 5px;">
-                                <!-- Лучи света -->
                                 <g class="disco-rays">
                                     <polygon points="120,5 0,80 40,80" fill="url(#rayGrad)" stroke="none"/>
                                     <polygon points="120,5 80,80 120,80" fill="url(#rayGrad)" stroke="none"/>
                                     <polygon points="120,5 160,80 200,80" fill="url(#rayGrad)" stroke="none"/>
                                     <polygon points="120,5 220,80 260,80" fill="url(#rayGrad)" stroke="none"/>
                                 </g>
-                                <!-- Шар -->
                                 <line x1="120" y1="-50" x2="120" y2="0" stroke="currentColor" stroke-width="1.5" />
                                 <circle cx="120" cy="5" r="8" fill="#e2e8f0" stroke="currentColor" stroke-width="1.5"/>
                                 <path d="M 115 2 L 125 8 M 115 8 L 125 2 M 113 5 L 127 5" stroke="#94a3b8" stroke-width="0.5"/>
                             </g>
 
-                            <!-- Градиент для лучей дискошара -->
                             <defs>
                                 <linearGradient id="rayGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stop-color="#fef08a" stop-opacity="0.8" />
@@ -501,46 +489,30 @@
                                 </linearGradient>
                             </defs>
 
-                            <!-- НОРМАЛЬНЫЕ СЦЕНЫ РАБОТЫ (Девчонки и Механик) -->
                             <g class="normal-scenes absolute inset-0">
-                                <!-- Группа Девочек (Света и Марина) -->
                                 <g id="girlsGroup">
-                                    <!-- Общий длинный стол -->
                                     <path d="M 15 48 L 85 48" stroke-width="2"/>
-                                    
-                                    <!-- Света (Слева) -->
                                     <g id="svetaBody" style="transform-origin: 30px 48px;">
-                                        <!-- Монитор Светы -->
                                         <rect x="15" y="32" width="10" height="7" rx="1" />
                                         <path d="M 20 39 V 48" />
-                                        
-                                        <!-- Тело -->
-                                        <circle cx="35" cy="22" r="5" /> <!-- Голова -->
-                                        <path d="M 35 27 V 43" /> <!-- Туловище -->
-                                        <path d="M 35 43 L 30 55 M 35 43 L 40 55" /> <!-- Ноги -->
-                                        <path d="M 30 43 L 40 43 Z" fill="currentColor" stroke-width="1"/> <!-- Юбка -->
-                                        
-                                        <!-- Руки печатают -->
+                                        <circle cx="35" cy="22" r="5" /> 
+                                        <path d="M 35 27 V 43" /> 
+                                        <path d="M 35 43 L 30 55 M 35 43 L 40 55" /> 
+                                        <path d="M 30 43 L 40 43 Z" fill="currentColor" stroke-width="1"/> 
                                         <g class="arm-typing" style="transform-origin: 35px 29px;">
                                             <path d="M 35 29 L 28 35 L 22 36" />
                                             <path d="M 35 29 L 25 36 L 20 38" />
                                         </g>
                                     </g>
 
-                                    <!-- Марина (Справа) -->
                                     <g id="marinaBody" style="transform-origin: 70px 48px;">
-                                        <!-- Монитор Марины -->
                                         <rect x="75" y="32" width="10" height="7" rx="1" />
                                         <path d="M 80 39 V 48" />
-                                        
-                                        <!-- Тело -->
                                         <circle cx="60" cy="22" r="5" />
-                                        <path d="M 55 22 A 5 5 0 0 1 65 22" stroke-width="2"/> <!-- Прическа -->
+                                        <path d="M 55 22 A 5 5 0 0 1 65 22" stroke-width="2"/> 
                                         <path d="M 60 27 V 43" />
                                         <path d="M 60 43 L 55 55 M 60 43 L 65 55" />
-                                        <path d="M 55 43 L 65 43 Z" fill="currentColor" stroke-width="1"/> <!-- Юбка -->
-                                        
-                                        <!-- Руки печатают -->
+                                        <path d="M 55 43 L 65 43 Z" fill="currentColor" stroke-width="1"/> 
                                         <g class="arm-typing-delay" style="transform-origin: 60px 29px;">
                                             <path d="M 60 29 L 68 35 L 75 36" />
                                             <path d="M 60 29 L 71 36 L 78 38" />
@@ -548,55 +520,42 @@
                                     </g>
                                 </g>
 
-                                <!-- Группа Механика -->
                                 <g id="mechGroup">
-                                    <!-- Механик -->
                                     <g id="mechBody" style="transform-origin: 170px 55px;">
                                         <circle cx="170" cy="22" r="5" />
-                                        <path d="M 165 18 L 175 18 L 173 22 Z" fill="currentColor"/> <!-- Кепка -->
-                                        <path d="M 170 27 V 45" /> <!-- Тело -->
-                                        <path d="M 170 45 L 163 55 M 170 45 L 177 55" /> <!-- Ноги -->
-                                        
-                                        <!-- Рука с гаечным ключом -->
+                                        <path d="M 165 18 L 175 18 L 173 22 Z" fill="currentColor"/> 
+                                        <path d="M 170 27 V 45" /> 
+                                        <path d="M 170 45 L 163 55 M 170 45 L 177 55" /> 
                                         <g class="wrench-arm" style="transform-origin: 170px 29px;">
                                             <path d="M 170 29 L 155 36" />
                                             <path d="M 157 34 L 150 40" stroke-width="2"/>
                                             <path d="M 148 37 C 152 35, 153 42, 150 40" stroke-width="2" fill="none"/>
                                         </g>
-                                        <!-- Вторая рука на поясе -->
                                         <path d="M 170 29 L 178 35 L 172 40" />
-                                        
-                                        <!-- Эмоция пота (скрыта по умолчанию) -->
                                         <path id="sweatDrop" d="M 176 16 Q 178 20 176 22 Q 174 20 176 16 Z" fill="#38bdf8" stroke="none" class="sweat-drop"/>
                                     </g>
-                                    
-                                    <!-- Какое-то колесо рядом -->
                                     <circle cx="195" cy="45" r="10" stroke-width="3"/>
                                     <circle cx="195" cy="45" r="3" fill="currentColor" stroke="none"/>
-                                    <path d="M 185 55 L 205 55" stroke-width="1.5"/> <!-- Пол -->
+                                    <path d="M 185 55 L 205 55" stroke-width="1.5"/> 
                                 </g>
                             </g>
 
-                            <!-- СЦЕНА ДИСКОТЕКИ (ВКЛЮЧАЕТСЯ ТОЛЬКО ПРИ МУЗЫКЕ) -->
                             <g class="dancing-scene absolute inset-0">
                                 <g class="music-notes">
                                     <text x="80" y="20" font-size="12" fill="currentColor">♪</text>
                                     <text x="150" y="15" font-size="16" fill="currentColor">♫</text>
                                 </g>
                                 
-                                <!-- Света в юбке танцует (Ламбада/Раскачивание) -->
                                 <g class="dance-sway" style="transform-origin: 50px 55px;">
                                     <circle cx="50" cy="22" r="5" />
                                     <path d="M 50 27 V 43" />
                                     <path d="M 50 43 L 45 55 M 50 43 L 55 55" />
                                     <path d="M 45 43 L 55 43 Z" fill="currentColor" stroke-width="1"/>
-                                    <!-- Руки машут вверх -->
                                     <g class="dance-arms-wave" style="transform-origin: 50px 29px;">
                                         <path d="M 35 15 Q 50 35 65 15" />
                                     </g>
                                 </g>
 
-                                <!-- Механик танцует (Прыжки) -->
                                 <g class="dance-jump" style="transform-origin: 100px 55px;">
                                     <circle cx="100" cy="22" r="5" />
                                     <path d="M 95 18 L 105 18 L 103 22 Z" fill="currentColor"/> 
@@ -605,7 +564,6 @@
                                     <path d="M 100 30 L 90 20 M 100 30 L 110 20" />
                                 </g>
 
-                                <!-- Второй чувак/водитель танцует (Диско Джон Траволта) -->
                                 <g class="dance-sway" style="transform-origin: 140px 55px; animation-delay: 0.2s;">
                                     <circle cx="140" cy="22" r="5" />
                                     <path d="M 140 27 V 45" />
@@ -616,14 +574,12 @@
                                     </g>
                                 </g>
 
-                                <!-- Марина в юбке танцует (Прыжки, руки в боки) -->
                                 <g class="dance-jump" style="transform-origin: 190px 55px; animation-delay: 0.1s;">
                                     <circle cx="190" cy="22" r="5" />
                                     <path d="M 185 22 A 5 5 0 0 1 195 22" stroke-width="2"/>
                                     <path d="M 190 27 V 43" />
                                     <path d="M 190 43 L 185 55 M 190 43 L 195 55" />
                                     <path d="M 185 43 L 195 43 Z" fill="currentColor" stroke-width="1"/>
-                                    <!-- Руки в боки -->
                                     <path d="M 190 30 L 180 35 L 186 40" />
                                     <path d="M 190 30 L 200 35 L 194 40" />
                                 </g>
@@ -633,7 +589,6 @@
                     <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0 text-center w-full z-20 relative">Контакты</div>
                 </div>
                 
-                <!-- Правая часть: Умный знак скорости -->
                 <div id="speedContainer" class="flex flex-col items-center justify-center cursor-default shrink-0 min-w-[50px] z-10" title="Ограничение скорости на этот сезон">
                     <div class="w-10 h-10 rounded-full border-[3px] border-red-500 bg-white dark:bg-gray-100 flex items-center justify-center shadow-[0_4px_10px_rgba(239,68,68,0.2)] relative">
                         <span id="speedLimitNumber" class="text-slate-800 font-black text-base leading-none tracking-tighter">80</span>
@@ -643,7 +598,6 @@
 
             </div>
             
-            <!-- СТРОКА 3: Поиск -->
             <div class="flex items-center gap-2 w-full mb-4 mt-2">
                 <div class="relative flex-1 group">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 group-focus-within:text-lentaBlue dark:group-focus-within:text-blue-400 transition-colors">
@@ -663,7 +617,6 @@
                 </button>
             </div>
 
-            <!-- СТРОКА 4: Анимация окружения -->
             <div class="relative overflow-hidden rounded-[16px] shadow-[inset_0_4px_15px_rgba(0,0,0,0.05)] border border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-900">
                 <div class="scenic-bg group">
                     <div id="skyDay" class="sky-layer sky-day"></div>
@@ -708,7 +661,6 @@
     <div id="toast-notification" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800/95 dark:bg-slate-700/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-[13px] text-center border border-gray-700 transition-all duration-300 opacity-0 scale-95 pointer-events-none whitespace-nowrap"></div>
 
     <script>
-        // === НАДЕЖНЫЙ СЧЕТЧИК ===
         function initCounter() {
             const badge = document.getElementById('visitCounterBadge');
             const uniqueTime = Date.now(); 
@@ -869,11 +821,9 @@
             const now = Date.now();
             
             if (now - lastLogoTapTime < 400) {
-                // Двойной клик -> Полный СТОП
                 clearTimeout(logoTapTimeout);
                 fullStopMusic();
             } else {
-                // Одинарный клик -> ПАУЗА / ПЛЕЙ
                 logoTapTimeout = setTimeout(() => {
                     togglePlayPause();
                 }, 400); 
@@ -886,16 +836,14 @@
             const mechSvg = document.getElementById('mechanicSvgElement');
 
             if (isMusicPlaying) {
-                // ПАУЗА
                 bgMusic.pause();
                 isMusicPlaying = false;
                 logo.classList.remove('record-spin');
                 mechSvg.classList.remove('party-mode'); 
                 mechSvg.classList.add('normal-mode');   
                 stopAutoScroll(); 
-                startStoryTimer(); // Возобновляем сценки
+                startStoryTimer(); 
             } else {
-                // ПЛЕЙ
                 abortStory();
                 clearTimeout(storyTimer);
                 
@@ -915,7 +863,6 @@
         }
 
         function fullStopMusic() {
-            // СТОП И СБРОС В НАЧАЛО
             bgMusic.pause();
             bgMusic.currentTime = 0; 
             isMusicPlaying = false;
@@ -1480,7 +1427,7 @@
                 if (searchWords.length === 0) matchesSearch = true;
                 else {
                     const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b,?\s*/g, ''); 
-                    const fullText = `${store.tk}${store.city} ${cleanAddressTextSearch}${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    const fullText = `${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
                     matchesSearch = searchWords.every(word => {
                         if (/^\d+$/.test(word)) {
                             return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
@@ -1587,7 +1534,7 @@
                 else if (store.address.includes("Монетка") || store.tk.startsWith("92")) brandName = "МОНЕТКА";
 
                 const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b,?\s*/g, ''); 
-                const fullText = `${store.tk}${store.city} ${cleanAddressTextSearch}${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                const fullText = `${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
                 const matchesSearch = searchWords.every(word => {
                     if (/^\d+$/.test(word)) {
                         return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
@@ -1664,32 +1611,6 @@
             }
         };
 
-        const disappointedPhrases = [
-            "Ну блин, было же классно! 😩",
-            "Эх, на самом интересном месте...",
-            "Опять гайки крутить 🔧",
-            "Дискотека окончена, за работу!",
-            "А я только ритм поймал 🕺",
-            "Шеф пришел, сворачиваемся!",
-            "Эй, верните музыку! 🎵"
-        ];
-
-        function showMechanicPhrase(isDisappointed = false) {
-            const bubble = document.getElementById('mechanicSpeech');
-            if (!bubble) return;
-            let phrase = disappointedPhrases[Math.floor(Math.random() * disappointedPhrases.length)];
-            
-            bubble.innerHTML = phrase + '<div class="absolute top-full left-1/2 w-2 h-2 bg-white dark:bg-slate-700 border-b border-r border-gray-200 dark:border-slate-600 transform rotate-45 -translate-x-1/2 -mt-[5px]"></div>';
-            
-            bubble.classList.remove('opacity-0', 'scale-95');
-            bubble.classList.add('opacity-100', 'scale-100');
-            
-            setTimeout(() => {
-                bubble.classList.remove('opacity-100', 'scale-100');
-                bubble.classList.add('opacity-0', 'scale-95');
-            }, 4000); 
-        }
-
         function updateSpeedLimit() {
             const month = new Date().getMonth();
             const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
@@ -1708,8 +1629,8 @@
 
         window.executeNavigation = function(type) {
             playTickSound();
-            const encFullAddr = encodeURIComponent(currentNavFullAddress);
             let navUrl = '';
+            const encFullAddr = encodeURIComponent(currentNavFullAddress);
             
             if (type === 'yandex') {
                 navUrl = `https://yandex.ru/maps/?rtext=~${encFullAddr}&rtt=auto`;
@@ -1722,63 +1643,6 @@
             window.location.href = navUrl;
             closeNavModal();
         };
-
-        let logoTapTimeout;
-        function handleLogoTap() {
-            unlockAudio();
-            const now = Date.now();
-            if (now - lastLogoTapTime < 400) {
-                clearTimeout(logoTapTimeout);
-                fullStopMusic();
-            } else {
-                logoTapTimeout = setTimeout(() => {
-                    togglePlayPause();
-                }, 400);
-            }
-            lastLogoTapTime = now;
-        }
-
-        function togglePlayPause() {
-            const logo = document.getElementById('logoImage');
-            const mechSvg = document.getElementById('mechanicSvgElement');
-
-            if (isMusicPlaying) {
-                showMechanicPhrase(true); 
-                bgMusic.pause();
-                isMusicPlaying = false;
-                logo.classList.remove('record-spin');
-                mechSvg.classList.remove('party-mode'); 
-                mechSvg.classList.add('normal-mode');   
-                stopAutoScroll(); 
-                startStoryTimer();
-            } else {
-                abortStory();
-                clearTimeout(storyTimer);
-                const playPromise = bgMusic.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        isMusicPlaying = true;
-                        logo.classList.add('record-spin');
-                        mechSvg.classList.remove('normal-mode');
-                        mechSvg.classList.add('party-mode');
-                        startAutoScroll();
-                    }).catch(() => {});
-                }
-            }
-        }
-
-        function fullStopMusic() {
-            bgMusic.pause();
-            bgMusic.currentTime = 0; 
-            isMusicPlaying = false;
-            document.getElementById('logoImage').classList.remove('record-spin');
-            const mechSvg = document.getElementById('mechanicSvgElement');
-            mechSvg.classList.remove('party-mode');
-            mechSvg.classList.add('normal-mode');
-            stopAutoScroll(); 
-            resetTrucksToStart();
-            startStoryTimer(); 
-        }
 
         // ==========================================
         // ЛОГИКА СЦЕНОК (ЮМОР ЛОГИСТИКИ)
@@ -1936,6 +1800,7 @@
             }, 30000); 
         }
 
+        // Запуск
         updateSpeedLimit();
         renderCards();
         setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
@@ -1948,4 +1813,3 @@
     </script>
 </body>
 </html>
-```eof
