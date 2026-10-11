@@ -15,6 +15,8 @@
     <meta name="theme-color" content="#0f172a">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Библиотека для создания скриншотов отчетов -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <script>
@@ -361,6 +363,25 @@
             animation: tooltipPop 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Стили для скроллбара в чате и журнале */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* Стили для календаря */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .calendar-day { 
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 8px; font-size: 12px; font-weight: 600; position: relative; border: 1px solid transparent;
+        }
+        .calendar-day.empty { background: transparent; border: none; }
+        .calendar-day.default { background: #f1f5f9; color: #475569; }
+        .dark .calendar-day.default { background: #1e293b; color: #94a3b8; }
+        .calendar-day.has-trip { background: #dcfce7; color: #166534; border-color: #86efac; box-shadow: inset 0 0 10px rgba(74,222,128,0.2); }
+        .dark .calendar-day.has-trip { background: #14532d; color: #4ade80; border-color: #166534; }
+        .calendar-day .truck-icon { position: absolute; bottom: 2px; font-size: 10px; }
+        
     </style>
 </head>
 <body class="relative flex flex-col min-h-screen">
@@ -461,7 +482,7 @@
             
             <h3 class="text-lg font-black text-lentaDark dark:text-white mb-2 tracking-tight uppercase pr-8 mt-1">Инструкция РЦ Монетка</h3>
             
-            <div class="overflow-y-auto pr-2 pb-2 space-y-4 text-sm text-gray-700 dark:text-gray-300 chat-scroll">
+            <div class="overflow-y-auto pr-2 pb-2 space-y-4 text-sm text-gray-700 dark:text-gray-300 custom-scroll">
                 
                 <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
                     <div class="font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2 mb-1">
@@ -548,6 +569,106 @@
         </div>
     </div>
 
+    <!-- Модал Добавления рейса -->
+    <div id="addTripModal" class="fixed inset-0 z-[110] bg-gray-900/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4 transition-opacity">
+        <div class="glass-modal rounded-[32px] p-6 max-w-sm w-full relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl mb-10 sm:mb-0">
+            <button onclick="closeAddTripModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-black text-lentaDark dark:text-white mb-1 tracking-tight">Отметить рейс ✅</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-5 font-medium" id="addTripStoreInfo"></p>
+            
+            <div class="mb-5">
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Дата выгрузки:</label>
+                <input type="date" id="tripDateInput" class="w-full bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-800 dark:text-white outline-none focus:border-lentaBlue transition-colors font-medium">
+            </div>
+            
+            <button id="saveTripBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl py-3.5 px-4 font-bold shadow-[0_8px_20px_rgba(16,185,129,0.3)] transition-all tactile-btn flex items-center justify-center gap-2">
+                Сохранить в журнал
+            </button>
+        </div>
+    </div>
+
+    <!-- Модал Журнала Рейсов -->
+    <div id="journalModal" class="fixed inset-0 z-[105] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4 transition-opacity">
+        <div class="glass-modal rounded-[24px] max-w-lg w-full relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl flex flex-col h-[90vh] max-h-[800px] overflow-hidden border border-gray-200 dark:border-slate-700">
+            <!-- Шапка журнала -->
+            <div class="bg-slate-50 dark:bg-slate-900 px-5 py-4 flex items-center justify-between border-b border-gray-200 dark:border-slate-700 shrink-0 z-20">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🗓️</span>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-800 dark:text-white leading-tight">Журнал рейсов</h3>
+                        <p class="text-[10px] text-gray-500 font-medium">Ваша личная статистика</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportJournal()" title="Скачать скриншот" class="bg-blue-50 hover:bg-blue-100 text-lentaBlue dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-blue-400 p-2 rounded-xl transition-colors tactile-btn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                    <button onclick="closeJournalModal();" class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-500 dark:text-gray-300 p-2 rounded-xl transition-colors tactile-btn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Контент для экспорта -->
+            <div id="journalContent" class="flex-1 overflow-y-auto custom-scroll bg-white dark:bg-slate-800 relative">
+                
+                <!-- Навигация по месяцам -->
+                <div class="flex items-center justify-between px-5 py-4 bg-white dark:bg-slate-800 sticky top-0 z-10 border-b border-gray-100 dark:border-slate-700">
+                    <button onclick="changeJournalMonth(-1)" class="p-2 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg tactile-btn">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <div class="font-black text-slate-800 dark:text-white uppercase tracking-wide" id="journalMonthLabel">Октябрь 2026</div>
+                    <button onclick="changeJournalMonth(1)" class="p-2 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg tactile-btn">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+                <div class="p-5">
+                    <!-- Календарь -->
+                    <div class="bg-gray-50 dark:bg-slate-900 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 shadow-inner mb-6">
+                        <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                            <div class="text-[10px] font-bold text-gray-400">ПН</div>
+                            <div class="text-[10px] font-bold text-gray-400">ВТ</div>
+                            <div class="text-[10px] font-bold text-gray-400">СР</div>
+                            <div class="text-[10px] font-bold text-gray-400">ЧТ</div>
+                            <div class="text-[10px] font-bold text-gray-400">ПТ</div>
+                            <div class="text-[10px] font-bold text-red-400">СБ</div>
+                            <div class="text-[10px] font-bold text-red-400">ВС</div>
+                        </div>
+                        <div id="calendarGrid" class="calendar-grid">
+                            <!-- Дни генерируются через JS -->
+                        </div>
+                        <div class="mt-3 flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-slate-700 pt-2">
+                            <span>Всего рейсов за месяц:</span>
+                            <span id="monthTripsCount" class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 px-2 py-0.5 rounded-md">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Список рейсов -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-black text-sm text-slate-800 dark:text-gray-200 uppercase tracking-widest">Детализация</h4>
+                            <span class="text-[10px] text-gray-400 font-medium">*Хранится ровно 1 год</span>
+                        </div>
+                        <div id="journalList" class="space-y-3">
+                            <!-- Список генерируется через JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Подвал журнала (Кнопка очистки) -->
+            <div class="bg-slate-50 dark:bg-slate-900 px-5 py-4 border-t border-gray-200 dark:border-slate-700 shrink-0 z-20">
+                <button onclick="clearJournalMonth()" class="w-full py-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 font-bold text-sm rounded-xl transition-colors border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Очистить историю за этот месяц
+                </button>
+            </div>
+        </div>
+    </div>
+
     <header class="glass-header">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 relative z-10 pb-4">
             
@@ -568,6 +689,11 @@
                 </div>
                 
                 <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="openJournalModal()" class="bg-gray-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 w-10 h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn relative" title="Журнал рейсов">
+                        🗓️
+                        <!-- Маленький индикатор, если есть рейсы -->
+                        <div id="journalBadge" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-800 hidden"></div>
+                    </button>
                     <div class="relative flex items-center">
                         <button onclick="openFeedbackModal()" class="bg-blue-50 dark:bg-blue-900/40 text-lentaBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/60 w-10 h-10 rounded-xl shadow-sm border border-blue-100 dark:border-blue-800/50 flex items-center justify-center cursor-pointer tactile-btn" title="Предложить идею">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
@@ -801,6 +927,263 @@
     <div id="toast-notification" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800/95 dark:bg-slate-700/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-[13px] text-center border border-gray-700 transition-all duration-300 opacity-0 scale-95 pointer-events-none whitespace-nowrap"></div>
 
     <script>
+        // ==========================================
+        // ЛОГИКА ЖУРНАЛА РЕЙСОВ (НОВЫЙ БЛОК)
+        // ==========================================
+        let personalTrips = [];
+        let journalCurrentDate = new Date();
+        let tripToSave = null;
+
+        function initJournal() {
+            try {
+                const stored = localStorage.getItem('lenta_trips');
+                if (stored) personalTrips = JSON.parse(stored);
+            } catch (e) { console.warn("Не удалось прочитать журнал", e); }
+            
+            checkOldTrips();
+            updateJournalBadge();
+        }
+
+        function checkOldTrips() {
+            const now = new Date();
+            const oneYearMs = 365 * 24 * 60 * 60 * 1000;
+            const weekMs = 7 * 24 * 60 * 60 * 1000;
+            let needsWarning = false;
+            let filtered = [];
+
+            personalTrips.forEach(t => {
+                const tripDate = new Date(t.date);
+                const age = now - tripDate;
+                if (age > oneYearMs) {
+                    // Удаляем (просто не добавляем в filtered)
+                } else {
+                    filtered.push(t);
+                    if (oneYearMs - age <= weekMs) needsWarning = true;
+                }
+            });
+            
+            if (filtered.length !== personalTrips.length) {
+                personalTrips = filtered;
+                localStorage.setItem('lenta_trips', JSON.stringify(personalTrips));
+            }
+            
+            if (needsWarning) {
+                setTimeout(() => showToast("⚠️ Есть рейсы старше года, они скоро удалятся!"), 3000);
+            }
+        }
+
+        function updateJournalBadge() {
+            const badge = document.getElementById('journalBadge');
+            if (personalTrips.length > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+        }
+
+        window.openAddTripModal = function(tk, city, address) {
+            playTickSound();
+            tripToSave = { tk, city, address };
+            
+            let brandName = "ЛЕНТА";
+            if (address.includes("ОКЕЙ") || tk === "929929") brandName = "О'КЕЙ";
+            else if (address.includes("Молл")) brandName = "РЦ МОЛЛ";
+            else if (address.includes("Монетка") || (tk.startsWith("92") && tk.length > 3)) brandName = "МОНЕТКА";
+            
+            const displayTk = tk !== '-' ? (brandName === 'ЛЕНТА' ? `ТК ${tk}` : `${tk}`) : brandName;
+
+            document.getElementById('addTripStoreInfo').innerText = `📍 ${city}, ${displayTk}`;
+            
+            // Ставим сегодня по умолчанию
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tripDateInput').value = today;
+            document.getElementById('addTripModal').classList.remove('hidden');
+        };
+
+        window.closeAddTripModal = function() {
+            document.getElementById('addTripModal').classList.add('hidden');
+            tripToSave = null;
+        };
+
+        document.getElementById('saveTripBtn').addEventListener('click', () => {
+            const dateStr = document.getElementById('tripDateInput').value;
+            if (!dateStr || !tripToSave) return;
+            
+            playTickSound();
+            const newTrip = {
+                id: Date.now(),
+                tk: tripToSave.tk,
+                city: tripToSave.city,
+                address: tripToSave.address,
+                date: dateStr
+            };
+            
+            personalTrips.push(newTrip);
+            personalTrips.sort((a, b) => new Date(b.date) - new Date(a.date)); // Сортируем от новых к старым
+            localStorage.setItem('lenta_trips', JSON.stringify(personalTrips));
+            
+            updateJournalBadge();
+            closeAddTripModal();
+            showToast("✅ Рейс успешно добавлен в журнал!");
+        });
+
+        window.openJournalModal = function() {
+            playTickSound();
+            journalCurrentDate = new Date(); // Сбрасываем на текущий месяц
+            renderJournal();
+            document.getElementById('journalModal').classList.remove('hidden');
+        };
+
+        window.closeJournalModal = function() {
+            document.getElementById('journalModal').classList.add('hidden');
+        };
+
+        window.changeJournalMonth = function(delta) {
+            playTickSound();
+            journalCurrentDate.setMonth(journalCurrentDate.getMonth() + delta);
+            renderJournal();
+        };
+
+        function renderJournal() {
+            const y = journalCurrentDate.getFullYear();
+            const m = journalCurrentDate.getMonth();
+            
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            document.getElementById('journalMonthLabel').innerText = `${monthNames[m]} ${y}`;
+
+            const firstDay = new Date(y, m, 1).getDay(); // 0 (Вс) - 6 (Сб)
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            
+            // Сдвигаем первый день недели, чтобы понедельник был первым (1)
+            let startDayOffset = firstDay === 0 ? 6 : firstDay - 1; 
+
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            // Фильтруем рейсы текущего месяца
+            const monthTrips = personalTrips.filter(t => {
+                const td = new Date(t.date);
+                return td.getFullYear() === y && td.getMonth() === m;
+            });
+            
+            document.getElementById('monthTripsCount').innerText = monthTrips.length;
+
+            // Пустые ячейки до начала месяца
+            for (let i = 0; i < startDayOffset; i++) {
+                grid.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            // Дни месяца
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayTrips = monthTrips.filter(t => t.date === dateStr);
+                
+                let dayClass = 'default';
+                let iconHtml = '';
+                
+                if (dayTrips.length > 0) {
+                    dayClass = 'has-trip';
+                    iconHtml = `<div class="truck-icon">🚛</div>`;
+                }
+
+                grid.innerHTML += `
+                    <div class="calendar-day ${dayClass}">
+                        ${day}
+                        ${iconHtml}
+                        ${dayTrips.length > 1 ? `<div class="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center">${dayTrips.length}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Рендер списка под календарем
+            const listContainer = document.getElementById('journalList');
+            listContainer.innerHTML = '';
+            
+            if (monthTrips.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-gray-400 py-6 text-xs font-medium">В этом месяце рейсов нет</div>`;
+            } else {
+                monthTrips.forEach(trip => {
+                    // Форматируем дату красиво
+                    const td = new Date(trip.date);
+                    const prettyDate = `${String(td.getDate()).padStart(2, '0')}.${String(td.getMonth() + 1).padStart(2, '0')}`;
+                    
+                    let brandName = "ЛЕНТА"; let badgeColor = "bg-lentaYellow text-lentaDark";
+                    if (trip.address.includes("ОКЕЙ") || trip.tk === "929929") { brandName = "О'КЕЙ"; badgeColor = "bg-red-600 text-white"; }
+                    else if (trip.address.includes("Молл")) { brandName = "РЦ МОЛЛ"; badgeColor = "bg-purple-600 text-white"; }
+                    else if (trip.address.includes("Монетка") || (trip.tk.startsWith("92") && trip.tk.length > 3)) { brandName = "МОНЕТКА"; badgeColor = "bg-orange-500 text-white"; }
+                    
+                    const displayTk = trip.tk !== '-' ? (brandName === 'ЛЕНТА' ? `ТК ${trip.tk}` : `${trip.tk}`) : brandName;
+
+                    listContainer.innerHTML += `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[10px] font-black tracking-widest ${badgeColor} px-1.5 py-0.5 rounded shadow-sm">${prettyDate}</span>
+                                    <span class="text-xs font-bold text-gray-800 dark:text-gray-200">${trip.city}</span>
+                                </div>
+                                <div class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">${displayTk}</div>
+                            </div>
+                            <button onclick="deleteTrip(${trip.id})" class="p-2 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        window.deleteTrip = function(id) {
+            playTickSound();
+            personalTrips = personalTrips.filter(t => t.id !== id);
+            localStorage.setItem('lenta_trips', JSON.stringify(personalTrips));
+            renderJournal();
+            updateJournalBadge();
+            showToast("Рейс удален 🗑️");
+        };
+
+        window.clearJournalMonth = function() {
+            playTickSound();
+            const y = journalCurrentDate.getFullYear();
+            const m = journalCurrentDate.getMonth();
+            
+            const countBefore = personalTrips.length;
+            personalTrips = personalTrips.filter(t => {
+                const td = new Date(t.date);
+                return !(td.getFullYear() === y && td.getMonth() === m);
+            });
+            
+            if (personalTrips.length !== countBefore) {
+                localStorage.setItem('lenta_trips', JSON.stringify(personalTrips));
+                renderJournal();
+                updateJournalBadge();
+                showToast("Месяц очищен 🧹");
+            } else {
+                showToast("В этом месяце удалять нечего 🤷‍♂️");
+            }
+        };
+
+        window.exportJournal = function() {
+            playTickSound();
+            showToast("📸 Создаю снимок журнала...");
+            const target = document.getElementById('journalContent');
+            
+            html2canvas(target, {
+                scale: 2, // Высокое качество
+                backgroundColor: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+                windowWidth: 400 // Фиксируем ширину для ровного скрина мобилки
+            }).then(canvas => {
+                const monthNames = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+                const m = monthNames[journalCurrentDate.getMonth()];
+                const y = journalCurrentDate.getFullYear();
+                
+                let link = document.createElement('a');
+                link.download = `Журнал_Рейсов_${m}_${y}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                showToast("✅ Журнал сохранен в галерею!");
+            });
+        };
+
+        // Запуск инициализации при загрузке
+        initJournal();
+
         function initCounter() {
             const badge = document.getElementById('visitCounterBadge');
             const uniqueTime = Date.now(); 
@@ -953,6 +1336,10 @@
         });
         citySlider.style.cursor = 'grab';
 
+        // --- ЛОГИКА НАЖАТИЙ НА ПОДСОЛНУХ ---
+        let lastLogoTapTime = 0;
+        let logoTapTimeout;
+
         function handleLogoTap() {
             unlockAudio();
             const now = Date.now();
@@ -967,9 +1354,6 @@
             }
             lastLogoTapTime = now;
         }
-
-        let lastLogoTapTime = 0;
-        let logoTapTimeout;
 
         function togglePlayPause() {
             const logo = document.getElementById('logoImage');
@@ -1493,23 +1877,22 @@
             let clean = query.toLowerCase().trim()
                 .replace(/['"`]/g, '')
                 .replace(/окэй/g, 'окей')
-                .replace(/наябрьск/g, 'ноябрьск')       // Обработка опечаток голоса
+                .replace(/наябрьск/g, 'ноябрьск')
                 .replace(/екатеренбург/g, 'екатеринбург') 
                 .replace(/челяба/g, 'челябинск');
             return clean.split(/\s+/).filter(w => w.length > 0);
         }
 
-        // ПРОВЕРКА СОВПАДЕНИЙ МАГАЗИНА (Общая логика для поиска и выпадающего списка)
+        // ПРОВЕРКА СОВПАДЕНИЙ МАГАЗИНА
         function checkStoreMatches(store, searchWords) {
             let brandName = "ЛЕНТА";
             if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
             else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
             else if (store.address.includes("Монетка") || (store.tk.startsWith("92") && store.tk.length > 3)) brandName = "МОНЕТКА";
 
-            // Синонимы для брендов
             let brandKeywords = "";
             if (brandName === "ОКЕЙ") brandKeywords = "окей гипермаркет";
-            else if (brandName === "РЦ МОЛЛ") brandKeywords = "рц молл монетка склад"; // Монетка теперь ищет Молл
+            else if (brandName === "РЦ МОЛЛ") brandKeywords = "рц молл монетка склад"; 
             else if (brandName === "МОНЕТКА") brandKeywords = "рц монетка молл склад";
             else brandKeywords = "лента гипермаркет";
 
@@ -1584,26 +1967,6 @@
             window.open("https://max.ru/join/xpn98S2KE1ueR2mjjDXeTPxt8N0roEbd_r1KT6Q-uGY", "_blank");
             closeFeedbackModal();
         };
-
-        function showToast(message) {
-            let toast = document.getElementById('toast-notification');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'toast-notification';
-                toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800/95 dark:bg-slate-700/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-[13px] text-center border border-gray-700 transition-all duration-300 opacity-0 scale-95 pointer-events-none whitespace-nowrap';
-                document.body.appendChild(toast);
-            }
-            toast.innerHTML = message;
-            void toast.offsetWidth; 
-            toast.classList.remove('opacity-0', 'scale-95');
-            toast.classList.add('opacity-100', 'scale-100');
-            
-            if (toast.timeoutId) clearTimeout(toast.timeoutId);
-            toast.timeoutId = setTimeout(() => {
-                toast.classList.remove('opacity-100', 'scale-100');
-                toast.classList.add('opacity-0', 'scale-95');
-            }, 3000);
-        }
 
         // Высчитывание расстояния (Формула Гаверсинуса)
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -1879,10 +2242,15 @@
 
                                     <!-- Кнопки иконками -->
                                     <div class="flex gap-2">
+                                        <!-- Новая кнопка "Журнал" (Галочка) -->
+                                        <button onclick="openAddTripModal('${store.tk}', '${store.city}', '${cleanAddressText.replace(/'/g, "\\'")}')" title="Отметить рейс в журнале" class="w-10 flex items-center justify-center bg-emerald-50 dark:bg-slate-700 hover:bg-emerald-100 dark:hover:bg-slate-600 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-slate-600 rounded-xl transition-all tactile-btn cursor-pointer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                        </button>
+
                                         <a href="${panoUrl}" target="_blank" onclick="playTickSound()" title="${panoLabel}" class="w-10 flex items-center justify-center bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-200 rounded-xl transition-all tactile-btn">
                                             <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                         </a>
-                                        <button onclick="shareStore('${store.tk}', '${store.city}', '${cleanAddressText.replace(/'/g, "\\'")}', '${storeCustomRouteUrl}')" title="Поделиться" class="w-10 flex items-center justify-center bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-lentaBlue dark:text-blue-400 rounded-xl transition-all tactile-btn cursor-pointer">
+                                        <button onclick="shareStore('${store.tk}', '${store.city}', '${cleanAddressText.replace(/'/g, "\\'")}', '${storeCustomRouteUrl}')" title="Поделиться" class="w-10 flex items-center justify-center bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-lentaBlue dark:text-blue-400 rounded-xl transition-all tactile-btn cursor-pointer border border-blue-100 dark:border-slate-600">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                                         </button>
                                     </div>
@@ -2187,3 +2555,4 @@
     </script>
 </body>
 </html>
+```eof
