@@ -355,9 +355,9 @@
 
         /* --- АНИМАЦИЯ ПОДСКАЗКИ ИДЕЙ --- */
         @keyframes tooltipPop {
-            0%, 85% { opacity: 0; transform: translateY(-5px) scale(0.95); }
-            87%, 98% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-5px) scale(0.95); }
+            0%, 85% { opacity: 0; transform: translateY(-5px) scale(0.95) translateX(-50%); }
+            87%, 98% { opacity: 1; transform: translateY(0) scale(1) translateX(-50%); }
+            100% { opacity: 0; transform: translateY(-5px) scale(0.95) translateX(-50%); }
         }
         .idea-tooltip {
             animation: tooltipPop 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
@@ -559,7 +559,7 @@
             
             <h3 class="text-xl font-black text-lentaDark dark:text-white mb-2 tracking-tight">Есть идеи?</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium leading-relaxed px-2">
-                Нашли ошибку или хотите предложить улучшение? Я перенаправлю вас в чат <b class="text-lentaBlue dark:text-blue-400">Max</b>, где вы сможете оставить свое сообщение.
+                Нашли ошибку или хотите предложить улучшение? Я перенаправлю вас в чат <b class="text-lentaBlue dark:text-blue-400">Max</b>, где вы сможете напрямую мне написать.
             </p>
             
             <button onclick="goToMax();" class="w-full bg-[#004182] hover:bg-[#003366] text-white rounded-2xl py-3.5 px-4 font-bold text-sm shadow-[0_8px_20px_rgba(0,65,130,0.2)] transition-all tactile-btn flex items-center justify-center gap-2">
@@ -698,9 +698,9 @@
                         <button onclick="openFeedbackModal()" class="bg-blue-50 dark:bg-blue-900/40 text-lentaBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/60 w-10 h-10 rounded-xl shadow-sm border border-blue-100 dark:border-blue-800/50 flex items-center justify-center cursor-pointer tactile-btn" title="Предложить идею">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
                         </button>
-                        <div class="idea-tooltip absolute top-[115%] right-0 bg-[#004182] dark:bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg pointer-events-none whitespace-nowrap z-50">
+                        <div class="idea-tooltip absolute top-[125%] left-1/2 -translate-x-1/2 bg-[#004182] dark:bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg pointer-events-none whitespace-nowrap z-[1050]">
                             💡 Есть идеи? Пиши!
-                            <div class="absolute -top-1 right-3 w-2.5 h-2.5 bg-[#004182] dark:bg-blue-600 transform rotate-45"></div>
+                            <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#004182] dark:bg-blue-600 transform rotate-45"></div>
                         </div>
                     </div>
                     <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-10 h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn" title="Сменить тему">
@@ -2324,6 +2324,7 @@
                 recognition.onresult = function(event) {
                     let speechResult = event.results[0][0].transcript.toLowerCase();
                     
+                    // Обработка слов-чисел для надежности
                     speechResult = speechResult.replace(/\bсто\b/gi, '100')
                                                .replace(/\bдвести\b/gi, '200')
                                                .replace(/\bтриста\b/gi, '300')
