@@ -360,12 +360,6 @@
         .idea-tooltip {
             animation: tooltipPop 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        /* Стили для скроллбара в чате */
-        .chat-scroll::-webkit-scrollbar { width: 4px; }
-        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
-        .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .dark .chat-scroll::-webkit-scrollbar-thumb { background: #475569; }
 
     </style>
 </head>
@@ -388,11 +382,11 @@
                     <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700 dark:text-gray-200">Яндекс</span>
                 </button>
                 <button onclick="executeNavigation('2gis');" class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-700 border border-gray-100 dark:border-slate-600 shadow-[0_8px_20px_rgba(16,185,129,0.2)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
-                    <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-white text-xs font-black">2Г</span></div>
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-emerald-500 text-xs font-black">2Г</span></div>
                     <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700 dark:text-gray-200">2ГИС</span>
                 </button>
                 <button onclick="executeNavigation('google');" class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-700 border border-gray-100 dark:border-slate-600 shadow-[0_8px_20px_rgba(59,130,246,0.2)] flex flex-col items-center justify-center tactile-btn cursor-pointer group hover:-translate-y-1 transition-all">
-                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-white text-xs font-black">G</span></div>
+                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform"><span class="text-blue-500 text-xs font-black">G</span></div>
                     <span class="text-[10px] uppercase tracking-wide font-bold text-gray-700 dark:text-gray-200">Google</span>
                 </button>
             </div>
@@ -547,7 +541,7 @@
                 Нашли ошибку или хотите предложить улучшение? Я перенаправлю вас в чат <b class="text-lentaBlue dark:text-blue-400">Max</b>, где вы сможете оставить свое сообщение.
             </p>
             
-            <button onclick="goToMax();" class="w-full bg-[#004182] hover:bg-[#003366] text-white rounded-2xl py-3.5 px-4 font-bold text-sm shadow-[0_8px_20px_rgba(0,65,130,0.2)] transition-all tactile-btn flex items-center justify-center gap-2 cursor-pointer">
+            <button onclick="goToMax();" class="w-full bg-[#004182] hover:bg-[#003366] text-white rounded-2xl py-3.5 px-4 font-bold text-sm shadow-[0_8px_20px_rgba(0,65,130,0.2)] transition-all tactile-btn flex items-center justify-center gap-2">
                 Перейти в Max
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
@@ -810,7 +804,8 @@
         function initCounter() {
             const badge = document.getElementById('visitCounterBadge');
             const uniqueTime = Date.now(); 
-            badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v2.svg?label=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&color=1e293b&labelColor=334155&nocache=${uniqueTime}`;
+            // Имя счетчика изменено на lenta_app_v4 для сброса с нуля
+            badge.src = `https://hits.sh/garionlexa.github.io/lenta_app_v4.svg?label=%D0%92%D0%B8%D0%B7%D0%B8%D1%82%D1%8B&color=1e293b&labelColor=334155&nocache=${uniqueTime}`;
         }
         initCounter();
 
@@ -958,10 +953,6 @@
         });
         citySlider.style.cursor = 'grab';
 
-        // --- ЛОГИКА НАЖАТИЙ НА ПОДСОЛНУХ ---
-        let lastLogoTapTime = 0;
-        let logoTapTimeout;
-
         function handleLogoTap() {
             unlockAudio();
             const now = Date.now();
@@ -976,6 +967,9 @@
             }
             lastLogoTapTime = now;
         }
+
+        let lastLogoTapTime = 0;
+        let logoTapTimeout;
 
         function togglePlayPause() {
             const logo = document.getElementById('logoImage');
@@ -1367,12 +1361,11 @@
                     tk: cols[0], route: cols[1], address: cols[2], city: cols[3],
                     rc1: cols[4] || '-', rc2: cols[5] || '-', 
                     is24_7: cols[7] === 'Да', start: cols[8] || '-', end: cols[9] || '-',
-                    distance: null // Добавлено поле для расстояния
+                    distance: null 
                 });
             }
         });
 
-        // Базовая сортировка
         function sortStoresDefault() {
             stores.sort((a, b) => {
                 let indexA = cityOrder.indexOf(a.city); let indexB = cityOrder.indexOf(b.city);
@@ -1495,11 +1488,47 @@
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         const autocompleteList = document.getElementById('autocompleteList');
 
+        // УМНЫЙ ПАРСЕР ПОИСКА
+        function getSearchWords(query) {
+            let clean = query.toLowerCase().trim()
+                .replace(/['"`]/g, '')
+                .replace(/окэй/g, 'окей')
+                .replace(/наябрьск/g, 'ноябрьск')       // Обработка опечаток голоса
+                .replace(/екатеренбург/g, 'екатеринбург') 
+                .replace(/челяба/g, 'челябинск');
+            return clean.split(/\s+/).filter(w => w.length > 0);
+        }
+
+        // ПРОВЕРКА СОВПАДЕНИЙ МАГАЗИНА (Общая логика для поиска и выпадающего списка)
+        function checkStoreMatches(store, searchWords) {
+            let brandName = "ЛЕНТА";
+            if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
+            else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
+            else if (store.address.includes("Монетка") || (store.tk.startsWith("92") && store.tk.length > 3)) brandName = "МОНЕТКА";
+
+            // Синонимы для брендов
+            let brandKeywords = "";
+            if (brandName === "ОКЕЙ") brandKeywords = "окей гипермаркет";
+            else if (brandName === "РЦ МОЛЛ") brandKeywords = "рц молл монетка склад"; // Монетка теперь ищет Молл
+            else if (brandName === "МОНЕТКА") brandKeywords = "рц монетка молл склад";
+            else brandKeywords = "лента гипермаркет";
+
+            const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b,?\s*/g, ''); 
+            const fullText = `тк ${store.tk} рц ${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandKeywords}`.toLowerCase().replace(/['"`]/g, '');
+            
+            return searchWords.every(word => {
+                if (/^\d+$/.test(word)) {
+                    return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
+                }
+                return fullText.includes(word);
+            });
+        }
+
         window.clearSearch = function() {
             searchInput.value = '';
             clearSearchBtn.classList.add('hidden');
             autocompleteList.classList.add('hidden');
-            sortStoresDefault(); // Возвращаем обычную сортировку
+            sortStoresDefault(); 
             renderCards();
         };
 
@@ -1522,7 +1551,7 @@
                     el.classList.remove('active');
                 }
             });
-            sortStoresDefault(); // При фильтрации сбрасываем поиск по локации
+            sortStoresDefault(); 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             renderCards();
         };
@@ -1549,7 +1578,7 @@
         window.closeFeedbackModal = function() { 
             document.getElementById('feedbackModal').classList.add('hidden'); 
         };
-
+        
         window.goToMax = function() {
             playTickSound();
             window.open("https://max.ru/join/xpn98S2KE1ueR2mjjDXeTPxt8N0roEbd_r1KT6Q-uGY", "_blank");
@@ -1578,7 +1607,7 @@
 
         // Высчитывание расстояния (Формула Гаверсинуса)
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-            var R = 6371; // Радиус Земли в км
+            var R = 6371; 
             var dLat = deg2rad(lat2-lat1);  
             var dLon = deg2rad(lon2-lon1); 
             var a = 
@@ -1610,20 +1639,17 @@
                     const myLat = position.coords.latitude;
                     const myLon = position.coords.longitude;
 
-                    // Высчитываем расстояние для каждого магазина
                     stores.forEach(store => {
                         const coords = storeCoords[store.tk];
                         if (coords) {
                             store.distance = getDistanceFromLatLonInKm(myLat, myLon, coords.lat, coords.lon);
                         } else {
-                            store.distance = 999999; // Если координат нет, кидаем в конец
+                            store.distance = 999999; 
                         }
                     });
 
-                    // Сортируем по расстоянию
                     stores.sort((a, b) => a.distance - b.distance);
 
-                    // Очищаем поиск, показываем все города, чтобы было видно результат
                     searchInput.value = '';
                     selectedCityFilter = 'all';
                     document.querySelectorAll('.truck-chip').forEach(el => {
@@ -1665,7 +1691,6 @@
                     });
                     showToast("Успешно поделились! 📤");
                 } catch (err) {
-                    // Отмена юзером - не ошибка
                     if(err.name !== 'AbortError') copyFallback(shareText);
                 }
             } else {
@@ -1746,43 +1771,30 @@
         }
 
         function renderCards() {
-            const rawSearch = searchInput.value.toLowerCase().trim();
-            const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
+            const searchWords = getSearchWords(searchInput.value);
             
-            if (cleanSearchQuery) clearSearchBtn.classList.remove('hidden');
+            if (searchInput.value.trim() !== '') clearSearchBtn.classList.remove('hidden');
             else clearSearchBtn.classList.add('hidden');
 
             cardsGrid.innerHTML = '';
             let count = 0;
-            const searchWords = cleanSearchQuery.split(/\s+/).filter(w => w.length > 0);
 
             stores.forEach(store => {
-                let brandName = "ЛЕНТА";
-                if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
-                else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
-                else if (store.address.includes("Монетка") || (store.tk.startsWith("92") && store.tk.length > 3)) brandName = "МОНЕТКА";
-
-                let matchesSearch = false;
-                if (searchWords.length === 0) matchesSearch = true;
-                else {
-                    const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b,?\s*/g, ''); 
-                    // Добавляем приставки ТК и РЦ к строке поиска для корректного нахождения по "тк 100" или "рц 929451"
-                    const fullText = `тк ${store.tk} рц ${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
-                    matchesSearch = searchWords.every(word => {
-                        if (/^\d+$/.test(word)) {
-                            return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
-                        }
-                        return fullText.includes(word);
-                    });
-                }
-                
+                let matchesSearch = searchWords.length === 0 ? true : checkStoreMatches(store, searchWords);
                 let matchesFilter = true;
-                if (!cleanSearchQuery && selectedCityFilter !== 'all' && store.city !== selectedCityFilter) {
+                
+                if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) {
                     matchesFilter = false;
                 }
 
                 if (matchesSearch && matchesFilter) {
                     count++;
+                    
+                    let brandName = "ЛЕНТА";
+                    if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
+                    else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
+                    else if (store.address.includes("Монетка") || (store.tk.startsWith("92") && store.tk.length > 3)) brandName = "МОНЕТКА";
+
                     let displayBrand = "ЛЕНТА"; let badgeClass = "bg-lentaYellow text-lentaDark"; let displayNumber = store.tk !== '-' ? `ТК ${store.tk}` : '';
 
                     if (brandName === "ОКЕЙ") { displayBrand = "О'КЕЙ"; badgeClass = "bg-red-600 text-white"; displayNumber = "ГИПЕРМАРКЕТ"; } 
@@ -1809,7 +1821,6 @@
                     const encodedAddr = cleanNavAddress.trim();
                     const encodedFullAddr = store.city + ", " + cleanAddressText;
                     
-                    // Расстояние для отображения
                     let distanceHtml = '';
                     if (store.distance !== null && store.distance < 999999) {
                         const distFormatted = store.distance < 10 ? store.distance.toFixed(1) : Math.round(store.distance);
@@ -1887,28 +1898,13 @@
 
         searchInput.addEventListener('input', function() {
             renderCards(); 
-            const rawSearch = this.value.toLowerCase().trim();
-            const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
+            const searchWords = getSearchWords(this.value);
             autocompleteList.innerHTML = ''; 
             
-            if (!cleanSearchQuery) { autocompleteList.classList.add('hidden'); return; }
-            const searchWords = cleanSearchQuery.split(/\s+/).filter(w => w.length > 0);
+            if (searchWords.length === 0) { autocompleteList.classList.add('hidden'); return; }
 
             let suggestions = stores.filter(store => {
-                let brandName = "ЛЕНТА";
-                if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
-                else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
-                else if (store.address.includes("Монетка") || (store.tk.startsWith("92") && store.tk.length > 3)) brandName = "МОНЕТКА";
-
-                const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b,?\s*/g, ''); 
-                const fullText = `тк ${store.tk} рц ${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
-                const matchesSearch = searchWords.every(word => {
-                    if (/^\d+$/.test(word)) {
-                        return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
-                    }
-                    return fullText.includes(word);
-                });
-                
+                const matchesSearch = checkStoreMatches(store, searchWords);
                 let matchesFilter = true;
                 if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) matchesFilter = false;
                 return matchesSearch && matchesFilter;
@@ -1960,7 +1956,6 @@
                 recognition.onresult = function(event) {
                     let speechResult = event.results[0][0].transcript.toLowerCase();
                     
-                    // Обработка слов-чисел для надежности
                     speechResult = speechResult.replace(/\bсто\b/gi, '100')
                                                .replace(/\bдвести\b/gi, '200')
                                                .replace(/\bтриста\b/gi, '300')
