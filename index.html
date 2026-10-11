@@ -89,6 +89,7 @@
         .record-spin { animation: recordSpin 4s linear infinite; }
         @keyframes recordSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* --- АНИМАЦИЯ МИКРОФОНА --- */
         @keyframes pulse-ring {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -244,6 +245,7 @@
             background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
         }
 
+        /* --- АНИМАЦИИ ДЛЯ СЦЕНОК --- */
         #visitContainer, #speedContainer { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
         .story-mode #visitContainer, .story-mode #speedContainer { width: 0px !important; min-width: 0 !important; opacity: 0; padding: 0; margin: 0; transform: scale(0.8); }
         .story-mode #centerStage { width: 100%; flex: 1; }
@@ -267,6 +269,7 @@
         .show-sweat { opacity: 1; transform: translateY(0); animation: dripDown 1.5s forwards; }
         @keyframes dripDown { 0% { transform: translateY(0); opacity: 1;} 100% { transform: translateY(10px); opacity: 0; } }
 
+        /* --- ДИСКОТЕКА --- */
         .party-mode .dancing-scene { display: block; }
         .party-mode .normal-scenes { display: none; }
         .normal-mode .dancing-scene { display: none; }
@@ -343,6 +346,7 @@
 
     <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
 
+    <!-- Навигационный Модал -->
     <div id="navModal" class="fixed inset-0 z-[100] bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
         <div class="glass-modal rounded-[32px] p-8 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
             <button onclick="closeNavModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
@@ -368,6 +372,7 @@
         </div>
     </div>
 
+    <!-- Модал Контактов -->
     <div id="contactsModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
         <div class="glass-modal rounded-[32px] p-6 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
             <button onclick="closeContactsModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
@@ -426,6 +431,7 @@
         </div>
     </div>
 
+    <!-- Модал Инструкции Монетки -->
     <div id="monetkaModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
         <div class="glass-modal rounded-[32px] p-6 max-w-md w-full relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl flex flex-col max-h-[90vh]">
             <button onclick="closeMonetkaModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn z-10">
@@ -435,6 +441,7 @@
             <h3 class="text-lg font-black text-lentaDark dark:text-white mb-2 tracking-tight uppercase pr-8 mt-1">Инструкция РЦ Монетка</h3>
             
             <div class="overflow-y-auto pr-2 pb-2 space-y-4 text-sm text-gray-700 dark:text-gray-300">
+                
                 <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
                     <div class="font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2 mb-1">
                         <span class="text-lg">❄️</span> ВАЖНО: ЗАМОРОЗКА
@@ -442,7 +449,37 @@
                     <p class="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">Доставка заморозки — это <b class="uppercase">приоритет</b>. Необходимо четко доводить информацию о доставке заморозки сотрудникам Монетки!</p>
                 </div>
 
-                <div class="space-y-3">
+                <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 mt-3">
+                    <div class="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-2 mb-1">
+                        <span class="text-lg">⚡</span> ЛАЙФХАК: БЕЗ ОЖИДАНИЯ ЗВОНКА
+                    </div>
+                    <p class="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">Водители могут <b>зайти на склад</b> и обозначить своё присутствие <b>Старшему смены</b> на РЦ Монетки, чтобы не сидеть и не ждать звонка!</p>
+                </div>
+
+                <div class="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-2xl p-4 mt-3">
+                    <div class="font-bold text-purple-800 dark:text-purple-300 flex items-center gap-2 mb-2">
+                        <span class="text-lg">📞</span> ТЕЛЕФОНЫ РЦ ТЭЦ (ЕКБ)
+                    </div>
+                    <p class="text-xs text-purple-700 dark:text-purple-400 mb-2">Узнать собран ли товар, когда поставят на док и т.д.</p>
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                         <a href="tel:+73432930001" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-[0_4px_10px_rgba(168,85,247,0.3)] transition-all tactile-btn">+7 (343) 293-00-01</a>
+                         <span class="text-[11px] text-purple-600 dark:text-purple-300 font-medium">в тоновом режиме жмём <b class="bg-purple-200 dark:bg-purple-800/80 border border-purple-300 dark:border-purple-600 px-1.5 py-0.5 rounded shadow-sm text-purple-800 dark:text-purple-200">1</b></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-white dark:bg-slate-800 border border-purple-100 dark:border-purple-700 p-2 rounded-xl text-center shadow-sm">
+                            <div class="text-gray-500 dark:text-gray-400 text-[9px] font-bold uppercase tracking-wider mb-0.5">Старый склад</div>
+                            <div class="font-black text-purple-700 dark:text-purple-300 text-sm bg-purple-50/50 dark:bg-slate-700/50 py-1 rounded-lg">доб. 22204</div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 border border-purple-100 dark:border-purple-700 p-2 rounded-xl text-center shadow-sm">
+                            <div class="text-gray-500 dark:text-gray-400 text-[9px] font-bold uppercase tracking-wider mb-0.5">Новый склад</div>
+                            <div class="font-black text-purple-700 dark:text-purple-300 text-sm bg-purple-50/50 dark:bg-slate-700/50 py-1 rounded-lg">доб. 22537</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <div class="font-black text-gray-800 dark:text-gray-200 text-xs uppercase tracking-widest text-center mt-2 border-b border-gray-200 dark:border-slate-700 pb-2">Порядок передачи документов</div>
+                    
                     <div class="bg-gray-50 dark:bg-slate-700/50 p-3.5 rounded-xl border border-gray-100 dark:border-slate-600">
                         <div class="font-bold text-gray-900 dark:text-white text-xs mb-1">1. Только СМ Ленты</div>
                         <div class="text-xs text-gray-600 dark:text-gray-400">По прибытию подходит к диспетчеру отгрузки и <span class="bg-yellow-200/60 dark:bg-yellow-900/60 px-1 rounded font-semibold text-gray-800 dark:text-yellow-100">передает документы</span>.</div>
@@ -499,6 +536,7 @@
                 </div>
             </div>
 
+            <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ -->
             <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between transition-all duration-700 min-h-[85px]">
                 
                 <div id="visitContainer" class="flex flex-col items-center justify-center shrink-0 min-w-[70px] z-10" title="Счетчик визитов">
@@ -701,6 +739,7 @@
         <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 mb-8"></div>
     </main>
 
+    <!-- Всплывающие уведомления (Toasts) -->
     <div id="toast-notification" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800/95 dark:bg-slate-700/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-[13px] text-center border border-gray-700 transition-all duration-300 opacity-0 scale-95 pointer-events-none whitespace-nowrap"></div>
 
     <script>
@@ -855,6 +894,7 @@
         });
         citySlider.style.cursor = 'grab';
 
+        // --- ЛОГИКА НАЖАТИЙ НА ПОДСОЛНУХ ---
         let lastLogoTapTime = 0;
         let logoTapTimeout;
 
@@ -1181,68 +1221,6 @@
             '228': 'https://yandex.ru/maps/?um=constructor%3A8fcf241d4a420f1383a3a5340a88946bd3920f05ce6319b3f15c419b9484eb39&source=constructorLink',
             '227': 'https://yandex.ru/maps/?um=constructor%3A585e886c013d87e06fac691aa947e6c165d773146047bb1343a571bdadfd4646&source=constructorLink',
             '203': 'https://yandex.ru/maps/?um=constructor%3Afbbd0b022ba16d28a9759e073e3de48d938f03a1cd710ca64ff5c6fad195da4f&source=constructorLink'
-        };
-
-        const storeCoords = {
-            '203': {lat: 56.8197, lon: 60.6728},
-            '227': {lat: 56.7865, lon: 60.5484},
-            '228': {lat: 56.8641, lon: 60.6111},
-            '229': {lat: 56.8858, lon: 60.5833},
-            '230': {lat: 56.9015, lon: 60.6276},
-            '176': {lat: 56.4024, lon: 61.9429},
-            '309': {lat: 55.4363, lon: 65.3051},
-            '74': {lat: 53.4294, lon: 58.9818},
-            '192': {lat: 53.3855, lon: 58.9806},
-            '317': {lat: 60.9587, lon: 76.5777},
-            '61': {lat: 57.8767, lon: 59.9866},
-            '206': {lat: 57.8631, lon: 60.0384},
-            '285': {lat: 63.2005, lon: 75.4206},
-            '42': {lat: 58.0016, lon: 56.1468},
-            '147': {lat: 57.9715, lon: 56.1774},
-            '235': {lat: 58.0076, lon: 56.2874},
-            '297': {lat: 57.9620, lon: 56.2625},
-            '92': {lat: 61.2678, lon: 73.4475},
-            '93': {lat: 61.2462, lon: 73.4402},
-            '321': {lat: 61.2588, lon: 73.3440},
-            '135': {lat: 58.2198, lon: 68.2868},
-            '91': {lat: 57.1147, lon: 65.5562},
-            '94': {lat: 57.1165, lon: 65.6174},
-            '146': {lat: 57.1726, lon: 65.6264},
-            '209': {lat: 57.1717, lon: 65.5684},
-            '245': {lat: 57.1171, lon: 65.5901},
-            '100': {lat: 60.9839, lon: 69.0435},
-            '69': {lat: 55.1206, lon: 61.3411},
-            '154': {lat: 55.1837, lon: 61.3415},
-            '184': {lat: 55.1583, lon: 61.2847},
-            '212': {lat: 55.2415, lon: 61.3853},
-            '213': {lat: 55.1322, lon: 61.4646},
-            '301': {lat: 55.1691, lon: 61.4317},
-            '335': {lat: 55.1669, lon: 61.2863},
-            '337': {lat: 55.1957, lon: 61.2721},
-            '334': {lat: 55.1706, lon: 61.3650},
-            '336': {lat: 55.1352, lon: 61.4352},
-            '338': {lat: 55.0560, lon: 60.1142},
-            '368': {lat: 56.8851, lon: 60.6231},
-            '396': {lat: 56.8152, lon: 60.5401},
-            '369': {lat: 56.7946, lon: 60.6166},
-            '390': {lat: 57.1118, lon: 65.6025},
-            '389': {lat: 57.1643, lon: 65.5492},
-            '929929': {lat: 57.1141, lon: 65.5583},
-            '411': {lat: 61.2654, lon: 73.3856},
-            '343': {lat: 61.1075, lon: 72.5833},
-            '929455': {lat: 58.0772, lon: 55.6728},
-            '929453': {lat: 57.2185, lon: 65.5898},
-            '928177': {lat: 56.8864, lon: 60.7712},
-            '927898': {lat: 56.8524, lon: 60.7915},
-            '929451': {lat: 61.0881, lon: 72.6366},
-            '929452': {lat: 54.4947, lon: 61.2291},
-            '928817': {lat: 54.7663, lon: 56.1662},
-            '929034': {lat: 55.0062, lon: 82.6843},
-            '929000': {lat: 55.2974, lon: 37.6415},
-            '929100': {lat: 59.9073, lon: 30.3951},
-            '8081': {lat: 55.2045, lon: 61.3444},
-            '8082': {lat: 55.2341, lon: 61.4283},
-            '8083': {lat: 55.2536, lon: 61.4111}
         };
 
         let stores = [];
@@ -1716,6 +1694,7 @@
                 recognition.onresult = function(event) {
                     let speechResult = event.results[0][0].transcript.toLowerCase();
                     
+                    // Обработка слов-чисел для надежности
                     speechResult = speechResult.replace(/\bсто\b/gi, '100')
                                                .replace(/\bдвести\b/gi, '200')
                                                .replace(/\bтриста\b/gi, '300')
@@ -1778,6 +1757,9 @@
             closeNavModal();
         };
 
+        // ==========================================
+        // ЛОГИКА СЦЕНОК (ЮМОР ЛОГИСТИКИ)
+        // ==========================================
         let isStoryPlaying = false;
         let storyTimer = null;
 
@@ -1931,6 +1913,7 @@
             }, 30000); 
         }
 
+        // Запуск
         updateSpeedLimit();
         renderCards();
         setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
