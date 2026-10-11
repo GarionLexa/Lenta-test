@@ -232,12 +232,10 @@
             background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
         }
 
-        /* --- АНИМАЦИИ ДЛЯ СЦЕНОК --- */
         #visitContainer, #speedContainer { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
         .story-mode #visitContainer, .story-mode #speedContainer { width: 0px !important; min-width: 0 !important; opacity: 0; padding: 0; margin: 0; transform: scale(0.8); }
         .story-mode #centerStage { width: 100%; flex: 1; }
 
-        /* Разбегание персонажей при раскрытии сцены */
         #girlsGroup { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         #mechGroup { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .story-mode #girlsGroup { transform: translateX(-25px); }
@@ -257,13 +255,11 @@
         .show-sweat { opacity: 1; transform: translateY(0); animation: dripDown 1.5s forwards; }
         @keyframes dripDown { 0% { transform: translateY(0); opacity: 1;} 100% { transform: translateY(10px); opacity: 0; } }
 
-        /* --- ДИСКОТЕКА --- */
         .party-mode .dancing-scene { display: block; }
         .party-mode .normal-scenes { display: none; }
         .normal-mode .dancing-scene { display: none; }
         .normal-mode .normal-scenes { display: block; }
 
-        /* Диско-шар (ТОЛЬКО НОЧЬЮ .dark) */
         #discoBallGroup { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .normal-mode #discoBallGroup { transform: translateY(-60px); }
         .party-mode #discoBallGroup { transform: translateY(0); }
@@ -273,7 +269,6 @@
         .dark .party-mode .disco-rays { opacity: 0.85; animation: sweepRays 3s ease-in-out infinite alternate; transform-origin: 120px 5px; }
         @keyframes sweepRays { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
 
-        /* Танцы */
         .dance-jump { animation: raveJump 0.4s infinite alternate ease-in-out; }
         @keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-4px) scaleY(1.05); } }
         
@@ -293,7 +288,6 @@
         .music-notes text:nth-child(2) { animation-delay: 0.6s; }
         @keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
 
-        /* Облачка с текстом (Исправлено обрезание по краям) */
         .story-bubble {
             position: absolute;
             background: white; border: 2px solid #e2e8f0; color: #1e293b;
@@ -454,7 +448,6 @@
                 </div>
             </div>
 
-            <!-- СТРОКА 2: БЛОК УПРАВЛЕНИЯ -->
             <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between transition-all duration-700 min-h-[85px]">
                 
                 <div id="visitContainer" class="flex flex-col items-center justify-center shrink-0 min-w-[70px] z-10" title="Счетчик визитов">
@@ -1141,6 +1134,68 @@
             '203': 'https://yandex.ru/maps/?um=constructor%3Afbbd0b022ba16d28a9759e073e3de48d938f03a1cd710ca64ff5c6fad195da4f&source=constructorLink'
         };
 
+        const storeCoords = {
+            '203': {lat: 56.8197, lon: 60.6728},
+            '227': {lat: 56.7865, lon: 60.5484},
+            '228': {lat: 56.8641, lon: 60.6111},
+            '229': {lat: 56.8858, lon: 60.5833},
+            '230': {lat: 56.9015, lon: 60.6276},
+            '176': {lat: 56.4024, lon: 61.9429},
+            '309': {lat: 55.4363, lon: 65.3051},
+            '74': {lat: 53.4294, lon: 58.9818},
+            '192': {lat: 53.3855, lon: 58.9806},
+            '317': {lat: 60.9587, lon: 76.5777},
+            '61': {lat: 57.8767, lon: 59.9866},
+            '206': {lat: 57.8631, lon: 60.0384},
+            '285': {lat: 63.2005, lon: 75.4206},
+            '42': {lat: 58.0016, lon: 56.1468},
+            '147': {lat: 57.9715, lon: 56.1774},
+            '235': {lat: 58.0076, lon: 56.2874},
+            '297': {lat: 57.9620, lon: 56.2625},
+            '92': {lat: 61.2678, lon: 73.4475},
+            '93': {lat: 61.2462, lon: 73.4402},
+            '321': {lat: 61.2588, lon: 73.3440},
+            '135': {lat: 58.2198, lon: 68.2868},
+            '91': {lat: 57.1147, lon: 65.5562},
+            '94': {lat: 57.1165, lon: 65.6174},
+            '146': {lat: 57.1726, lon: 65.6264},
+            '209': {lat: 57.1717, lon: 65.5684},
+            '245': {lat: 57.1171, lon: 65.5901},
+            '100': {lat: 60.9839, lon: 69.0435},
+            '69': {lat: 55.1206, lon: 61.3411},
+            '154': {lat: 55.1837, lon: 61.3415},
+            '184': {lat: 55.1583, lon: 61.2847},
+            '212': {lat: 55.2415, lon: 61.3853},
+            '213': {lat: 55.1322, lon: 61.4646},
+            '301': {lat: 55.1691, lon: 61.4317},
+            '335': {lat: 55.1669, lon: 61.2863},
+            '337': {lat: 55.1957, lon: 61.2721},
+            '334': {lat: 55.1706, lon: 61.3650},
+            '336': {lat: 55.1352, lon: 61.4352},
+            '338': {lat: 55.0560, lon: 60.1142},
+            '368': {lat: 56.8851, lon: 60.6231},
+            '396': {lat: 56.8152, lon: 60.5401},
+            '369': {lat: 56.7946, lon: 60.6166},
+            '390': {lat: 57.1118, lon: 65.6025},
+            '389': {lat: 57.1643, lon: 65.5492},
+            '929929': {lat: 57.1141, lon: 65.5583},
+            '411': {lat: 61.2654, lon: 73.3856},
+            '343': {lat: 61.1075, lon: 72.5833},
+            '929455': {lat: 58.0772, lon: 55.6728},
+            '929453': {lat: 57.2185, lon: 65.5898},
+            '928177': {lat: 56.8864, lon: 60.7712},
+            '927898': {lat: 56.8524, lon: 60.7915},
+            '929451': {lat: 61.0881, lon: 72.6366},
+            '929452': {lat: 54.4947, lon: 61.2291},
+            '928817': {lat: 54.7663, lon: 56.1662},
+            '929034': {lat: 55.0062, lon: 82.6843},
+            '929000': {lat: 55.2974, lon: 37.6415},
+            '929100': {lat: 59.9073, lon: 30.3951},
+            '8081': {lat: 55.2045, lon: 61.3444},
+            '8082': {lat: 55.2341, lon: 61.4283},
+            '8083': {lat: 55.2536, lon: 61.4111}
+        };
+
         let stores = [];
         let selectedCityFilter = 'all';
 
@@ -1312,9 +1367,11 @@
             renderCards();
         };
 
-        let currentNavAddress = ''; let currentNavFullAddress = '';
-        window.openNavModal = function(addr, fullAddr) {
-            currentNavAddress = addr; currentNavFullAddress = fullAddr;
+        let currentNavAddress = ''; let currentNavFullAddress = ''; let currentNavTk = '';
+        window.openNavModal = function(addr, fullAddr, tk) {
+            currentNavAddress = addr; 
+            currentNavFullAddress = fullAddr;
+            currentNavTk = tk;
             document.getElementById('navModal').classList.remove('hidden');
         };
         window.closeNavModal = function() { document.getElementById('navModal').classList.add('hidden'); };
@@ -1500,7 +1557,7 @@
                                         </button>
                                     </div>
                                     
-                                    <button onclick="playTickSound(); openNavModal('${encodedAddr.replace(/'/g, "\\'")}', '${encodedFullAddr.replace(/'/g, "\\'")}');" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-lentaBlue hover:bg-[#003366] text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(0,65,130,0.2)] cursor-pointer">
+                                    <button onclick="playTickSound(); openNavModal('${encodedAddr.replace(/'/g, "\\'")}', '${encodedFullAddr.replace(/'/g, "\\'")}', '${store.tk}');" class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-lentaBlue hover:bg-[#003366] text-white rounded-xl text-xs font-bold transition-all tactile-btn shadow-[0_4px_10px_rgba(0,65,130,0.2)] cursor-pointer">
                                         <svg class="w-4 h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
                                         Навигатор 🗺
                                     </button>
@@ -1633,7 +1690,12 @@
             const encFullAddr = encodeURIComponent(currentNavFullAddress);
             
             if (type === 'yandex') {
-                navUrl = `https://yandex.ru/maps/?rtext=~${encFullAddr}&rtt=auto`;
+                const coords = storeCoords[currentNavTk];
+                if (coords) {
+                    navUrl = `https://yandex.ru/maps/?rtext=~${coords.lat},${coords.lon}&rtt=auto`;
+                } else {
+                    navUrl = `https://yandex.ru/maps/?rtext=~${encFullAddr}&rtt=auto`;
+                }
             } else if (type === '2gis') {
                 navUrl = `https://2gis.ru/routeSearch/rsType/car/to/${encFullAddr}/go`;
             } else if (type === 'google') {
@@ -1644,9 +1706,6 @@
             closeNavModal();
         };
 
-        // ==========================================
-        // ЛОГИКА СЦЕНОК (ЮМОР ЛОГИСТИКИ)
-        // ==========================================
         let isStoryPlaying = false;
         let storyTimer = null;
 
@@ -1800,7 +1859,6 @@
             }, 30000); 
         }
 
-        // Запуск
         updateSpeedLimit();
         renderCards();
         setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
