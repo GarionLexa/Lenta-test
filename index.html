@@ -350,6 +350,16 @@
         .story-bubble.actor-sveta::after, .story-bubble.actor-sveta .story-bubble-inner::after { left: 40px; }
         .story-bubble.actor-marina::after, .story-bubble.actor-marina .story-bubble-inner::after { right: 40px; }
         .story-bubble.actor-mech::after, .story-bubble.actor-mech .story-bubble-inner::after { left: 50%; margin-left: -5px; }
+
+        /* --- АНИМАЦИЯ ПОДСКАЗКИ ИДЕЙ --- */
+        @keyframes tooltipPop {
+            0%, 85% { opacity: 0; transform: translateY(-5px) scale(0.95); }
+            87%, 98% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-5px) scale(0.95); }
+        }
+        .idea-tooltip {
+            animation: tooltipPop 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
         
         /* Стили для скроллбара в чате */
         .chat-scroll::-webkit-scrollbar { width: 4px; }
@@ -521,54 +531,26 @@
         </div>
     </div>
 
-    <!-- Модал Обратной связи (Чат VK) -->
+    <!-- Модал Обратной связи (Простое окно для Max) -->
     <div id="feedbackModal" class="fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-        <div class="glass-modal rounded-[28px] max-w-sm w-full relative animate-reveal bg-[#e5ddd5] dark:bg-slate-900 shadow-2xl flex flex-col h-[70vh] max-h-[500px] overflow-hidden border border-gray-200 dark:border-slate-700">
-            <!-- Шапка чата -->
-            <div class="bg-[#0077FF] dark:bg-[#0077FF] text-white px-4 py-3 flex items-center justify-between shadow-md z-10 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm relative">
-                        <!-- VK Icon -->
-                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M15.073 2H8.927C3.333 2 2 3.333 2 8.927v6.146C2 20.667 3.333 22 8.927 22h6.146C20.667 22 22 20.667 22 15.073V8.927C22 3.333 20.667 2 15.073 2zM17.12 16.326h-1.681c-.347 0-.46-.273-1.093-.934-.694-.707-.987-.787-1.147-.787-.213 0-.28.067-.28.32v1.014c0 .253-.08.387-1.12.387-1.653 0-3.466-1.027-4.693-2.773C5.587 11.373 4.96 8.52 4.96 8.24c0-.213.08-.32.333-.32h1.68c.227 0 .32.093.4.293 0 0 1.053 2.653 2.507 4.307.387.427.56.56.707.56.107 0 .173-.067.173-.32V9.893c0-.36-.107-.52-.36-.52-.16 0-.213-.107-.213-.213 0-.173.187-.253.507-.253h1.96c.267 0 .36.133.36.427v2.307c0 .32.147.387.253.387.16 0 .347-.133.72-.493 1.107-1.293 1.893-3.413 1.893-3.413.08-.213.227-.333.453-.333h1.68c.32 0 .4.16.4.16-.053.36-1.507 2.453-2.147 3.307-.173.227-.24.32 0 .64.16.213.733.68 1.107 1.107 1.013 1.16 1.253 1.547 1.347 1.773.133.333-.067.507-.533.507z"/>
-                        </svg>
-                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-[#0077FF] rounded-full"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold text-sm tracking-wide">Алексей Гарион (VK)</div>
-                        <div class="text-[10px] text-blue-100 font-medium">в сети</div>
-                    </div>
-                </div>
-                <button onclick="closeFeedbackModal();" class="text-blue-100 hover:text-white p-2 rounded-full transition-colors cursor-pointer tactile-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+        <div class="glass-modal rounded-[32px] p-6 max-w-sm w-full text-center relative animate-reveal bg-white dark:bg-slate-800 shadow-2xl">
+            <button onclick="closeFeedbackModal();" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white bg-gray-100 dark:bg-slate-700 p-2.5 rounded-full transition-colors cursor-pointer tactile-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/40 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-[inset_0_4px_10px_rgba(0,0,0,0.05)] border border-blue-100 dark:border-blue-800">
+                💡
             </div>
             
-            <!-- Тело чата -->
-            <div class="flex-1 p-4 overflow-y-auto chat-scroll flex flex-col gap-3 relative" style="background-image: url('data:image/svg+xml,%3Csvg width=\\'40\\' height=\\'40\\' viewBox=\\'0 0 40 40\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cpath d=\\'M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z\\' fill=\\'%239ca3af\\' fill-opacity=\\'0.05\\' fill-rule=\\'evenodd\\'/%3E%3C/svg%3E');">
-                
-                <div class="text-center w-full my-1">
-                    <span class="bg-[#d1e5f5] dark:bg-slate-800/80 text-[#4a5568] dark:text-gray-400 text-[10px] font-bold px-3 py-1 rounded-lg shadow-sm backdrop-blur-sm">Сегодня</span>
-                </div>
-
-                <div class="flex flex-col items-start max-w-[85%] self-start animate-reveal">
-                    <div class="bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-100 p-3 rounded-2xl rounded-tl-sm shadow-sm text-sm border border-gray-100 dark:border-slate-600 relative">
-                        Привет! Нашел ошибку или есть идея? Пиши текст сюда 👇. По кнопке "Отправить" он скопируется, и я откроюсь в VK Мессенджере!
-                        <div class="absolute -left-2 top-0 w-4 h-4 bg-white dark:bg-slate-700" style="clip-path: polygon(100% 0, 0 0, 100% 100%);"></div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Ввод сообщения -->
-            <div class="bg-gray-100 dark:bg-slate-800 p-3 shrink-0 flex items-end gap-2 border-t border-gray-200 dark:border-slate-700">
-                <div class="flex-1 bg-white dark:bg-slate-700 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-600 overflow-hidden flex items-center pr-1 min-h-[44px]">
-                    <textarea id="feedbackText" rows="1" placeholder="Ваше сообщение..." class="w-full bg-transparent text-sm text-gray-800 dark:text-gray-100 p-3 outline-none resize-none max-h-[100px] chat-scroll" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-                </div>
-                <button onclick="sendFeedback();" class="w-[44px] h-[44px] shrink-0 bg-[#0077FF] hover:bg-[#0055CC] text-white rounded-full flex items-center justify-center shadow-md tactile-btn transition-colors cursor-pointer group">
-                    <svg class="w-5 h-5 transform translate-x-[-1px] translate-y-[1px] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                </button>
-            </div>
+            <h3 class="text-xl font-black text-lentaDark dark:text-white mb-2 tracking-tight">Есть идеи?</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium leading-relaxed px-2">
+                Нашли ошибку или хотите предложить улучшение? Я перенаправлю вас в чат <b class="text-lentaBlue dark:text-blue-400">Max</b>, где вы сможете оставить свое сообщение.
+            </p>
+            
+            <button onclick="goToMax();" class="w-full bg-[#004182] hover:bg-[#003366] text-white rounded-2xl py-3.5 px-4 font-bold text-sm shadow-[0_8px_20px_rgba(0,65,130,0.2)] transition-all tactile-btn flex items-center justify-center gap-2 cursor-pointer">
+                Перейти в Max
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
         </div>
     </div>
 
@@ -592,9 +574,15 @@
                 </div>
                 
                 <div class="flex items-center gap-1.5 shrink-0">
-                    <button onclick="openFeedbackModal()" class="bg-blue-50 dark:bg-blue-900/40 text-lentaBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/60 w-10 h-10 rounded-xl shadow-sm border border-blue-100 dark:border-blue-800/50 flex items-center justify-center cursor-pointer tactile-btn" title="Предложить идею">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                    </button>
+                    <div class="relative flex items-center">
+                        <button onclick="openFeedbackModal()" class="bg-blue-50 dark:bg-blue-900/40 text-lentaBlue dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/60 w-10 h-10 rounded-xl shadow-sm border border-blue-100 dark:border-blue-800/50 flex items-center justify-center cursor-pointer tactile-btn" title="Предложить идею">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                        </button>
+                        <div class="idea-tooltip absolute top-[115%] right-0 bg-[#004182] dark:bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg pointer-events-none whitespace-nowrap z-50">
+                            💡 Есть идеи? Пиши!
+                            <div class="absolute -top-1 right-3 w-2.5 h-2.5 bg-[#004182] dark:bg-blue-600 transform rotate-45"></div>
+                        </div>
+                    </div>
                     <button id="themeToggleBtn" onclick="toggleTheme()" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-10 h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn" title="Сменить тему">
                         <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
@@ -1557,41 +1545,15 @@
         window.openFeedbackModal = function() { 
             playTickSound();
             document.getElementById('feedbackModal').classList.remove('hidden'); 
-            setTimeout(() => document.getElementById('feedbackText').focus(), 100);
         };
-        window.closeFeedbackModal = function() { document.getElementById('feedbackModal').classList.add('hidden'); };
+        window.closeFeedbackModal = function() { 
+            document.getElementById('feedbackModal').classList.add('hidden'); 
+        };
 
-        window.sendFeedback = function() {
-            const textArea = document.getElementById('feedbackText');
-            const text = textArea.value.trim();
-            if (!text) {
-                showToast("Напишите сообщение! ✍️");
-                return;
-            }
+        window.goToMax = function() {
             playTickSound();
-            
-            // ВАШ ИДЕНТИФИКАТОР ВКОНТАКТЕ (С учетом вашей ссылки на github это скорее всего garionlexa)
-            // Если он другой - просто поменяйте текст "garionlexa" на ваш реальный ID.
-            const vkId = "garionlexa"; 
-            
-            // Сначала пробуем скопировать текст в буфер обмена
-            navigator.clipboard.writeText(text).then(() => {
-                showToast("Текст скопирован! Вставьте его в чате VK 💬");
-                setTimeout(() => {
-                    // Открываем диалог в VK
-                    window.open(`https://vk.me/${vkId}`, '_blank');
-                    textArea.value = '';
-                    closeFeedbackModal();
-                }, 1500);
-            }).catch(() => {
-                // Если браузер запретил копирование без явного действия, просто открываем VK
-                showToast("Открываю VK Мессенджер... 🚀");
-                setTimeout(() => {
-                    window.open(`https://vk.me/${vkId}`, '_blank');
-                    textArea.value = '';
-                    closeFeedbackModal();
-                }, 800);
-            });
+            window.open("https://max.ru/join/xpn98S2KE1ueR2mjjDXeTPxt8N0roEbd_r1KT6Q-uGY", "_blank");
+            closeFeedbackModal();
         };
 
         function showToast(message) {
