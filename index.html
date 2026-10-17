@@ -1891,5 +1891,211 @@ function getTimeLeftHtml(timeStr) {
                                         <button onclick="shareRoute('${store.tk}', '${safeBrand}', '${safeAddress}', '${storeCustomRouteUrl}', event)" class="flex items-center justify-center gap-1.5 px-2 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 hover:text-lentaBlue dark:hover:text-blue-400 border border-transparent hover:border-blue-200 dark:hover:border-slate-500 rounded-xl transition-all tactile-btn cursor-pointer" title="Поделиться">
                                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
                                             <span class="truncate">Отправить</span>
-                                        </b
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            if (count === 0) {
+                cardsGrid.innerHTML = `<div class="col-span-full py-16 text-center text-gray-400 dark:text-gray-500 font-medium bg-white dark:bg-slate-800 rounded-[24px] shadow-sm border border-gray-100 dark:border-slate-700">По вашему запросу ничего не найдено</div>`;
+            } else {
+                cardsGrid.innerHTML = cardsHtml;
+            }
+        }
+
+        searchInput.addEventListener('input', function() {
+            renderCards(); 
+            const rawSearch = this.value.toLowerCase().trim();
+            const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
+            autocompleteList.innerHTML = ''; 
+            
+            if (!cleanSearchQuery) { autocompleteList.classList.add('hidden'); return; }
+            const searchWords = cleanSearchQuery.split(/\s+/).filter(w => w.length > 0);
+            let suggestions = [];
+            
+            if (isTechMode) {
+                suggestions = techStations.filter(station => {
+                    const fullText = `${station.type} ${station.name} ${station.address} ${station.desc} ${station.city || ''}`.toLowerCase();
+                    return searchWords.every(word => fullText.includes(word));
+                });
+                
+                if (suggestions.length > 0) {
+                    autocompleteList.classList.remove('hidden');
+                    suggestions.slice(0, 20).forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'px-4 py-3 hover:bg-orange-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-50 dark:border-slate-700 last:border-none transition-colors mx-1 my-0.5 text-gray-800 dark:text-gray-200';
+                        div.innerHTML = getDropdownItemHTML(item, true);
+                        div.addEventListener('click', () => {
+                            playTickSound();
+                            searchInput.value = item.name; 
+                            autocompleteList.classList.add('hidden');
+                            renderCards();
+                        });
+                        autocompleteList.appendChild(div);
+                    });
+                } else autocompleteList.classList.add('hidden');
+
+            } else {
+                suggestions = stores.filter(store => {
+                    let brandName = "ЛЕНТА";
+                    if (store.address.includes("ОКЕЙ") || store.tk === "929929") brandName = "ОКЕЙ";
+                    else if (store.address.includes("Молл")) brandName = "РЦ МОЛЛ";
+                    else if (store.address.includes("Монетка") || (store.tk.startsWith("92") && store.tk.length > 3)) brandName = "МОНЕТКА";
+
+                    const cleanAddressTextSearch = store.address.replace(/\b\d{6}\b,?\s*/g, ''); 
+                    const fullText = `тк ${store.tk} рц ${store.tk} ${store.city} ${cleanAddressTextSearch} ${brandName}`.toLowerCase().replace(/['"`]/g, '');
+                    const matchesSearch = searchWords.every(word => {
+                        if (/^\d+$/.test(word)) return store.tk === word || new RegExp(`\\b${word}\\b`).test(cleanAddressTextSearch.toLowerCase());
+                        return fullText.includes(word);
+                    });
+                    let matchesFilter = true;
+                    if (selectedCityFilter !== 'all' && store.city !== selectedCityFilter) matchesFilter = false;
+                    return matchesSearch && matchesFilter;
+                });
+
+                if (suggestions.length > 0) {
+                    autocompleteList.classList.remove('hidden');
+                    suggestions.slice(0, 20).forEach(store => {
+                        const item = document.createElement('div');
+                        item.className = 'px-4 py-3 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-50 dark:border-slate-700 last:border-none transition-colors mx-1 my-0.5 text-gray-800 dark:text-gray-200';
+                        item.innerHTML = getDropdownItemHTML(store, false);
+                        item.addEventListener('click', () => {
+                            playTickSound();
+                            searchInput.value = store.tk !== '-' ? store.tk : store.city; 
+                            autocompleteList.classList.add('hidden');
+                            renderCards();
+                        });
+                        autocompleteList.appendChild(item);
+                    });
+                } else autocompleteList.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+                autocompleteList.classList.add('hidden');
+            }
+        });
+
+        window.startVoiceSearch = function() {
+            const micBtn = document.getElementById('voiceSearchBtn');
+            const searchInput = document.getElementById('searchInput');
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { showToast("Голосовой поиск не поддерживается в этом браузере 🎙"); return; }
+            
+            try {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'ru-RU'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+                recognition.onstart = function() {
+                    micBtn.classList.add('mic-listening');
+                    micBtn.classList.remove('text-lentaBlue', 'dark:text-blue-400');
+                    searchInput.value = ''; searchInput.placeholder = "Слушаю вас...";
+                };
+                recognition.onresult = function(event) {
+                    let speechResult = event.results[0][0].transcript.toLowerCase();
+                    speechResult = speechResult.replace(/\bсто\b/gi, '100').replace(/\bдвести\b/gi, '200').replace(/\bтриста\b/gi, '300').replace(/\.$/, '').trim();
+                    searchInput.value = speechResult; searchInput.dispatchEvent(new Event('input'));
+                };
+                recognition.onerror = function() { 
+                    micBtn.classList.remove('mic-listening');
+                    micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
+                    searchInput.placeholder = "Повторите запрос..."; 
+                };
+                recognition.onend = function() { 
+                    micBtn.classList.remove('mic-listening');
+                    micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
+                    searchInput.placeholder = "Поиск...";
+                };
+                recognition.start();
+            } catch (e) { 
+                micBtn.classList.remove('mic-listening');
+                micBtn.classList.add('text-lentaBlue', 'dark:text-blue-400');
+            }
+        };
+
+        function updateSpeedLimit() {
+            const month = new Date().getMonth();
+            const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
+            document.getElementById('speedLimitNumber').innerText = isWinter ? '60' : '80';
+            const icon = document.getElementById('seasonIcon');
+            if (isWinter) {
+                icon.innerText = '❄️'; icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-blue-50 border-blue-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full';
+            } else {
+                icon.innerText = '☀️'; icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-amber-50 border-amber-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full';
+            }
+        }
+
+        // ==========================================
+        // ЛОГИКА СЦЕНОК (ЮМОР ЛОГИСТИКИ)
+        // ==========================================
+        let isStoryPlaying = false; let storyTimer = null;
+
+        const stories = [
+            { dialogues: [{ actor: 'mech', text: 'Девчонки, где мой ключ на 32?!', time: 2500, action: 'sweat' }, { actor: 'marina', text: 'Мы им ножку стола подперли.', time: 2500, action: 'laughing' }, { actor: 'mech', text: '...А мне как кардан крутить?', time: 2500, action: 'none' }, { actor: 'sveta', text: 'Крути руками, ты же сильный!', time: 2500, action: 'laughing' }] },
+            { dialogues: [{ actor: 'marina', text: 'Водитель говорит, перед ним 20 машин на выгрузку...', time: 3000, action: 'none' }, { actor: 'mech', text: 'Пусть поспит. Я пока ему колодки поменяю.', time: 3000, action: 'laughing' }, { actor: 'sveta', text: 'Он уже спит, мы добудиться не можем!', time: 2500, action: 'sweat' }] },
+            { dialogues: [{ actor: 'sveta', text: 'Водитель с 203 ТК в лесу застрял...', time: 2500, action: 'sweat' }, { actor: 'marina', text: 'Опять навигатор по короткой повел?', time: 2500, action: 'laughing' }, { actor: 'mech', text: 'Готовьте трактор, я выезжаю!', time: 2500, action: 'sweat' }] },
+            { dialogues: [{ actor: 'mech', text: 'Кто опять все паллеты сломал?!', time: 2500, action: 'sweat' }, { actor: 'sveta', text: 'Это не мы, это складские!', time: 2000, action: 'none' }, { actor: 'marina', text: 'Они их зубами грызут, что ли?', time: 2500, action: 'laughing' }] },
+            { dialogues: [{ actor: 'marina', text: 'У фуры перегруз на заднюю ось...', time: 2500, action: 'sweat' }, { actor: 'sveta', text: 'Скажи водителю, пусть гири на торпеду положит!', time: 3000, action: 'laughing' }, { actor: 'mech', text: 'Я вам сейчас положу! Ось оторвет!', time: 2500, action: 'sweat' }] },
+            { dialogues: [{ actor: 'mech', text: 'У нас глушитель по дороге отвалился...', time: 2500, action: 'sweat' }, { actor: 'sveta', text: 'Замотай скотчем и в рейс!', time: 2500, action: 'laughing' }, { actor: 'mech', text: 'Тут синяя изолента нужна, скотч не спасет.', time: 3000, action: 'none' }] },
+            { dialogues: [{ actor: 'marina', text: 'Девчонки, чай будем? С тортиком!', time: 2500, action: 'laughing' }, { actor: 'mech', text: 'О! А механиков угощаете?', time: 2000, action: 'none' }, { actor: 'sveta', text: 'Только если зиму мне на тачку перекинешь!', time: 3000, action: 'laughing' }] },
+            { dialogues: [{ actor: 'sveta', text: 'Где фура с мороженым?', time: 2000, action: 'none' }, { actor: 'marina', text: 'По ГЛОНАССУ она посреди озера...', time: 2500, action: 'sweat' }, { actor: 'mech', text: 'Надеюсь, караси любят пломбир.', time: 2500, action: 'laughing' }] }
+        ];
+
+        function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+        async function showBubble(actor, text, duration) {
+            if (!isStoryPlaying) return;
+            const bubbleL = document.getElementById('bubbleSveta'); const bubbleR = document.getElementById('bubbleMarina'); const bubbleM = document.getElementById('bubbleMech');
+            let targetBubble = null;
+            if (actor === 'mech') targetBubble = bubbleM; else if (actor === 'sveta') targetBubble = bubbleL; else if (actor === 'marina') targetBubble = bubbleR;
+            if (targetBubble) {
+                targetBubble.querySelector('.story-bubble-inner').innerText = text; targetBubble.classList.add('active');
+                await sleep(duration); targetBubble.classList.remove('active'); await sleep(400); 
+            }
+        }
+
+        function triggerAction(actor, actionName) {
+            if (!isStoryPlaying) return;
+            const sveta = document.getElementById('svetaBody'); const marina = document.getElementById('marinaBody'); const mech = document.getElementById('mechBody'); const sweat = document.getElementById('sweatDrop');
+            sveta.classList.remove('laughing'); marina.classList.remove('laughing'); mech.classList.remove('laughing'); sweat.classList.remove('show-sweat');
+            let target = null;
+            if (actor === 'sveta') target = sveta; if (actor === 'marina') target = marina; if (actor === 'mech') target = mech;
+            if (target && actionName === 'laughing') target.classList.add('laughing');
+            if (actor === 'mech' && actionName === 'sweat') sweat.classList.add('show-sweat');
+        }
+
+        async function playStory() {
+            if (isMusicPlaying || isStoryPlaying) return;
+            isStoryPlaying = true; document.getElementById('controlPanel').classList.add('story-mode');
+            await sleep(800); if (!isStoryPlaying) return; 
+            const story = stories[Math.floor(Math.random() * stories.length)];
+            for (let line of story.dialogues) {
+                if (!isStoryPlaying) break;
+                triggerAction(line.actor, line.action); await showBubble(line.actor, line.text, line.time);
+            }
+            if (isStoryPlaying) abortStory();
+        }
+
+        function abortStory() {
+            isStoryPlaying = false; document.getElementById('controlPanel').classList.remove('story-mode');
+            document.getElementById('bubbleSveta').classList.remove('active'); document.getElementById('bubbleMarina').classList.remove('active'); document.getElementById('bubbleMech').classList.remove('active');
+            document.getElementById('svetaBody').classList.remove('laughing'); document.getElementById('marinaBody').classList.remove('laughing'); document.getElementById('mechBody').classList.remove('laughing'); document.getElementById('sweatDrop').classList.remove('show-sweat');
+        }
+
+        function startStoryTimer() {
+            clearTimeout(storyTimer);
+            storyTimer = setInterval(() => { if (!isMusicPlaying && !isStoryPlaying) playStory(); }, 30000); 
+        }
+
+        updateSpeedLimit(); renderCards();
+        setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
+        setTimeout(() => { if(!isMusicPlaying) playStory(); startStoryTimer(); }, 5000);
+    </script>
+</body>
+</html>
                                         
