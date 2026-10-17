@@ -55,7 +55,7 @@ color: #1F2937;
 font-family: 'Inter', sans-serif;
 -webkit-tap-highlight-color: transparent;
 width: 100%;
-overflow-x: hidden;
+overflow-x: clip;
 padding-bottom: env(safe-area-inset-bottom);
 transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -117,24 +117,13 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 </style>
 <style>
 .parallax-signs { position: absolute; bottom: 18px; left: 0; width: 3000vw; height: 40px; z-index: 9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='40' viewBox='0 0 1500 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2200' height='40' viewBox='0 0 2200 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"); background-size: 1500px 40px, 2200px 40px; background-repeat: repeat-x; will-change: transform; }
-.police-car { position: absolute; bottom: 4px; left: 120vw; width: 60px; height: 20px; background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%); border-radius: 4px 4px 10px 6px; z-index: 25; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transform: scaleX(-1); }
-.police-car.active { display: block; animation: driveOpposite 4.5s linear forwards; }
-.police-siren-red { position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px; animation: sirenRed 0.6s infinite; }
-.police-siren-blue { position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px; animation: sirenBlue 0.6s infinite; }
-@keyframes sirenRed { 0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 50%, 100% { box-shadow: none; background: #991b1b; } }
-@keyframes sirenBlue { 0%, 49% { box-shadow: none; background: #1e3a8a; } 50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } }
-@keyframes driveOpposite { 0% { left: 120vw; } 100% { left: -150px; } }
 .city-slider { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; height: 100%; align-items: flex-end; padding-bottom: 2px; padding-left: 10px; }
 .city-slider::-webkit-scrollbar { display: none; }
-</style>
-<style>
 .truck-chip { outline: none; opacity: 0.9; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-right: 20px; }
 .truck-chip.active { opacity: 1; transform: scale(1.03) translateY(-2px); z-index: 30; }
 .truck-wrapper { filter: brightness(var(--truck-body-brightness)); transition: filter 0.2s ease-out; }
 @keyframes truckBump { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-2px); } }
 .auto-driving .truck-wrapper { animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s); }
-.siren-orange { position: absolute; top: -5px; left: 10px; width: 10px; height: 5px; border-radius: 3px 3px 0 0; background: #f59e0b; animation: flashOrange 0.6s infinite alternate; z-index: 30; }
-@keyframes flashOrange { 0% { box-shadow: 0 0 10px 3px rgba(251, 191, 36, 0.8); background: #fbbf24; } 100% { box-shadow: 0 0 25px 10px rgba(245, 158, 11, 1); background: #d97706; } }
 .headlight-beam { position: absolute; width: 70px; height: 20px; background: linear-gradient(to right, rgba(253,224,71,0.95), transparent); transform: skewX(-15deg); opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 50%; filter: blur(2px); z-index: 50; pointer-events: none; }
 .tail-light { position: absolute; bottom: 4px; left: -1px; width: 3px; height: 8px; background-color: #ef4444; box-shadow: 0 0 12px 3px rgba(239,68,68,0.95); opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 2px; z-index: 20; }
 .marker-light { position: absolute; top: 2px; width: 4px; height: 2px; background-color: #fde047; box-shadow: 0 0 8px 2px rgba(253,224,71,0.9); opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 1px; }
@@ -157,26 +146,6 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 .sweat-drop { opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(-5px); }
 .show-sweat { opacity: 1; transform: translateY(0); animation: dripDown 1.5s forwards; }
 @keyframes dripDown { 0% { transform: translateY(0); opacity: 1;} 100% { transform: translateY(10px); opacity: 0; } }
-</style>
-<style>
-.party-mode .dancing-scene { display: block; } .party-mode .normal-scenes { display: none; }
-.normal-mode .dancing-scene { display: none; } .normal-mode .normal-scenes { display: block; }
-#discoBallGroup { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.normal-mode #discoBallGroup { transform: translateY(-60px); } .party-mode #discoBallGroup { transform: translateY(0); }
-html:not(.dark) #discoBallGroup { display: none; }
-.disco-rays { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
-.dark .party-mode .disco-rays { opacity: 0.85; animation: sweepRays 3s ease-in-out infinite alternate; transform-origin: 120px 5px; }
-@keyframes sweepRays { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
-.dance-jump { animation: raveJump 0.4s infinite alternate ease-in-out; }
-@keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-4px) scaleY(1.05); } }
-.dance-sway { animation: discoSway 0.5s infinite alternate ease-in-out; }
-@keyframes discoSway { 0% { transform: translateX(-3px) rotate(-5deg); } 100% { transform: translateX(3px) rotate(5deg); } }
-.dance-arms-wave { animation: waveArms 0.4s infinite alternate ease-in-out; }
-@keyframes waveArms { 0% { transform: rotate(-20deg); } 100% { transform: rotate(20deg); } }
-.dance-arm-point { animation: discoPoint 0.5s infinite alternate ease-in-out; }
-@keyframes discoPoint { 0% { transform: rotate(-45deg); } 100% { transform: rotate(15deg); } }
-.music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; } .music-notes text:nth-child(2) { animation-delay: 0.6s; }
-@keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
 .story-bubble { position: absolute; background: white; border: 2px solid #e2e8f0; color: #1e293b; font-size: 10px; font-weight: 800; padding: 6px 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); opacity: 0; pointer-events: none; z-index: 1000; max-width: 140px; text-align: center; line-height: 1.2; white-space: normal; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .dark .story-bubble { background: #1e293b; border-color: #475569; color: #f1f5f9; }
 .story-bubble.actor-sveta { bottom: 85%; left: 0px; transform: scale(0.9) translateY(10px); } .story-bubble.actor-sveta.active { transform: scale(1) translateY(0); opacity: 1; }
@@ -284,7 +253,6 @@ html:not(.dark) #discoBallGroup { display: none; }
 <a href="https://max.ru/join/xpn98S2KE1ueR2mjjDXeTPxt8N0roEbd_r1KT6Q-uGY" target="_blank" rel="noopener" onclick="playTickSound()" aria-label="Идеи" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 w-8 h-8 sm:w-auto sm:h-10 sm:px-3 rounded-xl shadow-sm border border-indigo-200 dark:border-indigo-800 flex items-center justify-center cursor-pointer tactile-btn shrink-0 transition-colors gap-1.5" title="Написать Максу (Идеи/Ошибки)"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><span class="hidden sm:block text-[11px] font-bold tracking-wide uppercase">Идеи</span></a>
 <button id="calendarBtn" onclick="openCalendarModal()" aria-label="Мои смены" class="bg-gray-100 dark:bg-slate-800 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-slate-700 w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn shrink-0" title="Мои смены"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></button>
 <button id="themeToggleBtn" onclick="toggleTheme()" aria-label="Сменить тему" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn shrink-0" title="Сменить тему"><svg id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></button>
-<a href="app.apk" download class="flex items-center justify-center gap-1 bg-[#004182] hover:bg-[#003366] text-white w-8 h-8 sm:w-auto sm:h-10 sm:px-3 rounded-xl shadow-[0_6px_15px_rgba(0,65,130,0.2)] transition-all tactile-btn cursor-pointer shrink-0" title="Скачать APK"><svg class="w-4 h-4 sm:w-4 sm:h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span class="hidden sm:block text-[11px] font-bold tracking-wide uppercase">APK</span></a>
 </div>
 </div>
 <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between transition-all duration-700 min-h-[85px]">
@@ -403,7 +371,7 @@ document.getElementById('selectedDayShifts').innerHTML = '<div class="text-cente
 document.getElementById('selectedDayTitle').innerHTML = '<span>Выберите день</span><span id="selectedDayCount"></span>';
 renderCalendar();
 };
-    function renderCalendar() {
+function renderCalendar() {
 document.getElementById('calendarMonthYear').innerText = `${monthNames[currentCalMonth]} ${currentCalYear}`;
 const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
 const firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
@@ -714,7 +682,7 @@ const rawData = `203	8092	ООО "Лента", 620000, Свердловская 
 206	8092	ООО "Лента", 622000, Свердловская обл., г. Нижний Тагил, Свердловское ш., д. 31	Нижний Тагил	08:00-12:00	-	-	Нет	08:00	23:00
 285	8092	ООО "Лента", 629803, Ямало-Ненецкий АО, г. Ноябрьск, мкр.Б-2А, ул. Цоя, д.22	Ноябрьск	08:00-13:00	-	-	Нет	07:00	23:00
 42	8092	ООО "Лента"  614097, г. Пермь, Парковый пр., д.66	Пермь	04:00-09:00	-	-	Да	Круглосуточно	Круглосуточно
-147	8092	ООО "Лента", 614065, г. Пермь, ш. Космонавтов, стр.162 б	Пермь	08:00-12:00	-	-	Да	Круглосуточно	Круглосуточно
+const rawDataPart2 = `147	8092	ООО "Лента", 614065, г. Пермь, ш. Космонавтов, стр.162 б	Пермь	08:00-12:00	-	-	Да	Круглосуточно	Круглосуточно
 235	8092	ООО "Лента", 614077, г. Пермь, б-р Гагарина, д.65	Пермь	06:00-11:00	-	-	Да	Круглосуточно	Круглосуточно
 297	8092	ООО "Лента", 614025, г. Пермь, ул. Героев Хасана, 105	Пермь	06:00-11:00	-	-	Да	Круглосуточно	Круглосуточно
 92	8092	ООО "Лента", 628403, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, ул. 30 лет Победы, д. 74	Сургут	04:00-09:00	-	-	Да	Круглосуточно	Круглосуточно
@@ -731,7 +699,7 @@ const rawData = `203	8092	ООО "Лента", 620000, Свердловская 
 154	8092	ООО "Лента", 454021, Челябинская обл., г. Челябинск, ул. Братьев Кашириных, д. 75	Челябинск	03:00-08:00	-	-	Да	Круглосуточно	Круглосуточно
 184	8092	ООО "Лента", 454004, Челябинская обл., г. Челябинск, ул. Академика Сахарова, д. 15	Челябинск	07:00-14:00	-	-	Нет	08:00	00:00
 212	8092	ООО "Лента", 454008, Челябинская обл., г. Челябинск, ул. Черкасская, д. 23	Челябинск	07:00-14:00	-	-	Нет	08:00	24:00
-213	8092	ООО "Лента", 454010, Челябинская обл., г. Челябинск, Копейское ш., д. 64	Челябинск	07:00-14:00	-	-	Нет	09:00	23:00
+   const rawDataPart3 = `213	8092	ООО "Лента", 454010, Челябинская обл., г. Челябинск, Копейское ш., д. 64	Челябинск	07:00-14:00	-	-	Нет	09:00	23:00
 301	8092	ООО "Лента", 454007, Челябинская обл., г. Челябинск, ул. Артиллерийская, д. 136	Челябинск	08:00-14:00	-	-	Нет	09:00	24:00
 335	8092	ООО "Лента", 454003, Челябинская область, г. Челябинск, ул. Братьев Кашириных, д. 133	Челябинск	07:00-14:00	-	-	Нет	08:00	23:00
 337	8092	ООО "Лента", 454100, Челябинская область, г. Челябинск, Комсомольский пр., д. 113	Челябинск	08:00-14:00	-	-	Нет	08:00	23:00
@@ -759,7 +727,8 @@ const rawData = `203	8092	ООО "Лента", 620000, Свердловская 
 8081	-	РЦ Молл, Радонежская улица, 15, Челябинск, 454036	Челябинск	-	-	-	Нет	-	-
 8082	-	РЦ Молл, Моховая улица, 7, Челябинск, 454005	Челябинск	-	-	-	Нет	-	-
 8083	-	РЦ Молл, шоссе Металлургов, 88, Челябинск, 454052	Челябинск	-	-	-	Нет	-	-`;
-    const storeCoords = {
+    const fullRawData = rawData + "\n" + rawDataPart2 + "\n" + rawDataPart3;
+const storeCoords = {
 '203': {lat: 56.8197, lon: 60.6728}, '227': {lat: 56.7865, lon: 60.5484}, '228': {lat: 56.8641, lon: 60.6111}, '229': {lat: 56.8858, lon: 60.5833},
 '230': {lat: 56.9015, lon: 60.6276}, '176': {lat: 56.4024, lon: 61.9429}, '309': {lat: 55.4363, lon: 65.3051}, '74': {lat: 53.4294, lon: 58.9818},
 '192': {lat: 53.3855, lon: 58.9806}, '317': {lat: 60.9587, lon: 76.5777}, '61': {lat: 57.8767, lon: 59.9866}, '206': {lat: 57.8631, lon: 60.0384},
@@ -778,7 +747,7 @@ const rawData = `203	8092	ООО "Лента", 620000, Свердловская 
 };
 let stores = [];
 const cityOrder = ["Все города", "Екатеринбург", "Березовский", "Каменск-Уральский", "Нижний Тагил", "Челябинск", "Магнитогорск", "Миасс", "Южноуральск", "Уфа", "Пермь", "Курган", "Тюмень", "Тобольск", "Ханты-Мансийск", "Нефтеюганск", "Сургут", "Ноябрьск", "Нижневартовск", "Новосибирск", "Москва", "Санкт-Петербург"];
-rawData.trim().split('\n').forEach((line, index) => {
+fullRawData.trim().split('\n').forEach((line, index) => {
 const cols = line.split('\t').map(c => c ? c.trim() : '-');
 if (cols.length >= 4) {
 stores.push({ id: 'store_' + index, tk: cols[0], route: cols[1], address: cols[2], city: cols[3], rc1: cols[4] || '-', is24_7: cols[7] === 'Да', start: cols[8] || '-', end: cols[9] || '-' });
@@ -843,25 +812,21 @@ return a.tk.localeCompare(b.tk, undefined, {numeric: true});
 '227': 'https://yandex.ru/maps/?um=constructor%3A585e886c013d87e06fac691aa947e6c165d773146047bb1343a571bdadfd4646&source=constructorLink',
 '203': 'https://yandex.ru/maps/?um=constructor%3Afbbd0b022ba16d28a9759e073e3de48d938f03a1cd710ca64ff5c6fad195da4f&source=constructorLink'
 };
-const techStations = [
-{ id: 'ts_1', type: 'КАФЕ', highway: 'Тюменский тракт', name: 'Кафе и Стоянка "У Михалыча"', address: 'Тюменский тракт, 45 км (Пример)', desc: 'Отличная еда, большая асфальтированная стоянка. Душ 150р.', lat: 56.7501, lon: 61.1205, is24_7: true, city: 'Екатеринбург' },
-{ id: 'ts_2', type: 'ШИНОМОНТАЖ', highway: 'Челябинский тракт', name: 'Грузовой 24/7', address: 'ЕКАД, 12 км (возле Березовского)', desc: 'Быстро переобуют, безнал принимают. Кофе автомат.', lat: 56.9102, lon: 60.8011, is24_7: true, city: 'Березовский' },
-{ id: 'ts_3', type: 'АВТОМОЙКА', highway: 'Пермский тракт', name: 'Мойка "Дальнобой"', address: 'Челябинский тракт, 20 км', desc: 'Влезает фура целиком. Моют химией хорошо.', lat: 56.6500, lon: 60.7500, is24_7: false, start: '08:00', end: '22:00', city: 'Екатеринбург' },
-{ id: 'ts_4', type: 'СТОЯНКА', highway: 'Пермский тракт', name: 'Бесплатный карман', address: 'Пермский тракт, 60 км', desc: 'Удобный съезд, есть эстакада, рядом заправка.', lat: 56.8200, lon: 60.0500, is24_7: true, city: 'Первоуральск' },
-{ id: 'ts_5', type: 'СТОЯНКА', highway: 'Тюменский тракт', name: 'Стоянка "Березка"', address: 'Тюменский тракт, 120 км', desc: 'Охраняемая стоянка, есть туалет и магазин.', lat: 56.9200, lon: 65.1000, is24_7: true, city: 'Тюмень' },
-{ id: 'ts_6', type: 'ШИНОМОНТАЖ', highway: 'Челябинский тракт', name: 'Шиномонтаж "Колесо"', address: 'Челябинский тракт, 35 км', desc: 'Ремонт проколов, грузовые шины.', lat: 56.5000, lon: 60.8000, is24_7: false, start: '09:00', end: '21:00', city: 'Челябинск' }
-];
+// ПУСТОЙ МАССИВ ТЕХПОМОЩИ, так как примеры удалены
+const techStations = [];
 const highways = ['Все трассы', 'Тюменский тракт', 'Челябинский тракт', 'Пермский тракт'];
 let userLocation = null; let isSortedByDistance = false;
-    async function fetchWeather(lat, lon) {
+async function fetchWeather(lat, lon) {
 try {
-const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`);
 const data = await res.json();
-if (data.current_weather) return Math.round(data.current_weather.temperature);
+if (data.current && data.current.temperature_2m !== undefined) {
+return Math.round(data.current.temperature_2m);
+}
 } catch(e) {}
 return null;
 }
-window.toggleOpenNow = function() {
+    window.toggleOpenNow = function() {
 playTickSound(); isOpenNowFilter = !isOpenNowFilter;
 const btn = document.getElementById('openNowBtn');
 if (isOpenNowFilter) { btn.classList.add('bg-emerald-100', 'text-emerald-700'); }
@@ -915,7 +880,7 @@ const textArea = document.createElement("textarea"); textArea.value = text; text
 try { document.execCommand('copy'); showToast("Скопировано 📋"); } catch (err) { showToast("Ошибка копирования 😔"); }
 document.body.removeChild(textArea);
 }
-    window.sortByNearest = function() {
+window.sortByNearest = function() {
 playTickSound(); const nearestBtn = document.getElementById('nearestBtn');
 if (isSortedByDistance) { isSortedByDistance = false; nearestBtn.classList.remove('bg-emerald-100', 'text-emerald-700'); nearestBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-emerald-500'); renderCards(); return; }
 if (!navigator.geolocation) { showToast("Геолокация не поддерживается 😔"); return; }
@@ -952,7 +917,7 @@ let total = 0; Object.values(myShifts).forEach(arr => total += arr.length);
 if (total === 1) showToast("🏆 Ачивка: Первый рейс!");
 else if (total === 10) showToast("🏆 Ачивка: 10 рейсов отмечено!");
 else if (total === 50) showToast("🏆 Ачивка: 50 рейсов! Профи!");
-    }
+}
     function createTechTruckButton() {
 const btn = document.createElement('button'); btn.setAttribute('data-city', 'TECH_SUPPORT'); btn.className = `truck-chip group flex items-end shrink-0 cursor-pointer`;
 const cabHtml = `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-orange-500 border-y border-r border-b-2 border-orange-700 shadow-md rounded-tr-lg rounded-br-sm relative ml-[1px] z-20"><div class="siren-orange"></div><div class="headlight-beam" style="top: 20px; right: -45px;"></div><div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-md border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`;
@@ -993,7 +958,7 @@ const cardsGrid = document.getElementById('cardsGrid');
 const searchInput = document.getElementById('searchInput');
 const clearSearchBtn = document.getElementById('clearSearchBtn');
 const autocompleteList = document.getElementById('autocompleteList');
-    function renderCards() {
+function renderCards() {
 const rawSearch = searchInput.value.toLowerCase().trim();
 const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
 if (cleanSearchQuery) clearSearchBtn.classList.remove('hidden'); else clearSearchBtn.classList.add('hidden');
@@ -1101,7 +1066,7 @@ el.style.display = 'none';
 }
 });
 }
-    }
+}
     searchInput.addEventListener('input', function() {
 renderCards(); const raw = this.value.toLowerCase().trim(); autocompleteList.innerHTML = ''; 
 if (!raw) { autocompleteList.classList.add('hidden'); return; }
