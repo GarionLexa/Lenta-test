@@ -55,7 +55,7 @@ color: #1F2937;
 font-family: 'Inter', sans-serif;
 -webkit-tap-highlight-color: transparent;
 width: 100%;
-overflow-x: clip;
+overflow-x: hidden;
 padding-bottom: env(safe-area-inset-bottom);
 transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -103,6 +103,53 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 .sky-night { background: linear-gradient(to bottom, #0f172a 0%, #1e1b4b 100%); opacity: 0; z-index: 3;}
 .sky-stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 4; background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px), radial-gradient(#ffffff 1px, transparent 1px); background-size: 50px 50px; background-position: 0 0, 25px 25px; opacity: 0; transition: opacity 0.2s ease-out; }
 .celestial-body { position: absolute; border-radius: 50%; transition: transform 0.2s ease-out, opacity 0.2s ease-out; will-change: transform; z-index: 5; }
+
+/* ===== РАДАР для кнопки "Ближайшие ко мне" ===== */
+#nearestBtn.geo-active {
+  background-color: #d1fae5 !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+}
+.dark #nearestBtn.geo-active {
+  background-color: rgba(6, 78, 59, 0.5) !important;
+  color: #34d399 !important;
+}
+#nearestBtn.geo-searching {
+  position: relative;
+  isolation: isolate;
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+  cursor: wait;
+  pointer-events: none;
+}
+#nearestBtn.geo-searching svg {
+  color: #ffffff;
+  animation: geoIconPulse 1.2s ease-in-out infinite;
+}
+#nearestBtn.geo-searching::before,
+#nearestBtn.geo-searching::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid #10b981;
+  animation: radarPing 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+#nearestBtn.geo-searching::after {
+  animation-delay: 0.9s;
+}
+@keyframes radarPing {
+  0%   { transform: scale(1);   opacity: 1;   }
+  70%  { opacity: 0.5; }
+  100% { transform: scale(2.4); opacity: 0;   }
+}
+@keyframes geoIconPulse {
+  0%, 100% { transform: scale(1);    }
+  50%      { transform: scale(1.15); }
+}
 </style>
 <style>
 .parallax-layer { position: absolute; top: 0; left: 0; width: 1000vw; height: 100%; background-repeat: repeat-x; background-position: bottom left; will-change: transform; }
@@ -117,13 +164,24 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 </style>
 <style>
 .parallax-signs { position: absolute; bottom: 18px; left: 0; width: 3000vw; height: 40px; z-index: 9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='40' viewBox='0 0 1500 40'%3E%3Cg transform='translate(50,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='1,1 19,1 10,18' fill='white' stroke='%23ef4444' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2200' height='40' viewBox='0 0 2200 40'%3E%3Cg transform='translate(800,0)'%3E%3Crect x='9' y='10' width='2' height='30' fill='%23475569'/%3E%3Cpolygon points='10,1 19,10 10,19 1,10' fill='%23fde047' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"); background-size: 1500px 40px, 2200px 40px; background-repeat: repeat-x; will-change: transform; }
+.police-car { position: absolute; bottom: 4px; left: 120vw; width: 60px; height: 20px; background: linear-gradient(to right, #1e293b 25%, #ffffff 25%, #ffffff 75%, #1e293b 75%); border-radius: 4px 4px 10px 6px; z-index: 25; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transform: scaleX(-1); }
+.police-car.active { display: block; animation: driveOpposite 4.5s linear forwards; }
+.police-siren-red { position: absolute; top: -5px; left: 25px; width: 6px; height: 5px; border-radius: 2px; animation: sirenRed 0.6s infinite; }
+.police-siren-blue { position: absolute; top: -5px; left: 15px; width: 6px; height: 5px; border-radius: 2px; animation: sirenBlue 0.6s infinite; }
+@keyframes sirenRed { 0%, 49% { box-shadow: 0 0 16px 6px rgba(239, 68, 68, 0.95); background: #f87171; } 50%, 100% { box-shadow: none; background: #991b1b; } }
+@keyframes sirenBlue { 0%, 49% { box-shadow: none; background: #1e3a8a; } 50%, 100% { box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.95); background: #60a5fa; } }
+@keyframes driveOpposite { 0% { left: 120vw; } 100% { left: -150px; } }
 .city-slider { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; height: 100%; align-items: flex-end; padding-bottom: 2px; padding-left: 10px; }
 .city-slider::-webkit-scrollbar { display: none; }
+</style>
+<style>
 .truck-chip { outline: none; opacity: 0.9; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-right: 20px; }
 .truck-chip.active { opacity: 1; transform: scale(1.03) translateY(-2px); z-index: 30; }
 .truck-wrapper { filter: brightness(var(--truck-body-brightness)); transition: filter 0.2s ease-out; }
 @keyframes truckBump { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-2px); } }
 .auto-driving .truck-wrapper { animation: truckBump var(--bump-dur, 1.2s) ease-in-out infinite var(--bump-del, 0s); }
+.siren-orange { position: absolute; top: -5px; left: 10px; width: 10px; height: 5px; border-radius: 3px 3px 0 0; background: #f59e0b; animation: flashOrange 0.6s infinite alternate; z-index: 30; }
+@keyframes flashOrange { 0% { box-shadow: 0 0 10px 3px rgba(251, 191, 36, 0.8); background: #fbbf24; } 100% { box-shadow: 0 0 25px 10px rgba(245, 158, 11, 1); background: #d97706; } }
 .headlight-beam { position: absolute; width: 70px; height: 20px; background: linear-gradient(to right, rgba(253,224,71,0.95), transparent); transform: skewX(-15deg); opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 50%; filter: blur(2px); z-index: 50; pointer-events: none; }
 .tail-light { position: absolute; bottom: 4px; left: -1px; width: 3px; height: 8px; background-color: #ef4444; box-shadow: 0 0 12px 3px rgba(239,68,68,0.95); opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 2px; z-index: 20; }
 .marker-light { position: absolute; top: 2px; width: 4px; height: 2px; background-color: #fde047; box-shadow: 0 0 8px 2px rgba(253,224,71,0.9); opacity: var(--truck-light-opacity); transition: opacity 0.3s; border-radius: 1px; }
@@ -146,6 +204,26 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 .sweat-drop { opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(-5px); }
 .show-sweat { opacity: 1; transform: translateY(0); animation: dripDown 1.5s forwards; }
 @keyframes dripDown { 0% { transform: translateY(0); opacity: 1;} 100% { transform: translateY(10px); opacity: 0; } }
+</style>
+<style>
+.party-mode .dancing-scene { display: block; } .party-mode .normal-scenes { display: none; }
+.normal-mode .dancing-scene { display: none; } .normal-mode .normal-scenes { display: block; }
+#discoBallGroup { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.normal-mode #discoBallGroup { transform: translateY(-60px); } .party-mode #discoBallGroup { transform: translateY(0); }
+html:not(.dark) #discoBallGroup { display: none; }
+.disco-rays { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
+.dark .party-mode .disco-rays { opacity: 0.85; animation: sweepRays 3s ease-in-out infinite alternate; transform-origin: 120px 5px; }
+@keyframes sweepRays { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
+.dance-jump { animation: raveJump 0.4s infinite alternate ease-in-out; }
+@keyframes raveJump { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(-4px) scaleY(1.05); } }
+.dance-sway { animation: discoSway 0.5s infinite alternate ease-in-out; }
+@keyframes discoSway { 0% { transform: translateX(-3px) rotate(-5deg); } 100% { transform: translateX(3px) rotate(5deg); } }
+.dance-arms-wave { animation: waveArms 0.4s infinite alternate ease-in-out; }
+@keyframes waveArms { 0% { transform: rotate(-20deg); } 100% { transform: rotate(20deg); } }
+.dance-arm-point { animation: discoPoint 0.5s infinite alternate ease-in-out; }
+@keyframes discoPoint { 0% { transform: rotate(-45deg); } 100% { transform: rotate(15deg); } }
+.music-notes text { animation: floatNote 1.2s infinite linear; opacity: 0; } .music-notes text:nth-child(2) { animation-delay: 0.6s; }
+@keyframes floatNote { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15px) scale(1.2); } }
 .story-bubble { position: absolute; background: white; border: 2px solid #e2e8f0; color: #1e293b; font-size: 10px; font-weight: 800; padding: 6px 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); opacity: 0; pointer-events: none; z-index: 1000; max-width: 140px; text-align: center; line-height: 1.2; white-space: normal; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .dark .story-bubble { background: #1e293b; border-color: #475569; color: #f1f5f9; }
 .story-bubble.actor-sveta { bottom: 85%; left: 0px; transform: scale(0.9) translateY(10px); } .story-bubble.actor-sveta.active { transform: scale(1) translateY(0); opacity: 1; }
@@ -253,6 +331,7 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 <a href="https://max.ru/join/xpn98S2KE1ueR2mjjDXeTPxt8N0roEbd_r1KT6Q-uGY" target="_blank" rel="noopener" onclick="playTickSound()" aria-label="Идеи" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 w-8 h-8 sm:w-auto sm:h-10 sm:px-3 rounded-xl shadow-sm border border-indigo-200 dark:border-indigo-800 flex items-center justify-center cursor-pointer tactile-btn shrink-0 transition-colors gap-1.5" title="Написать Максу (Идеи/Ошибки)"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg><span class="hidden sm:block text-[11px] font-bold tracking-wide uppercase">Идеи</span></a>
 <button id="calendarBtn" onclick="openCalendarModal()" aria-label="Мои смены" class="bg-gray-100 dark:bg-slate-800 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-slate-700 w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn shrink-0" title="Мои смены"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></button>
 <button id="themeToggleBtn" onclick="toggleTheme()" aria-label="Сменить тему" class="bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer tactile-btn shrink-0" title="Сменить тему"><svg id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></button>
+<a href="app.apk" download class="flex items-center justify-center gap-1 bg-[#004182] hover:bg-[#003366] text-white w-8 h-8 sm:w-auto sm:h-10 sm:px-3 rounded-xl shadow-[0_6px_15px_rgba(0,65,130,0.2)] transition-all tactile-btn cursor-pointer shrink-0" title="Скачать APK"><svg class="w-4 h-4 sm:w-4 sm:h-4 text-lentaYellow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span class="hidden sm:block text-[11px] font-bold tracking-wide uppercase">APK</span></a>
 </div>
 </div>
 <div id="controlPanel" class="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 py-3 px-4 relative flex items-center justify-between transition-all duration-700 min-h-[85px]">
@@ -284,9 +363,8 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 <button id="clearSearchBtn" onclick="clearSearch();" class="hidden absolute right-2 top-2 text-gray-400 hover:text-gray-700 bg-white dark:bg-slate-700 p-1 rounded-full shadow-sm cursor-pointer tactile-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
 <div id="autocompleteList" class="absolute z-[100] w-full bg-white dark:bg-slate-800 rounded-xl hidden max-h-[40vh] overflow-y-auto mt-2 text-left text-gray-800 dark:text-gray-200 shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-slate-700 hide-scrollbar"></div>
 </div>
-<button id="openNowBtn" onclick="toggleOpenNow()" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-slate-700 w-11 h-11 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 cursor-pointer tactile-btn transition-all duration-300" title="Открыто сейчас"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
-<button id="nearestBtn" onclick="sortByNearest();" class="bg-white dark:bg-slate-800 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 w-11 h-11 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 cursor-pointer tactile-btn transition-all duration-300" title="Ближайшие ко мне"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
 <button id="voiceSearchBtn" onclick="startVoiceSearch();" class="bg-white dark:bg-slate-800 text-lentaBlue dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 w-11 h-11 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 cursor-pointer tactile-btn transition-all duration-300" title="Голосовой поиск"><svg id="micIcon" class="w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button>
+<button id="nearestBtn" onclick="sortByNearest();" class="bg-white dark:bg-slate-800 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-700 w-11 h-11 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 cursor-pointer tactile-btn transition-all duration-300" title="Ближайшие ко мне"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
 </div>
 <div class="relative overflow-hidden rounded-[16px] shadow-[inset_0_4px_15px_rgba(0,0,0,0.05)] border border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-900">
 <div class="scenic-bg group">
@@ -340,7 +418,7 @@ if (!document.getElementById('calendarModal').classList.contains('hidden')) {
 renderCalendar(); showDayShifts(today);
 }
 };
-    window.addManualShift = function() {
+window.addManualShift = function() {
 if (!selectedDate) { showToast("Сначала выберите день в календаре 📅"); return; }
 const timeInput = document.getElementById('manualTime').value;
 const commentInput = document.getElementById('manualComment').value.trim();
@@ -354,7 +432,7 @@ renderCalendar(); showDayShifts(selectedDate);
 checkAchievements();
 };
 function saveShifts() { try { localStorage.setItem('lenta_shifts_v1', JSON.stringify(myShifts)); } catch(e) {} }
-window.openCalendarModal = function() {
+    window.openCalendarModal = function() {
 playTickSound();
 document.getElementById('calendarModal').classList.remove('hidden');
 const today = new Date();
@@ -396,7 +474,7 @@ grid.innerHTML += `<div onclick="selectDate('${dateStr}')" class="${classes}"><s
 }
 }
 window.selectDate = function(dateStr) { playTickSound(); selectedDate = dateStr; renderCalendar(); showDayShifts(dateStr); };
-    window.showDayShifts = function(dateStr) {
+window.showDayShifts = function(dateStr) {
 if (!dateStr) return;
 const parts = dateStr.split('-');
 document.getElementById('selectedDayTitle').innerHTML = `<span>${parts[2]}.${parts[1]}.${parts[0]}</span><span id="selectedDayCount" class="text-purple-600 dark:text-purple-400">${myShifts[dateStr] ? myShifts[dateStr].length + ' рейс(ов)' : ''}</span>`;
@@ -509,7 +587,7 @@ if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
 }
 });
-    let audioCtx = null; let engineOsc = null; let engineGain = null; let isAudioUnlocked = false;
+let audioCtx = null; let engineOsc = null; let engineGain = null; let isAudioUnlocked = false;
 function unlockAudio() {
 if (isAudioUnlocked) return;
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -561,7 +639,7 @@ citySlider.addEventListener('mouseleave', () => { isMouseDown = false; citySlide
 citySlider.addEventListener('mouseup', () => { isMouseDown = false; citySlider.style.cursor = 'grab'; });
 citySlider.addEventListener('mousemove', (e) => { if (!isMouseDown || isMusicPlaying) return; e.preventDefault(); const x = e.pageX - citySlider.offsetLeft; const walk = (x - startX) * 2; citySlider.scrollLeft = scrollLeftPos - walk; });
 citySlider.style.cursor = 'grab';
-    let lastLogoTapTime = 0; let logoTapTimeout;
+let lastLogoTapTime = 0; let logoTapTimeout;
 function handleLogoTap() {
 unlockAudio(); const now = Date.now();
 if (now - lastLogoTapTime < 400) { clearTimeout(logoTapTimeout); fullStopMusic(); } 
@@ -592,8 +670,7 @@ const mechSvg = document.getElementById('mechanicSvgElement');
 mechSvg.classList.remove('party-mode'); mechSvg.classList.add('normal-mode');
 stopAutoScroll(); resetTrucksToStart(); startStoryTimer(); 
 selectedCityFilter = 'all'; isTechMode = false; renderCards();
-}
-function resetTrucksToStart() {
+                    function resetTrucksToStart() {
 buildCitySlider(); citySlider.scrollLeft = 0; virtualScrollX = 0;
 window.fractionalScroll = 0; lastActualScrollLeft = 0; updateParallax(0);
 }
@@ -608,7 +685,7 @@ lastSliderScrollTime = now; updateParallax(virtualScrollX);
 }
 lastActualScrollLeft = currentScroll;
 }, { passive: true });
-    function startAutoScroll() { if (!autoScrollAnimationId) { lastActualScrollLeft = citySlider.scrollLeft; citySlider.classList.add('auto-driving'); autoScrollLoop(); } }
+function startAutoScroll() { if (!autoScrollAnimationId) { lastActualScrollLeft = citySlider.scrollLeft; citySlider.classList.add('auto-driving'); autoScrollLoop(); } }
 function stopAutoScroll() { if (autoScrollAnimationId) { cancelAnimationFrame(autoScrollAnimationId); autoScrollAnimationId = null; } citySlider.classList.remove('auto-driving'); if (engineGain) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2); document.getElementById('policeCar').classList.remove('active'); }
 let policeTimer = 0;
 function autoScrollLoop() {
@@ -652,7 +729,7 @@ window.openMonetkaModal = function() { document.getElementById('monetkaModal').c
 window.closeMonetkaModal = function() { document.getElementById('monetkaModal').classList.add('hidden'); };
 window.closeGeoModal = function() { document.getElementById('geoModal').classList.add('hidden'); };
 window.showGeoModal = function() { document.getElementById('geoModal').classList.remove('hidden'); };
-    function showToast(message) {
+function showToast(message) {
 let toast = document.getElementById('toast-notification');
 toast.innerHTML = message; void toast.offsetWidth; 
 toast.classList.remove('opacity-0', 'scale-95'); toast.classList.add('opacity-100', 'scale-100');
@@ -682,7 +759,7 @@ const rawData = `203	8092	ООО "Лента", 620000, Свердловская 
 206	8092	ООО "Лента", 622000, Свердловская обл., г. Нижний Тагил, Свердловское ш., д. 31	Нижний Тагил	08:00-12:00	-	-	Нет	08:00	23:00
 285	8092	ООО "Лента", 629803, Ямало-Ненецкий АО, г. Ноябрьск, мкр.Б-2А, ул. Цоя, д.22	Ноябрьск	08:00-13:00	-	-	Нет	07:00	23:00
 42	8092	ООО "Лента"  614097, г. Пермь, Парковый пр., д.66	Пермь	04:00-09:00	-	-	Да	Круглосуточно	Круглосуточно
-const rawDataPart2 = `147	8092	ООО "Лента", 614065, г. Пермь, ш. Космонавтов, стр.162 б	Пермь	08:00-12:00	-	-	Да	Круглосуточно	Круглосуточно
+147	8092	ООО "Лента", 614065, г. Пермь, ш. Космонавтов, стр.162 б	Пермь	08:00-12:00	-	-	Да	Круглосуточно	Круглосуточно
 235	8092	ООО "Лента", 614077, г. Пермь, б-р Гагарина, д.65	Пермь	06:00-11:00	-	-	Да	Круглосуточно	Круглосуточно
 297	8092	ООО "Лента", 614025, г. Пермь, ул. Героев Хасана, 105	Пермь	06:00-11:00	-	-	Да	Круглосуточно	Круглосуточно
 92	8092	ООО "Лента", 628403, Ханты-Мансийский Автономный округ - Югра АО, г. Сургут, ул. 30 лет Победы, д. 74	Сургут	04:00-09:00	-	-	Да	Круглосуточно	Круглосуточно
@@ -699,7 +776,7 @@ const rawDataPart2 = `147	8092	ООО "Лента", 614065, г. Пермь, ш. 
 154	8092	ООО "Лента", 454021, Челябинская обл., г. Челябинск, ул. Братьев Кашириных, д. 75	Челябинск	03:00-08:00	-	-	Да	Круглосуточно	Круглосуточно
 184	8092	ООО "Лента", 454004, Челябинская обл., г. Челябинск, ул. Академика Сахарова, д. 15	Челябинск	07:00-14:00	-	-	Нет	08:00	00:00
 212	8092	ООО "Лента", 454008, Челябинская обл., г. Челябинск, ул. Черкасская, д. 23	Челябинск	07:00-14:00	-	-	Нет	08:00	24:00
-   const rawDataPart3 = `213	8092	ООО "Лента", 454010, Челябинская обл., г. Челябинск, Копейское ш., д. 64	Челябинск	07:00-14:00	-	-	Нет	09:00	23:00
+213	8092	ООО "Лента", 454010, Челябинская обл., г. Челябинск, Копейское ш., д. 64	Челябинск	07:00-14:00	-	-	Нет	09:00	23:00
 301	8092	ООО "Лента", 454007, Челябинская обл., г. Челябинск, ул. Артиллерийская, д. 136	Челябинск	08:00-14:00	-	-	Нет	09:00	24:00
 335	8092	ООО "Лента", 454003, Челябинская область, г. Челябинск, ул. Братьев Кашириных, д. 133	Челябинск	07:00-14:00	-	-	Нет	08:00	23:00
 337	8092	ООО "Лента", 454100, Челябинская область, г. Челябинск, Комсомольский пр., д. 113	Челябинск	08:00-14:00	-	-	Нет	08:00	23:00
@@ -726,9 +803,8 @@ const rawDataPart2 = `147	8092	ООО "Лента", 614065, г. Пермь, ш. 
 929100	-	РЦ "Монетка", Санкт-Петербург, Невский район, исторический район Стеклянный Городок	Санкт-Петербург	-	-	-	Нет	-	-
 8081	-	РЦ Молл, Радонежская улица, 15, Челябинск, 454036	Челябинск	-	-	-	Нет	-	-
 8082	-	РЦ Молл, Моховая улица, 7, Челябинск, 454005	Челябинск	-	-	-	Нет	-	-
-8083	-	РЦ Молл, шоссе Металлургов, 88, Челябинск, 454052	Челябинск	-	-	-	Нет	-	-`;
-    const fullRawData = rawData + "\n" + rawDataPart2 + "\n" + rawDataPart3;
-const storeCoords = {
+8083	-	РЦ Молл, шоссе Металлургов, 88, Челябинск, 454052	Челябинск	-	-	-	Нет	-	-`;}
+    const storeCoords = {
 '203': {lat: 56.8197, lon: 60.6728}, '227': {lat: 56.7865, lon: 60.5484}, '228': {lat: 56.8641, lon: 60.6111}, '229': {lat: 56.8858, lon: 60.5833},
 '230': {lat: 56.9015, lon: 60.6276}, '176': {lat: 56.4024, lon: 61.9429}, '309': {lat: 55.4363, lon: 65.3051}, '74': {lat: 53.4294, lon: 58.9818},
 '192': {lat: 53.3855, lon: 58.9806}, '317': {lat: 60.9587, lon: 76.5777}, '61': {lat: 57.8767, lon: 59.9866}, '206': {lat: 57.8631, lon: 60.0384},
@@ -747,7 +823,7 @@ const storeCoords = {
 };
 let stores = [];
 const cityOrder = ["Все города", "Екатеринбург", "Березовский", "Каменск-Уральский", "Нижний Тагил", "Челябинск", "Магнитогорск", "Миасс", "Южноуральск", "Уфа", "Пермь", "Курган", "Тюмень", "Тобольск", "Ханты-Мансийск", "Нефтеюганск", "Сургут", "Ноябрьск", "Нижневартовск", "Новосибирск", "Москва", "Санкт-Петербург"];
-fullRawData.trim().split('\n').forEach((line, index) => {
+rawData.trim().split('\n').forEach((line, index) => {
 const cols = line.split('\t').map(c => c ? c.trim() : '-');
 if (cols.length >= 4) {
 stores.push({ id: 'store_' + index, tk: cols[0], route: cols[1], address: cols[2], city: cols[3], rc1: cols[4] || '-', is24_7: cols[7] === 'Да', start: cols[8] || '-', end: cols[9] || '-' });
@@ -759,7 +835,7 @@ if (indexA === -1) indexA = 999; if (indexB === -1) indexB = 999;
 if (indexA !== indexB) return indexA - indexB;
 return a.tk.localeCompare(b.tk, undefined, {numeric: true});
 });
-    const customRoutes = {
+const customRoutes = {
 '317': 'https://yandex.ru/maps/?um=constructor%3A5f0fb3706ed1ecc385fdf70ddc878fc1b9ed849e91bb04e5cd628df6fb1a899f&source=constructorLink',
 '368': 'https://yandex.ru/maps/?um=constructor%3A151b677d3b24e5df2ebe6b33ae80a1f4be00314930619040658a6cd4a76487a8&source=constructorLink',
 '94': 'https://yandex.ru/maps/?um=constructor%3A80d2266d0be153d3f15728239c6084256047cb996bd39ac8fc4f78b2d51a904b&source=constructorLink',
@@ -812,27 +888,59 @@ return a.tk.localeCompare(b.tk, undefined, {numeric: true});
 '227': 'https://yandex.ru/maps/?um=constructor%3A585e886c013d87e06fac691aa947e6c165d773146047bb1343a571bdadfd4646&source=constructorLink',
 '203': 'https://yandex.ru/maps/?um=constructor%3Afbbd0b022ba16d28a9759e073e3de48d938f03a1cd710ca64ff5c6fad195da4f&source=constructorLink'
 };
-// ПУСТОЙ МАССИВ ТЕХПОМОЩИ, так как примеры удалены
-const techStations = [];
+const techStations = [
+{ id: 'ts_1', type: 'КАФЕ', highway: 'Тюменский тракт', name: 'Кафе и Стоянка "У Михалыча"', address: 'Тюменский тракт, 45 км (Пример)', desc: 'Отличная еда, большая асфальтированная стоянка. Душ 150р.', lat: 56.7501, lon: 61.1205, is24_7: true, city: 'Екатеринбург' },
+{ id: 'ts_2', type: 'ШИНОМОНТАЖ', highway: 'Челябинский тракт', name: 'Грузовой 24/7', address: 'ЕКАД, 12 км (возле Березовского)', desc: 'Быстро переобуют, безнал принимают. Кофе автомат.', lat: 56.9102, lon: 60.8011, is24_7: true, city: 'Березовский' },
+{ id: 'ts_3', type: 'АВТОМОЙКА', highway: 'Пермский тракт', name: 'Мойка "Дальнобой"', address: 'Челябинский тракт, 20 км', desc: 'Влезает фура целиком. Моют химией хорошо.', lat: 56.6500, lon: 60.7500, is24_7: false, start: '08:00', end: '22:00', city: 'Екатеринбург' },
+{ id: 'ts_4', type: 'СТОЯНКА', highway: 'Пермский тракт', name: 'Бесплатный карман', address: 'Пермский тракт, 60 км', desc: 'Удобный съезд, есть эстакада, рядом заправка.', lat: 56.8200, lon: 60.0500, is24_7: true, city: 'Первоуральск' },
+{ id: 'ts_5', type: 'СТОЯНКА', highway: 'Тюменский тракт', name: 'Стоянка "Березка"', address: 'Тюменский тракт, 120 км', desc: 'Охраняемая стоянка, есть туалет и магазин.', lat: 56.9200, lon: 65.1000, is24_7: true, city: 'Тюмень' },
+{ id: 'ts_6', type: 'ШИНОМОНТАЖ', highway: 'Челябинский тракт', name: 'Шиномонтаж "Колесо"', address: 'Челябинский тракт, 35 км', desc: 'Ремонт проколов, грузовые шины.', lat: 56.5000, lon: 60.8000, is24_7: false, start: '09:00', end: '21:00', city: 'Челябинск' }
+];
 const highways = ['Все трассы', 'Тюменский тракт', 'Челябинский тракт', 'Пермский тракт'];
 let userLocation = null; let isSortedByDistance = false;
 async function fetchWeather(lat, lon) {
 try {
-const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`);
+const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
 const data = await res.json();
-if (data.current && data.current.temperature_2m !== undefined) {
-return Math.round(data.current.temperature_2m);
-}
+if (data.current_weather) return Math.round(data.current_weather.temperature);
 } catch(e) {}
 return null;
+          // ===== КЭШ ПОГОДЫ: 1 запрос на город, кэш на 3 часа =====
+// Хочешь реже обновлять — увеличь WEATHER_TTL_MS (мс). Например 6ч = 6*60*60*1000
+const WEATHER_TTL_MS = 3 * 60 * 60 * 1000;
+const weatherCache = (() => {
+  try { return JSON.parse(localStorage.getItem('lenta_weather_cache_v1')) || {}; } catch(e) { return {}; }
+})();
+const weatherInFlight = {};
+function weatherCacheKey(lat, lon, city) {
+  if (city) return 'city_' + city;
+  return `${lat.toFixed(1)}_${lon.toFixed(1)}`;
 }
-    window.toggleOpenNow = function() {
-playTickSound(); isOpenNowFilter = !isOpenNowFilter;
-const btn = document.getElementById('openNowBtn');
-if (isOpenNowFilter) { btn.classList.add('bg-emerald-100', 'text-emerald-700'); }
-else { btn.classList.remove('bg-emerald-100', 'text-emerald-700'); }
-renderCards();
-};
+function weatherCacheSave() {
+  try { localStorage.setItem('lenta_weather_cache_v1', JSON.stringify(weatherCache)); } catch(e) {}
+}
+async function getWeatherCached(city, lat, lon) {
+  const key = weatherCacheKey(lat, lon, city);
+  const now = Date.now();
+  const entry = weatherCache[key];
+  if (entry && (now - entry.ts) <= WEATHER_TTL_MS) return entry.temp;
+  if (weatherInFlight[key]) return weatherInFlight[key];
+  const p = (async () => {
+    try {
+      const t = await fetchWeather(lat, lon);
+      if (t !== null) {
+        weatherCache[key] = { temp: t, ts: Date.now() };
+        weatherCacheSave();
+        return t;
+      }
+      return entry ? entry.temp : null;
+    } finally { delete weatherInFlight[key]; }
+  })();
+  weatherInFlight[key] = p;
+  return p;
+}
+// ===== /КЭШ ПОГОДЫ =====
+
 window.clearSearch = function() { searchInput.value = ''; clearSearchBtn.classList.add('hidden'); autocompleteList.classList.add('hidden'); renderCards(); };
 window.closeCard = function(btn) { playTickSound(); if (searchInput.value.trim() !== '') clearSearch(); else { const card = btn.closest('.store-card'); if (card) card.style.display = 'none'; } };
 window.filterByTechSupport = function() {
@@ -847,7 +955,7 @@ try { localStorage.setItem('lenta_city_filter', city); } catch(e) {}
 document.querySelectorAll('.truck-chip').forEach(el => { if (el.getAttribute('data-city') === city) { el.classList.add('active'); if (!isMusicPlaying) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); } else el.classList.remove('active'); });
 window.scrollTo({ top: 0, behavior: 'smooth' }); renderCards();
 };
-    function getSmartNavQuery(city, address) {
+function getSmartNavQuery(city, address) {
 let text = address.replace(/ООО ["']?Лента["']?,?/gi, '').replace(/ООО ОКЕЙ,?/gi, '').replace(/РЦ ["']?Монетка["']?,?/gi, '').replace(/РЦ Молл,?/gi, '').replace(/\b\d{6}\b,?/g, '');
 text = text.replace(/Свердловская обл(?:асть|\.)?,?/gi, '').replace(/Тюменская обл(?:асть|\.)?,?/gi, '').replace(/Челябинская обл(?:асть|\.)?,?/gi, '').replace(/Курганская обл(?:асть|\.)?,?/gi, '').replace(/Ханты-?Мансийский Автономный округ.*?АО,?/gi, '').replace(/Ханты-Мансийский Автономный округ - Югра,?/gi, '').replace(/Ямало-Ненецкий АО,?/gi, '').replace(/Пермский край,?/gi, '').replace(/город Екатеринбург г\.о\.?,?/gi, '').replace(/Екатеринбург г\.о\.?,?/gi, '').replace(/г\.о\.,?/gi, '');
 text = text.replace(/г\.\s*[А-Яа-я-]+,?/g, '').replace(new RegExp(`\\b${city}\\b,`, 'gi'), '').replace(/[\/\\]/g, ' ').replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
@@ -881,15 +989,34 @@ try { document.execCommand('copy'); showToast("Скопировано 📋"); } 
 document.body.removeChild(textArea);
 }
 window.sortByNearest = function() {
-playTickSound(); const nearestBtn = document.getElementById('nearestBtn');
-if (isSortedByDistance) { isSortedByDistance = false; nearestBtn.classList.remove('bg-emerald-100', 'text-emerald-700'); nearestBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-emerald-500'); renderCards(); return; }
-if (!navigator.geolocation) { showToast("Геолокация не поддерживается 😔"); return; }
-nearestBtn.classList.add('animate-pulse');
-navigator.geolocation.getCurrentPosition((position) => {
-userLocation = { lat: position.coords.latitude, lon: position.coords.longitude }; isSortedByDistance = true;
-nearestBtn.classList.remove('animate-pulse', 'bg-white', 'text-emerald-500'); nearestBtn.classList.add('bg-emerald-100', 'text-emerald-700');
-renderCards(); showToast("Сортировка по удаленности 📍");
-}, (error) => { nearestBtn.classList.remove('animate-pulse'); showGeoModal(); }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
+playTickSound();
+const nearestBtn = document.getElementById('nearestBtn');
+if (isSortedByDistance) {
+  isSortedByDistance = false;
+  nearestBtn.classList.remove('geo-active');
+  renderCards();
+  return;
+}
+if (!navigator.geolocation) {
+  showToast("Геолокация не поддерживается 😔");
+  return;
+}
+nearestBtn.classList.add('geo-searching');
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    userLocation = { lat: position.coords.latitude, lon: position.coords.longitude };
+    isSortedByDistance = true;
+    nearestBtn.classList.remove('geo-searching');
+    nearestBtn.classList.add('geo-active');
+    renderCards();
+    showToast("Сортировка по удаленности 📍");
+  },
+  (error) => {
+    nearestBtn.classList.remove('geo-searching');
+    showGeoModal();
+  },
+  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+);
 };
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 const R = 6371; const dLat = (lat2 - lat1) * (Math.PI / 180); const dLon = (lon2 - lon1) * (Math.PI / 180);
@@ -918,7 +1045,7 @@ if (total === 1) showToast("🏆 Ачивка: Первый рейс!");
 else if (total === 10) showToast("🏆 Ачивка: 10 рейсов отмечено!");
 else if (total === 50) showToast("🏆 Ачивка: 50 рейсов! Профи!");
 }
-    function createTechTruckButton() {
+function createTechTruckButton() {
 const btn = document.createElement('button'); btn.setAttribute('data-city', 'TECH_SUPPORT'); btn.className = `truck-chip group flex items-end shrink-0 cursor-pointer`;
 const cabHtml = `<div class="cab w-7 md:w-8 h-9 md:h-10 bg-orange-500 border-y border-r border-b-2 border-orange-700 shadow-md rounded-tr-lg rounded-br-sm relative ml-[1px] z-20"><div class="siren-orange"></div><div class="headlight-beam" style="top: 20px; right: -45px;"></div><div class="absolute top-1 right-1 w-3 md:w-4 h-3 md:h-4 bg-sky-200/80 rounded-tr-md border-b border-l border-sky-300"></div><div class="absolute -bottom-1.5 right-1"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`;
 const boxHtml = `<div class="trailer h-9 md:h-10 min-w-[140px] rounded-l-md border border-orange-600 bg-yellow-400 shadow-md flex relative z-10 overflow-hidden transition-all duration-300 group-hover:brightness-110 items-center justify-center"><div class="tail-light"></div><div class="absolute inset-0 bg-gradient-to-r from-yellow-500 to-yellow-400"></div><div class="relative flex items-center gap-1.5 z-20 bg-white/95 px-2 py-0.5 rounded shadow-sm border border-orange-200"><span class="text-xs">🛠</span><span class="font-black text-[9px] md:text-[10px] text-orange-900 tracking-widest uppercase">ТЕХПОМОЩЬ</span></div><div class="absolute -bottom-1.5 left-2 flex gap-0.5 z-30"><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div><div class="w-3 md:w-3.5 h-3 md:h-3.5 bg-gray-800 rounded-full border-[2px] border-gray-300 shadow-sm"></div></div></div>`;
@@ -938,7 +1065,7 @@ const trailerVariants = [
 { border: 'border-[#172554]', bg: 'bg-gradient-to-b from-[#004182] to-[#002B5E]', html: `<div class="absolute bottom-0 w-full h-1 bg-lentaYellow z-10"></div><div class="absolute inset-0 flex items-center justify-center gap-1.5"><div class="w-4 md:w-5 h-4 md:h-5 bg-lentaYellow rounded-full flex items-center justify-center shrink-0"><div class="w-1.5 md:w-2 h-1.5 md:h-2 bg-[#004182] rounded-full"></div></div><div class="text-white font-black text-[10px] md:text-[12px] tracking-wide" style="font-family: Arial, sans-serif;">ЛЕНТА</div></div>` },
 { border: 'border-gray-300', bg: 'bg-gray-50', html: `<div class="absolute bottom-0 w-full h-[3px] bg-gray-200"></div><div class="absolute right-4 top-0 w-[1px] h-full bg-gray-300"></div><div class="absolute right-12 top-0 w-[1px] h-full bg-gray-300"></div><div class="absolute right-20 top-0 w-[1px] h-full bg-gray-300"></div>` }
 ];
-    function createTruckButton(city, isAll = false, index = 0) {
+function createTruckButton(city, isAll = false, index = 0) {
 const btn = document.createElement('button'); btn.setAttribute('data-city', city); btn.className = `truck-chip group flex items-end shrink-0 cursor-pointer ${isAll ? 'active' : ''}`;
 const label = isAll ? '🌐 ВСЕ ГОРОДА' : city;
 const cabHtml = cabVariants[index % cabVariants.length]; const trailer = trailerVariants[index % trailerVariants.length];
@@ -958,11 +1085,14 @@ const cardsGrid = document.getElementById('cardsGrid');
 const searchInput = document.getElementById('searchInput');
 const clearSearchBtn = document.getElementById('clearSearchBtn');
 const autocompleteList = document.getElementById('autocompleteList');
-function renderCards() {
+}
+    function renderCards() {
 const rawSearch = searchInput.value.toLowerCase().trim();
 const cleanSearchQuery = rawSearch.replace(/['"`]/g, '').replace('окэй', 'окей');
 if (cleanSearchQuery) clearSearchBtn.classList.remove('hidden'); else clearSearchBtn.classList.add('hidden');
 cardsGrid.innerHTML = ''; let count = 0; const searchWords = cleanSearchQuery.split(/\s+/).filter(w => w.length > 0); let cardsHtml = '';
+// ВАЖНО: displayStores объявлен на уровне функции, чтобы был доступен после if/else
+let displayStores = [];
 if (isTechMode) {
 let displayTech = [...techStations];
 if (selectedHighway !== 'all') displayTech = displayTech.filter(s => s.highway === selectedHighway);
@@ -997,7 +1127,7 @@ cardsHtml += `
 }
 });
 } else {
-    let displayStores = [...stores];
+displayStores = [...stores];
 if (isSortedByDistance && userLocation) { displayStores.forEach(s => { const c = storeCoords[s.tk]; s.distance = c ? getDistanceFromLatLonInKm(userLocation.lat, userLocation.lon, c.lat, c.lon) : 999999; }); displayStores.sort((a, b) => a.distance - b.distance); }
 for (const store of displayStores) {
 let brandName = store.address.includes("ОКЕЙ") ? "ОКЕЙ" : store.address.includes("Молл") ? "РЦ МОЛЛ" : store.address.includes("Монетка") ? "МОНЕТКА" : "ЛЕНТА";
@@ -1049,84 +1179,26 @@ ${brandName === "МОНЕТКА" ? `<button onclick="openMonetkaModal();" class=
 }
 if (count === 0) cardsGrid.innerHTML = `<div class="col-span-full py-16 text-center text-gray-400 font-medium bg-white dark:bg-slate-800 rounded-[24px] shadow-sm">Ничего не найдено</div>`;
 else cardsGrid.innerHTML = cardsHtml;
+// Загрузка погоды из кэша — 1 запрос на город, потом 0
 if (!isTechMode) {
 displayStores.forEach(async store => {
 const coords = storeCoords[store.tk];
-if (coords) {
-const temp = await fetchWeather(coords.lat, coords.lon);
-const el = document.getElementById(`weather-${store.tk}`);
-if (el) {
-if (temp !== null) {
-el.innerText = `${temp > 0 ? '+' : ''}${temp}°C`;
-el.className = 'text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md border border-blue-100';
-} else {
-el.style.display = 'none';
-}
-}
-}
-});
-}
-}
-    searchInput.addEventListener('input', function() {
-renderCards(); const raw = this.value.toLowerCase().trim(); autocompleteList.innerHTML = ''; 
-if (!raw) { autocompleteList.classList.add('hidden'); return; }
-let suggestions = isTechMode ? techStations.filter(s => s.name.toLowerCase().includes(raw)) : stores.filter(s => `тк ${s.tk} ${s.city} ${s.address}`.toLowerCase().includes(raw));
-if (suggestions.length > 0) {
-autocompleteList.classList.remove('hidden');
-suggestions.slice(0, 10).forEach(item => {
-const div = document.createElement('div'); div.className = 'px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-none';
-div.innerHTML = `<div class="font-bold text-xs text-gray-800">${item.name || 'ТК ' + item.tk} <span class="text-gray-400">${item.city}</span></div><div class="text-[10px] text-gray-500">${item.address}</div>`;
-div.onclick = () => { searchInput.value = item.tk || item.name; autocompleteList.classList.add('hidden'); renderCards(); };
-autocompleteList.appendChild(div);
-});
-} else autocompleteList.classList.add('hidden');
-});
-window.startVoiceSearch = function() {
-const micBtn = document.getElementById('voiceSearchBtn'), searchInput = document.getElementById('searchInput');
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (!SR) { showToast("Голосовой поиск не поддерживается 🎙"); return; }
-try {
-const rec = new SR(); rec.lang = 'ru-RU'; rec.interimResults = false;
-rec.onstart = () => { micBtn.classList.add('mic-listening'); searchInput.placeholder = "Слушаю..."; };
-rec.onresult = (e) => { searchInput.value = e.results[0][0].transcript.toLowerCase(); searchInput.dispatchEvent(new Event('input')); };
-rec.onend = () => { micBtn.classList.remove('mic-listening'); searchInput.placeholder = "Поиск..."; };
-rec.start();
-} catch(e) { micBtn.classList.remove('mic-listening'); }
+if (!coords) return;
+const applyTemp = (temp) => {
+  const el = document.getElementById(`weather-${store.tk}`);
+  if (!el) return;
+  if (temp !== null && temp !== undefined) {
+    el.innerText = `${temp > 0 ? '+' : ''}${temp}°C`;
+    el.className = 'text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md border border-blue-100';
+  } else {
+    el.style.display = 'none';
+  }
 };
-function updateSpeedLimit() {
-const month = new Date().getMonth();
-const isWinter = month === 11 || month === 0 || month === 1 || month === 2 || month === 10;
-document.getElementById('speedLimitNumber').innerText = isWinter ? '60' : '80';
-const icon = document.getElementById('seasonIcon');
-if (isWinter) { icon.innerText = '❄️'; icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-blue-50 border-blue-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full'; }
-else { icon.innerText = '☀️'; icon.className = 'absolute -bottom-1 -right-2 w-4 h-4 bg-amber-50 border-amber-200 flex items-center justify-center text-[8px] shadow-sm border rounded-full'; }
+const temp = await getWeatherCached(store.city, coords.lat, coords.lon);
+applyTemp(temp);
+});
 }
-let isStoryPlaying = false; let storyTimer = null;
-const stories = [
-{ dialogues: [{ actor: 'mech', text: 'Девчонки, где мой ключ на 32?!', time: 2500, action: 'sweat' }, { actor: 'marina', text: 'Мы им ножку стола подперли.', time: 2500, action: 'laughing' }, { actor: 'mech', text: '...А мне как кардан крутить?', time: 2500, action: 'none' }, { actor: 'sveta', text: 'Крути руками, ты же сильный!', time: 2500, action: 'laughing' }] },
-{ dialogues: [{ actor: 'marina', text: 'Водитель говорит, перед ним 20 машин...', time: 3000, action: 'none' }, { actor: 'mech', text: 'Пусть поспит. Я пока колодки поменяю.', time: 3000, action: 'laughing' }, { actor: 'sveta', text: 'Он уже спит, мы добудиться не можем!', time: 2500, action: 'sweat' }] }
-];
-function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
-async function showBubble(actor, text, duration) {
-if (!isStoryPlaying) return; const bubble = document.getElementById(`bubble${actor.charAt(0).toUpperCase() + actor.slice(1)}`);
-if (bubble) { bubble.querySelector('.story-bubble-inner').innerText = text; bubble.classList.add('active'); await sleep(duration); bubble.classList.remove('active'); await sleep(400); }
-}
-function triggerAction(actor, actionName) {
-if (!isStoryPlaying) return; const body = document.getElementById(`${actor}Body`); const sweat = document.getElementById('sweatDrop');
-if (body) body.classList.remove('laughing'); if (sweat) sweat.classList.remove('show-sweat');
-if (body && actionName === 'laughing') body.classList.add('laughing'); if (actor === 'mech' && actionName === 'sweat' && sweat) sweat.classList.add('show-sweat');
-}
-async function playStory() {
-if (isMusicPlaying || isStoryPlaying) return; isStoryPlaying = true; document.getElementById('controlPanel').classList.add('story-mode');
-await sleep(800); if (!isStoryPlaying) return; const story = stories[Math.floor(Math.random() * stories.length)];
-for (let line of story.dialogues) { if (!isStoryPlaying) break; triggerAction(line.actor, line.action); await showBubble(line.actor, line.text, line.time); }
-if (isStoryPlaying) abortStory();
-}
-function abortStory() { isStoryPlaying = false; document.getElementById('controlPanel').classList.remove('story-mode'); document.querySelectorAll('.story-bubble').forEach(b => b.classList.remove('active')); document.querySelectorAll('.laughing').forEach(b => b.classList.remove('laughing')); document.getElementById('sweatDrop').classList.remove('show-sweat'); }
-function startStoryTimer() { clearTimeout(storyTimer); storyTimer = setInterval(() => { if (!isMusicPlaying && !isStoryPlaying) playStory(); }, 30000); }
-updateSpeedLimit(); renderCards();
-setTimeout(() => { citySlider.dispatchEvent(new Event('scroll')); }, 100);
-setTimeout(() => { if(!isMusicPlaying) playStory(); startStoryTimer(); }, 5000);
-</script>
-</body>
-</html>
+    }
+    
+    
+    
